@@ -1,0 +1,139 @@
+# ================================================================
+# InsightGraph — 持续集成
+# ================================================================
+# 设计原则（借鉴 CoSense / love-lobster 的实证，见文档 §3）：
+#   1. 硬门禁 0 容忍：ruff / eslint 出现任何告警即失败
+#   2. 真实 LLM 评测不进常驻 CI（成本与随机波动），
+#      Phase 3 用独立手动触发 workflow（evaluation.yml）承载
+#   3. backend / frontend 尚未建立时，用「存在性守卫」让 CI
+#      立即可用且全绿，而不是先造一个必然失败的空壳 CI
+#   4. 真实 LLM 评测与随机动画不进 CI；CI 结果必须可复现
+# ================================================================
+
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+  workflow_dispatch:
+
+jobs:
+  # ------------------------------------------------------------
+  # 文档死链检查（立即可用）
+  # ------------------------------------------------------------
+  docs:
+    name: Docs — 死链检查
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check document links
+        run: bash scripts/doc-link-check.sh
+
+  # ------------------------------------------------------------
+  # 后端：ruff（硬门禁）+ pytest（mock 单测，不依赖 PG/Redis）
+  # backend/ 建立后自动生效
+  # ------------------------------------------------------------
+  backend:
+    name: Backend — lint + test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect backend
+        id: detect
+        run: |
+          if [ -f backend/pyproject.toml ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "backend/ 尚未建立，跳过后端检查（Phase 2 建立后自动生效）"
+          fi
+
+      - name: Install uv
+        if: steps.detect.outputs.exists == 'true'
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          enable-cache: true
+
+      - name: Set up Python 3.12
+        if: steps.detect.outputs.exists == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        if: steps.detect.outputs.exists == 'true'
+        run: |
+          cd backend
+          uv sync --group dev
+
+      - name: Lint — Ruff（0 错误 hard gate）
+        if: steps.detect.outputs.exists == 'true'
+        run: |
+          cd backend
+          uv run ruff check app/
+
+      - name: Test — pytest（mock 单测）
+        if: steps.detect.outputs.exists == 'true'
+        run: |
+          cd backend
+          uv run pytest -m "not integration" -q
+
+  # ------------------------------------------------------------
+  # 前端：eslint（硬门禁）+ tsc 类型检查
+  # frontend/ 建立后自动生效
+  # ------------------------------------------------------------
+  frontend:
+    name: Frontend — lint + typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect frontend
+        id: detect
+        run: |
+          if [ -f frontend/package.json ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "frontend/ 尚未建立，跳过前端检查（Phase 3 建立后自动生效）"
+          fi
+
+      - name: Set up Node.js 20
+        if: steps.detect.outputs.exists == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        if: steps.detect.outputs.exists == 'true'
+        run: |
+          cd frontend
+          corepack enable
+          pnpm install --frozen-lockfile
+
+      - name: Lint — ESLint（0 警告 hard gate）
+        if: steps.detect.outputs.exists == 'true'
+        run: |
+          cd frontend
+          pnpm lint
+
+      - name: Typecheck — tsc -b
+        # ⚠️ 不要用 `pnpm build --noEmit`：--noEmit 会被转发给 vite 导致恒红
+        # （CoSense 实测教训，2026-09-23）
+        if: steps.detect.outputs.exists == 'true'
+        run: |
+          cd frontend
+          pnpm exec tsc -b
