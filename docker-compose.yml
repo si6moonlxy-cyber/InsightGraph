@@ -1,0 +1,92 @@
+# ================================================================
+# InsightGraph — 本地开发基础设施
+# ================================================================
+# 使用:
+#   cp .env.example .env      # 填写本地开发值（可选，均有开发默认值）
+#   docker compose up -d      # 启动 PostgreSQL + Neo4j + Redis
+#   docker compose ps         # 查看健康状态
+#
+# 借鉴自 CoSense（love-lobster）的实证实践，见
+# docs/InsightGraph_Engineering Infrastructure.md §5：
+#   1. 每个服务有 healthcheck；依赖方用 condition: service_healthy 串联
+#   2. 敏感项用 ${VAR:?错误信息} 强制显式提供（可选 fail-fast）
+#   3. mem_limit 逐服务限制，防止单服务拖垮开发机
+#   4. 命名卷持久化，容器重建不丢数据
+#
+# api / web 服务在 backend / frontend 建立后加入（需要 Dockerfile）。
+# ================================================================
+
+services:
+  postgres:
+    # pgvector 扩展（向量列 + HNSW 索引，语义检索开箱即用）
+    image: pgvector/pgvector:pg16
+    container_name: insightgraph-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-insightgraph}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-insightgraph_dev}
+      POSTGRES_DB: ${DB_NAME:-insightgraph_dev}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    mem_limit: 512M
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-insightgraph} -d ${DB_NAME:-insightgraph_dev}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  neo4j:
+    # GraphRAG 存储（Technology / Concept / Capability / Evidence 图）
+    image: neo4j:5.26-community
+    container_name: insightgraph-neo4j
+    restart: unless-stopped
+    environment:
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:-insightgraph_dev}
+      # healthcheck 使用（NEO4J_AUTH 内的密码无法被 shell 直接读取）
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD:-insightgraph_dev}
+      NEO4J_server_memory_pagecache_size: 512M
+      NEO4J_server_memory_heap_initial__size: 256M
+      NEO4J_server_memory_heap_max__size: 512M
+    ports:
+      - "7474:7474"   # HTTP Browser
+      - "7687:7687"   # Bolt
+    volumes:
+      - neo4j_data:/data
+    mem_limit: 1536M
+    healthcheck:
+      test: ["CMD-SHELL", "cypher-shell -u neo4j -p $$NEO4J_PASSWORD 'RETURN 1' > /dev/null 2>&1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
+
+  redis:
+    # LangGraph checkpoint / Job State / Rate Limit / 临时缓存
+    image: redis:7-alpine
+    container_name: insightgraph-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru --requirepass ${REDIS_PASSWORD:-}
+    environment:
+      # REDISCLI_AUTH 让 redis-cli 自动带密码，健康检查在启用/未启用密码时都成立
+      REDISCLI_AUTH: ${REDIS_PASSWORD:-}
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    mem_limit: 256M
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  postgres_data:
+    driver: local
+  neo4j_data:
+    driver: local
+  redis_data:
+    driver: local
