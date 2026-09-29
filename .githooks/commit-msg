@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# ================================================================
+# commit-msg hook — Git 提交信息格式校验（强制约束）
+# ================================================================
+# 格式（copy 自 CoSense / love-lobster 的实际提交习惯）：
+#
+#   类型: 中文描述
+#
+#   - 文件名/模块: 要点        ← 可选：主题行后空行，再以 bullet 逐项列改动明细
+#
+# - 类型白名单: feat / fix / refactor / chore / docs / test / style / perf / ci / revert / merge
+# - 描述必须用中文；类型后不加括弧说明（不写 fix(web): ...）
+# - 例外放行: git 自动生成的 Merge / Revert 提交、fixup! / squash! 前缀
+#
+# 安装（一次性）: git config core.hooksPath .githooks
+# 临时跳过:       git commit --no-verify
+# ================================================================
+
+set -euo pipefail
+
+MSG_FILE="${1:-}"
+ALLOWED_TYPES="feat|fix|refactor|chore|docs|test|style|perf|ci|revert|merge"
+
+fail() {
+    echo ""
+    echo "❌ [commit-msg] 提交信息不符合规范：$1"
+    echo ""
+    echo "   期望格式:  类型: 中文描述"
+    echo "   例:        fix: 修正调用边漏解析"
+    echo "              feat: 新增依赖图导出"
+    echo ""
+    echo "   类型白名单: feat / fix / refactor / chore / docs / test / style / perf / ci / revert"
+    echo "   注意: 描述用中文，且类型后不加括弧说明（不写 fix(web): ...）"
+    echo "   主题行后可空行，再以「- 文件/模块: 要点」逐项列改动明细"
+    echo ""
+    exit 1
+}
+
+test -n "$MSG_FILE" || fail "hook 未收到提交信息文件参数"
+test -f "$MSG_FILE" || fail "找不到提交信息文件: $MSG_FILE"
+
+# 取主题行（第一行）并去掉行尾空白
+SUBJECT="$(head -n 1 "$MSG_FILE" | sed 's/[[:space:]]*$//')"
+
+test -n "$SUBJECT" || fail "提交信息为空"
+
+# 例外放行：git 自动生成的提交与 rebase 前缀
+case "$SUBJECT" in
+    "Merge "*|"Revert "*|fixup!*|squash!*|amend!*)
+        exit 0
+        ;;
+esac
+
+# 反例 1：类型后加了括弧说明（如 fix(web): ...）
+if printf '%s' "$SUBJECT" | grep -Eq '^[a-z]+\([^)]*\):'; then
+    fail "类型后不要加括弧说明（写 fix: xxx，不写 fix(web): xxx）"
+fi
+
+# 正例：类型白名单 +「: 」+ 非空描述
+if ! printf '%s' "$SUBJECT" | grep -Eq "^(${ALLOWED_TYPES}): .+"; then
+    fail "主题行应为「类型: 中文描述」（发现: ${SUBJECT}）"
+fi
+
+# 反例 2：描述必须包含非 ASCII 字符（即中文）
+DESC="$(printf '%s' "$SUBJECT" | sed -E "s/^(${ALLOWED_TYPES}): //")"
+if ! printf '%s' "$DESC" | LC_ALL=C grep -q '[^ -~]'; then
+    fail "描述必须用中文（发现: ${DESC}）"
+fi
+
+# 长度软提醒（不阻断）
+if [ "${#SUBJECT}" -gt 72 ]; then
+    echo "⚠️  [commit-msg] 主题行较长（${#SUBJECT} 字符），建议精简到 72 字符以内"
+fi
+
+exit 0

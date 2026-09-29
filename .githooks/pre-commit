@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# ================================================================
+# pre-commit hook — 文档死链检查
+# ================================================================
+# 只做一件事：检查 Markdown 文档的相对链接全部可达。
+# （lint / 类型检查太慢，放在 scripts/ci-check.sh 与 CI 里）
+#
+# 安装（一次性）: git config core.hooksPath .githooks
+# 临时跳过:       git commit --no-verify
+# ================================================================
+
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+
+echo "▶ [pre-commit] 检查文档链接..."
+bash "$ROOT_DIR/scripts/doc-link-check.sh"

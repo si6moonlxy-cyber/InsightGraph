@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# ================================================================
+# pre-push hook — 向 main / dev 推送前运行本地全量检查
+# ================================================================
+# 仅对 main / dev 分支强制执行；feature 分支不拦截。
+#
+# 安装（一次性）: git config core.hooksPath .githooks
+# 跳过方式:       SKIP_TESTS=1 git push
+# ================================================================
+
+set -euo pipefail
+
+# 旁路开关
+if [ "${SKIP_TESTS:-0}" = "1" ]; then
+    echo "⏭  SKIP_TESTS=1 — 跳过 pre-push 检查"
+    exit 0
+fi
+
+# 解析被推送的远程 ref
+while read -r local_ref local_sha remote_ref remote_sha; do
+    case "$remote_ref" in
+        refs/heads/main|refs/heads/dev)
+            echo ""
+            echo "▶ 推送到 $remote_ref — 运行本地全量检查..."
+            echo "   （SKIP_TESTS=1 可跳过）"
+            echo ""
+
+            ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+            bash "$ROOT_DIR/scripts/ci-check.sh"
+
+            echo ""
+            echo "✅ 检查通过 — 继续推送"
+            ;;
+        *)
+            # feature 分支：不强制
+            ;;
+    esac
+done
+
+exit 0
