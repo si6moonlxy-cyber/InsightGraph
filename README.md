@@ -1,58 +1,39 @@
 # InsightGraph
 
-> 面向「洞察」的图谱化分析与可视化项目。
+English | [简体中文](README_cn.md)
 
-当前仓库处于初始化阶段，仅包含项目骨架与版本控制配置。技术栈与目录结构将在
-确定方案后按下面的约定逐步补齐。
+> Turn scattered information into an explorable graph — and extract reusable insights from it.
 
----
+**Status: early stage of development.** The product has not been released yet.
+This README describes the product idea and how it is meant to be used;
+engineering documentation lives in [docs/](docs/README.md).
 
-## 仓库信息
+## The idea
 
-| 项目 | 值 |
-| --- | --- |
-| 本地开发目录 | `D:\Code\InsightGraph` |
-| 远程仓库 | `git@github.com:si6moonlxy-cyber/InsightGraph.git` |
-| 默认分支 | `main` |
-| 换行符规范 | 强制 LF（见 `.gitattributes`） |
+InsightGraph exists to help you understand a software project — and to let you be sure that
+what you understand is real.
 
-## 目录结构
+Give it a repository. It reads the code and builds a structural map of how the project is
+organized — its functions, classes, modules, imports and calls. It then builds a second map that
+connects technical concepts and claimed capabilities back to the concrete evidence that supports
+them: a file, a line, a document. What you get is an explorable map of what a project does,
+and why you can believe it.
+
+- **See the code as it is.** The structural map answers: *how is this codebase organized and called?*
+- **Trust only what is evidenced.** Every claim that "the project does X" must point back to real
+  evidence. Conclusions without direct evidence are explicitly marked as inference, hypothesis
+  or unsupported — never presented as fact.
+- **Explore, don't just answer.** Insights are organized as a graph you can navigate: every answer
+  stays connected to its source, and one conclusion leads you to the next question.
+- **Reproducible by design.** The same repository, version and configuration produce the same
+  analysis, so findings can be reviewed, compared and revisited later.
+
+## How to use it (planned)
 
 ```text
-InsightGraph/
-├── docs/              # 设计文档、架构说明、调研笔记
-│   └── architecture.md
-├── .gitattributes     # 换行符与二进制文件规范
-├── .gitignore         # 忽略规则（Node / Python / IDE / 系统文件）
-└── README.md
+1. Point InsightGraph at a repository (local path or remote URL)
+2. It analyzes the code structure and gathers document / code evidence
+3. Browse the result as an interactive graph
+4. Open any capability or conclusion and follow the evidence back to its source
+5. Export a research report in which every key claim is traceable
 ```
-
-> 业务代码目录（如 `src/`、`apps/`、`packages/`、`tests/`）在确定技术栈后创建，
-> 避免留下空占位目录。
-
-## 快速开始
-
-仓库刚刚初始化，尚无构建脚本。确认技术栈后，本节将补充：
-
-1. 环境要求（运行时版本、包管理器）
-2. 安装依赖命令
-3. 本地启动 / 调试命令
-4. 测试与代码检查命令
-
-## 版本控制约定
-
-- 分支模型：`main` 为可发布分支，功能开发走 `feat/<name>`，修复走 `fix/<name>`。
-- 提交信息：采用 Conventional Commits，例如
-  `feat(graph): 支持节点拖拽布局`、`docs: 补充架构说明`。
-- 提交前请确认 `git status` 中不包含密钥、个人配置或大型二进制文件。
-
-## 首次推送
-
-```bash
-git remote -v                      # 确认 origin 指向本仓库
-git push -u origin main            # 首次推送并建立上游跟踪
-```
-
-## 许可
-
-尚未选定开源许可证；如需发布请补充 `LICENSE`。
