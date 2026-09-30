@@ -238,7 +238,9 @@ update something       ← 缺类型前缀
 | `docker compose up -d` | 启动 PostgreSQL(pgvector) + Neo4j + Redis |
 | `bash scripts/ci-check.sh` | **push 前全量检查**（文档死链 → 后端 lint/测试 → 前端 lint → 密钥扫描） |
 | `bash scripts/doc-link-check.sh` | 仅检查文档死链 |
-| `git config core.hooksPath .githooks` | 一次性安装 Git Hooks（pre-commit / pre-push） |
+| 开发日志（查看/编辑） | 唯一真源在 `dev-log` 分支：worktree `D:\Project_Mine\InsightGraph-devlog`；网页直读见其 DEV_LOG.md 头部链接 |
+| `bash devlog.sh sync` | 在 devlog worktree 内运行：格式校验 → 提交 → pull --rebase → push（被拒自动重试） |
+| `git config core.hooksPath .githooks` | 一次性安装 Git Hooks（pre-commit / pre-push / commit-msg） |
 | `cd backend && uv run ruff check app/` | 后端 Ruff（0 错误 hard gate，backend 建立后可用） |
 
 ### 5.3 当前代码-文档现实（实际状态地图 · 迁移中间态）
@@ -253,6 +255,7 @@ update something       ← 缺类型前缀
 | `.github/workflows/ci.yml` | ✅ 就绪 | docs 立即可用；backend / frontend 用存在性守卫，建立后自动生效 |
 | `scripts/` + `.githooks/`（pre-commit / pre-push / commit-msg） | ✅ 就绪 | 需一次性安装：`git config core.hooksPath .githooks` |
 | `eval/` | ✅ 骨架 | 规则已定；第一个 evaluator 随第一个分析能力落地 |
+| 开发日志（`dev-log` 分支） | ✅ 就绪 | 独立 orphan 分支为唯一真源，main / dev 不含日志；CI 只读校验 + 7 天陈旧提醒；Setup 后续并入 start.bat 一键脚本（规划中） |
 | `backend/` | ⏳ 未建立 | Phase 2：FastAPI 骨架 + Settings(fail-fast) + ruff/mypy/pytest 配置 |
 | `frontend/` | ⏳ 未建立 | Phase 3：Vite + React + 视觉回归双守卫 |
 | CodeGraph / GraphRAG 引擎 | ⏳ 未建立 | LangGraph 主链路：Collector → CodeAnalyzer → GraphBuilder → Reviewer → Reporter |
