@@ -6,16 +6,19 @@
 > - 条目格式：`- [yyyy-mm-dd] 一句话任务 @区域/模块`
 > - 编辑后运行 `bash devlog.sh sync`（自动：格式校验 → 提交（信息为 `dlog: …`）→ pull --rebase → push；被拒自动重试）。
 > - 本分支已启用本地钩子：提交前自动校验格式、提交信息强制 `dlog:`、提交后自动推送（无需手动 push）。
-> - 登记 / 完成用一键命令：`bash devlog.sh add "任务 @区域"` 与 `bash devlog.sh done 关键词`（自动定位本人区块，校验、提交、推送一条龙；AI 代笔也走这两条）。
+> - 登记 / 完成：**向 AI 口述即可**——AI 代写 + 自动提交推送；`bash devlog.sh add/done` 是 AI 的内部命令，人不需要记。格式 / 日期 / 区块 / 颗粒度均由 AI 决定，人只做轻量 review。
 > - 条目超过 **7 天**未更新会被 CI 提醒（仅提醒，不阻断）。
 > - 本文件唯一真源在本分支（`dev-log`）；**不要**把日志副本放进 main / dev 分支。
 >
 > 网页直读：https://github.com/si6moonlxy-cyber/InsightGraph/blob/dev-log/DEV_LOG.md
 
 ## Sixmoonlxy（main）
-- [2026-09-30] 开发日志回写自动化 @协作流程
 
-- [2026-09-30] 开发日志基础设施搭建 @协作流程
+- [2026-09-30] 开发日志与协作体系（dev-log 独立分支 / 自动同步与回写 / start.bat） @协作流程
+- [2026-09-30] 架构文档体系（系统架构真源 / 初始化思想导论 / ADR-001~006） @docs
+- [2026-09-30] 后端分层架构骨架（Phase 2A：FastAPI + 领域契约 + 测试门禁） @backend
+- [2026-09-29] 工程基础设施体系（AI 行为守则 / CI / Docker Compose / 质量门禁 / 评测骨架 / 文档治理） @infra
+- [2026-09-28] 仓库初始化与 README 产品化（中英互跳） @项目
 
 ## Kalinka1962（dev）
 
