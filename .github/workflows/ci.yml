@@ -35,11 +35,11 @@ jobs:
         run: bash scripts/doc-link-check.sh
 
   # ------------------------------------------------------------
-  # 后端：ruff（硬门禁）+ pytest（mock 单测，不依赖 PG/Redis）
+  # 后端：ruff + format + mypy + pytest（mock 单测，不依赖 PG/Redis）
   # backend/ 建立后自动生效
   # ------------------------------------------------------------
   backend:
-    name: Backend — lint + test
+    name: Backend — lint + type + test
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -79,7 +79,19 @@ jobs:
         if: steps.detect.outputs.exists == 'true'
         run: |
           cd backend
-          uv run ruff check app/
+          uv run ruff check app/ tests/
+
+      - name: Format — Ruff
+        if: steps.detect.outputs.exists == 'true'
+        run: |
+          cd backend
+          uv run ruff format --check app/ tests/
+
+      - name: Typecheck — Mypy
+        if: steps.detect.outputs.exists == 'true'
+        run: |
+          cd backend
+          uv run mypy app/ tests/
 
       - name: Test — pytest（mock 单测）
         if: steps.detect.outputs.exists == 'true'

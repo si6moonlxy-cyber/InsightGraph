@@ -48,20 +48,34 @@ else
 fi
 
 # ================================================================
-# 2. 后端 — Ruff（0 错误 hard gate）+ Pytest（mock 单测）
+# 2. 后端 — Ruff + Format + Mypy + Pytest（mock 单测）
 # ================================================================
 echo ""
-echo -e "${CYAN}[2/4] Backend — Ruff + Pytest（mock 单测）${NC}"
+echo -e "${CYAN}[2/4] Backend — Ruff + Format + Mypy + Pytest（mock 单测）${NC}"
 if [ -f "$ROOT/backend/pyproject.toml" ]; then
     if ! command -v uv >/dev/null 2>&1; then
         fail "未找到 uv（安装: https://docs.astral.sh/uv/），无法运行后端检查"
         HAS_ERROR=1
     else
         echo "  ▶ Ruff"
-        if (cd "$ROOT/backend" && uv run ruff check app/); then
+        if (cd "$ROOT/backend" && uv run ruff check app/ tests/); then
             pass "Ruff"
         else
             fail "Ruff — 存在 lint 错误，修复后重新运行"
+            HAS_ERROR=1
+        fi
+        echo "  ▶ Ruff Format"
+        if (cd "$ROOT/backend" && uv run ruff format --check app/ tests/); then
+            pass "Ruff Format"
+        else
+            fail "Ruff Format — 存在未格式化文件"
+            HAS_ERROR=1
+        fi
+        echo "  ▶ Mypy"
+        if (cd "$ROOT/backend" && uv run mypy app/ tests/); then
+            pass "Mypy"
+        else
+            fail "Mypy — 存在类型错误"
             HAS_ERROR=1
         fi
         echo "  ▶ Pytest（-m \"not integration\"）"
