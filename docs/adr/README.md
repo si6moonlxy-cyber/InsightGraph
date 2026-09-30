@@ -30,16 +30,16 @@
 （正向收益 / 负向代价 / 未来需要复审的触发条件。）
 ````
 
-## 首批建议清单
+## 当前决策清单
 
 | ADR | 主题 | 状态 |
 |-----|------|------|
-| ADR-001 | CodeGraph 与 GraphRAG 的职责边界 | 待撰写 |
-| ADR-002 | PostgreSQL/pgvector 与 Neo4j 的存储分工 | 待撰写 |
-| ADR-003 | LangGraph 作为分析编排层 | 待撰写 |
-| ADR-004 | Evidence First 的报告生成约束 | 待撰写 |
-| ADR-005 | 本地优先的仓库分析 | 待撰写 |
+| [ADR-001](ADR-001-codegraph-graphrag-boundary.md) | CodeGraph 与 GraphRAG 的职责边界 | Accepted |
+| [ADR-002](ADR-002-storage-responsibilities.md) | PostgreSQL/pgvector、Neo4j、Redis 与 Artifact 分工 | Proposed |
+| [ADR-003](ADR-003-langgraph-orchestration-only.md) | LangGraph 只作为分析编排层 | Accepted |
+| [ADR-004](ADR-004-evidence-first-claims.md) | Evidence First 的 Claim 约束 | Accepted |
+| [ADR-005](ADR-005-local-python-mvp.md) | MVP 先支持本地 Python 仓库 | Accepted |
+| [ADR-006](ADR-006-codegraph-json-artifact-first.md) | CodeGraph 第一阶段使用 JSON Artifact | Proposed |
 
-> 前四条的背景与取舍见
-> [../InsightGraph_Engineering Infrastructure.md](../InsightGraph_Engineering%20Infrastructure.md) §7 / §17 / §21，
-> 撰写时据此展开，不要复制粘贴——ADR 记录的是**当时的决策理由与代价**。
+> `Proposed` 决策需要真实数据或实现验证后转为 `Accepted`；不得因为代码暂时采用某种实现而自动
+> 视为长期决策。

@@ -1,6 +1,6 @@
 # InsightGraph 文档索引
 
-> 最后更新：2026-09-29 | 本文档是所有文档的入口
+> 最后更新：2026-09-30 | 本文档是所有文档的入口
 
 ---
 
@@ -10,7 +10,8 @@
 |------|------|
 | [../CLAUDE.md](../CLAUDE.md) | **行为守则**——Pre-Flight / 架构硬约束 / 编码规范 / 文档同步矩阵 / 快速参考 |
 | [Standards.md](Standards.md) | 仓库信息、目录约定、版本控制约定 |
-| [architecture.md](architecture.md) | 目标架构（草稿，技术栈确定后完善） |
+| [architecture.md](architecture.md) | 系统架构真源：当前状态、边界、依赖方向、数据流与演进路线 |
+| [初始化架构思想导论.md](初始化架构思想导论.md) | 初始化架构哲学：Evidence First、依赖倒置、双图分离与确定性优先 |
 | [InsightGraph_Engineering Infrastructure.md](InsightGraph_Engineering%20Infrastructure.md) | 工程基础设施借鉴方案（v2 · 证据版）——CI / Docker / 评测 / 文档治理全部细则 |
 
 ## 文档分类（新增文档必须进这些目录）
@@ -18,7 +19,7 @@
 | 目录 | 放置内容 | 状态 |
 |------|----------|------|
 | [adr/](adr/README.md) | 架构决策记录（模板 + 首批清单） | ✅ 已建立 |
-| `architecture/` | 系统真实状态、子系统设计（CodeGraph / GraphRAG / 工作流） | 需要时创建 |
+| `architecture/` | 子系统设计（CodeGraph / GraphRAG / 工作流）；系统总览由根 `architecture.md` 维护 | 需要时创建 |
 | `engineering/` | 工程流程规范（评测驱动开发、视觉回归等） | 需要时创建 |
 | `evaluation/` | 评测方法、指标口径 | 需要时创建 |
 | `operations/` | 环境配置、排障、迁移 | 需要时创建 |

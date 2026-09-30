@@ -2,8 +2,8 @@
 
 > 面向「洞察」的图谱化分析与可视化项目。
 
-当前仓库处于初始化阶段：Phase 1 工程基础设施（AI 行为守则、CI、Docker Compose、
-文档治理、评测骨架）已就位；后端 / 前端业务代码目录将在确定方案后按下面的约定逐步补齐。
+当前仓库处于 Phase 2A：Phase 1 工程基础设施已经就位；后端架构骨架、领域契约与分层测试已经
+建立，Collector、Python Analyzer、持久化适配器、GraphRAG 引擎和前端尚未实现。
 
 ---
 
@@ -11,7 +11,7 @@
 
 | 项目 | 值 |
 | --- | --- |
-| 本地开发目录 | `D:\Code\InsightGraph` |
+| 本地开发目录 | `D:\Project_Mine\InsightGraph` |
 | 远程仓库 | `git@github.com:si6moonlxy-cyber/InsightGraph.git` |
 | 默认分支 | `main` |
 | 换行符规范 | 强制 LF（见 `.gitattributes`） |
@@ -20,9 +20,13 @@
 
 ```text
 InsightGraph/
+├── backend/                       # FastAPI 后端、领域核心与分层测试
+│   ├── app/                       # api / application / domain / infrastructure / workflows / foundation
+│   └── tests/                     # unit / architecture / integration
 ├── docs/                          # 设计文档、架构说明、借鉴方案、ADR
 │   ├── README.md                  # 文档索引与维护规则
-│   ├── architecture.md            # 目标架构（草稿）
+│   ├── architecture.md            # 系统架构真源
+│   ├── 初始化架构思想导论.md       # 架构哲学与长期判断尺度
 │   ├── Standards.md               # 本文档
 │   ├── InsightGraph_Engineering Infrastructure.md
 │   └── adr/                       # 架构决策记录
@@ -41,8 +45,7 @@ InsightGraph/
 └── README.md / README_cn.md
 ```
 
-> 业务代码目录（`backend/`、`frontend/`、`tests/`）在确定技术栈后创建，
-> 避免留下空占位目录。
+> `backend/` 已建立可运行骨架；`frontend/` 在 Phase 3 建立。未实现的能力不得在文档中写成已完成。
 
 ## 快速开始
 
@@ -58,8 +61,8 @@ bash scripts/ci-check.sh
 git config core.hooksPath .githooks
 ```
 
-后端 / 前端建立后，本节将补充：运行时版本要求（Python 3.12 / Node 20）、
-依赖安装命令、本地启动 / 调试命令、测试命令。
+后端运行与质量检查命令见 [`backend/README.md`](../backend/README.md)。运行时版本由
+`.python-version`（Python 3.12）和 `.nvmrc`（Node 20）固定。
 
 ## 版本控制约定
 

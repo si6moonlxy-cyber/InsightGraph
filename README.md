@@ -4,7 +4,7 @@ English | [简体中文](README_cn.md)
 
 > Turn scattered information into an explorable graph — and extract reusable insights from it.
 
-**Status: early stage of development.** The product has not been released yet.
+**Status: Phase 2A, with the backend architecture skeleton established.** The product has not been released yet.
 This README describes the product idea and how it is meant to be used;
 engineering documentation lives in [docs/](docs/README.md).
 
