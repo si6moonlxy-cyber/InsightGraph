@@ -4,7 +4,8 @@
 >
 > 当前阶段：Phase 2A——后端架构骨架已建立，CodeGraph 分析能力尚未实现。
 >
-> 本文档是系统架构真源；哲学与设计理由见[初始化架构思想导论](初始化架构思想导论.md)。
+> 本文档是系统架构真源；哲学与设计理由见[Introduction to Initialization Architecture Concepts](Introduction%20to%20Initialization%20Architecture%20Concepts.md)，
+> 分步执行与当前进度见 [Development Plan](Development%20Plan.md)。
 
 ## 1. 项目目标与边界
 

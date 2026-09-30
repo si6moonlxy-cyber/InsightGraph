@@ -11,7 +11,8 @@
 | [../CLAUDE.md](../CLAUDE.md) | **行为守则**——Pre-Flight / 架构硬约束 / 编码规范 / 文档同步矩阵 / 快速参考 |
 | [Standards.md](Standards.md) | 仓库信息、目录约定、版本控制约定 |
 | [architecture.md](architecture.md) | 系统架构真源：当前状态、边界、依赖方向、数据流与演进路线 |
-| [初始化架构思想导论.md](初始化架构思想导论.md) | 初始化架构哲学：Evidence First、依赖倒置、双图分离与确定性优先 |
+| [初始化架构思想导论.md](Introduction%20to%20Initialization%20Architecture%20Concepts.md) | 初始化架构哲学：Evidence First、依赖倒置、双图分离与确定性优先 |
+| [Development Plan.md](Development%20Plan.md) | 0～9 建设顺序、完成门槛、当前进度与下一步行动 |
 | [InsightGraph_Engineering Infrastructure.md](InsightGraph_Engineering%20Infrastructure.md) | 工程基础设施借鉴方案（v2 · 证据版）——CI / Docker / 评测 / 文档治理全部细则 |
 
 ## 文档分类（新增文档必须进这些目录）

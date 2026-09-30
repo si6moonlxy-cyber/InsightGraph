@@ -52,7 +52,7 @@
 ### 1.6 架构疑问先查文档
 
 架构 / 技术栈类问题，先查 [docs/architecture.md](docs/architecture.md)（系统架构真源：当前状态、边界、依赖方向与演进路线）与
-[docs/初始化架构思想导论.md](docs/初始化架构思想导论.md)（设计哲学：为什么这样分）；工程细则见
+[docs/初始化架构思想导论.md](docs/Introduction%20to%20Initialization%20Architecture%20Concepts.md)（设计哲学：为什么这样分）；工程细则见
 [docs/InsightGraph_Engineering Infrastructure.md](docs/InsightGraph_Engineering%20Infrastructure.md)。
 查不到细颗粒度信息，再搜索整个仓库。目的：节省时间、保持宏观视角。
 
@@ -287,7 +287,8 @@ update something       ← 缺类型前缀
 | [docs/README.md](docs/README.md) | 文档入口与维护规则 |
 | [docs/Standards.md](docs/Standards.md) | 仓库信息、目录约定、版本控制约定 |
 | [docs/architecture.md](docs/architecture.md) | 系统架构真源：当前状态、边界、数据流与演进路线 |
-| [docs/初始化架构思想导论.md](docs/初始化架构思想导论.md) | Evidence First、依赖倒置、双图分离与确定性优先 |
+| [docs/初始化架构思想导论.md](docs/Introduction%20to%20Initialization%20Architecture%20Concepts.md) | Evidence First、依赖倒置、双图分离与确定性优先 |
+| [docs/Development Plan.md](docs/Development%20Plan.md) | 0～9 建设顺序、完成门槛、当前进度与下一步行动 |
 | [docs/InsightGraph_Engineering Infrastructure.md](docs/InsightGraph_Engineering%20Infrastructure.md) | 工程基础设施借鉴方案（v2 · 证据版）——CI / Docker / 评测 / 文档治理全部细则 |
 | [docs/adr/README.md](docs/adr/README.md) | 架构决策记录（模板 + 首批清单） |
 | [eval/README.md](eval/README.md) | 评测目录规则（Baseline / Golden） |
