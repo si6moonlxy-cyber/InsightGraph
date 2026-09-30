@@ -58,3 +58,6 @@ data/raw/
 *.sqlite
 *.db
 *.parquet
+
+# ---------- 开发日志工作树（dev-log 分支，见 CLAUDE.md） ----------
+.devlog/

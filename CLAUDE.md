@@ -239,7 +239,7 @@ update something       ← 缺类型前缀
 | `docker compose up -d` | 启动 PostgreSQL(pgvector) + Neo4j + Redis |
 | `bash scripts/ci-check.sh` | **push 前全量检查**（文档死链 → 后端 lint/测试 → 前端 lint → 密钥扫描） |
 | `bash scripts/doc-link-check.sh` | 仅检查文档死链 |
-| 开发日志（查看/编辑） | 唯一真源在 `dev-log` 分支：worktree `D:\Project_Mine\InsightGraph-devlog`；网页直读见其 DEV_LOG.md 头部链接 |
+| 开发日志（查看/编辑） | 唯一真源在 `dev-log` 分支：worktree `D:\Project_Mine\InsightGraph\.devlog`；网页直读见其 DEV_LOG.md 头部链接 |
 | `bash devlog.sh sync` | 在 devlog worktree 内运行：格式校验 → 提交 → pull --rebase → push（被拒自动重试） |
 | `git config core.hooksPath .githooks` | 一次性安装 Git Hooks（pre-commit / pre-push / commit-msg） |
 | `cd backend && uv run ruff check app/` | 后端 Ruff（0 错误 hard gate，backend 建立后可用） |
