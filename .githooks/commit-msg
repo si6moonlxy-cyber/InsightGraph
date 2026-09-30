@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# dev-log 工作树 commit-msg：强制「dlog: 中文描述」
+set -euo pipefail
+MSG_FILE="${1:-}"
+test -n "$MSG_FILE" && test -f "$MSG_FILE" || exit 0
+SUBJECT="$(head -n 1 "$MSG_FILE" | sed 's/[[:space:]]*$//')"
+case "$SUBJECT" in
+    "Merge "*|"Revert "*|fixup!*|squash!*|amend!*) exit 0 ;;
+esac
+if ! printf '%s' "$SUBJECT" | grep -Eq '^dlog: .+'; then
+    echo ""
+    echo "❌ [commit-msg] dev-log 分支的提交信息必须为「dlog: 中文描述」"
+    echo "   例: dlog: 更新开发日志"
+    echo "   本次: ${SUBJECT}"
+    echo ""
+    exit 1
+fi
+DESC="$(printf '%s' "$SUBJECT" | sed -E 's/^dlog: //')"
+if ! printf '%s' "$DESC" | LC_ALL=C grep -q '[^ -~]'; then
+    echo ""
+    echo "❌ [commit-msg] dlog: 之后必须用中文描述（本次: ${SUBJECT}）"
+    echo ""
+    exit 1
+fi
+exit 0

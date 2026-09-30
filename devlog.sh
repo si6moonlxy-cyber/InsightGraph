@@ -6,6 +6,7 @@
 #
 # 用法:
 #   bash devlog.sh sync [提交说明]     # 提交说明可选，默认 "dlog: 更新开发日志"
+#   bash devlog.sh pull                # 仅拉取（不提交不推送；供 start.bat 等自动化调用）
 #
 # 流程:
 #   [1] 格式校验（scripts/check-devlog.sh，错误则中止）
@@ -24,9 +25,39 @@ cd "$ROOT"
 CMD="${1:-sync}"
 MSG="${2:-dlog: 更新开发日志}"
 
-if [ "$CMD" != "sync" ]; then
-    echo "用法: bash devlog.sh sync [提交说明]"
-    exit 1
+case "$CMD" in
+    sync) ;;
+    pull) ;;
+    *)
+        echo "用法: bash devlog.sh sync [提交说明]   # 校验 + 提交 + 拉取 + 推送"
+        echo "      bash devlog.sh pull              # 仅拉取（供 start.bat 等自动化调用）"
+        exit 1
+        ;;
+esac
+
+# ── pull：仅拉取，不提交、不推送、失败静默 ──
+if [ "$CMD" = "pull" ]; then
+    echo "▶ [pull] 拉取最新开发日志..."
+    if [ -n "$(git status --porcelain)" ]; then
+        echo "ℹ️  工作区有未提交改动，跳过拉取（处理后请跑: bash devlog.sh sync）"
+        exit 0
+    fi
+    if ! git rev-parse --abbrev-ref '@{upstream}' >/dev/null 2>&1; then
+        echo "ℹ️  尚未建立上游跟踪，请先跑一次: bash devlog.sh sync"
+        exit 0
+    fi
+    if ! git pull --rebase --quiet; then
+        echo "ℹ️  拉取失败（离线或冲突），已跳过，不影响本地使用"
+        exit 0
+    fi
+    NEW="$(git log --oneline ORIG_HEAD..HEAD 2>/dev/null || true)"
+    if [ -n "$NEW" ]; then
+        echo "✅ 拉到新更新："
+        echo "$NEW" | sed 's/^/   /'
+    else
+        echo "✅ 已是最新"
+    fi
+    exit 0
 fi
 
 # ── [1] 格式校验 ──

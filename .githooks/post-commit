@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# dev-log 工作树 post-commit：自动推送
+# 被拒 → 自动 pull --rebase 重试一次；仍失败仅提示，不改变提交结果
+set -uo pipefail
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT" || exit 0
+
+if ! git rev-parse --abbrev-ref '@{upstream}' >/dev/null 2>&1; then
+    echo "ℹ️  [post-commit] 尚无上游跟踪：跑一次 bash devlog.sh sync 完成首次推送"
+    exit 0
+fi
+
+if git push --quiet; then
+    echo "✅ [post-commit] 已自动推送到 origin/dev-log"
+    exit 0
+fi
+
+echo "⚠️  [post-commit] 推送被拒，尝试 pull --rebase 后重试..."
+if git pull --rebase --quiet && git push --quiet; then
+    echo "✅ [post-commit] 重试成功，已推送"
+    exit 0
+fi
+
+echo "⚠️  [post-commit] 自动推送未成功（网络或冲突）。提交已在本地，稍后跑: bash devlog.sh sync"
+git rebase --abort >/dev/null 2>&1 || true
+exit 0

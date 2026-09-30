@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# dev-log 工作树 pre-commit：DEV_LOG.md 格式与陈旧检查
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+echo "▶ [pre-commit] 校验 DEV_LOG.md 格式..."
+bash "$ROOT/scripts/check-devlog.sh"
