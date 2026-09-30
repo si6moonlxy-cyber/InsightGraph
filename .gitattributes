@@ -1,0 +1,2 @@
+# dev-log 分支：统一 LF（与主仓 .gitattributes 的约定一致）
+* text=auto eol=lf

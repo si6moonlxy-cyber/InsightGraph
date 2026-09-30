@@ -1,0 +1,28 @@
+# ================================================================
+# Dev Log Check — push 到 dev-log 分支时的只读格式校验
+# ================================================================
+# 只读（contents: read）：不产生任何写入与提交，零噪音。
+# 格式错误 → 失败；陈旧条目 → 警告（annotations / job summary）。
+# ================================================================
+
+name: Dev Log Check
+
+on:
+  push:
+    branches: [dev-log]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: 校验 DEV_LOG.md 格式
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check DEV_LOG.md
+        run: bash scripts/check-devlog.sh
