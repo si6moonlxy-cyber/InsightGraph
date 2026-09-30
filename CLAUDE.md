@@ -35,7 +35,7 @@
 - **代码变更时**：对照 §四 文档同步矩阵，更新对应文档
 - **顺手发现腐败时**：死链 / 幽灵模块 / 过时路径 / 重复描述 / 过期日期（>90 天）→ 立即修复，不作为独立任务
 - **重大变更完成时**：更新对应架构文档与评测记录
-- **任务开始 / 完成时**：同步 `.devlog/DEV_LOG.md` 自己区块（`bash devlog.sh add/done`，AI 代笔走同一条命令）
+- **任务登记（AI 代笔，口述即写入）**：用户口述任务的开始 / 完成 / 变化 → AI 直接维护 `.devlog/DEV_LOG.md` 并自动提交推送；格式、区块、颗粒度由 AI 决定，用户只做轻量 review（命令细节见 §5.2）
 
 **原则：发现腐败不修 = 新增 Bug。文档过时和生产 Bug 优先级等同。**
 
@@ -242,7 +242,7 @@ update something       ← 缺类型前缀
 | `docker compose up -d` | 启动 PostgreSQL(pgvector) + Neo4j + Redis |
 | `bash scripts/ci-check.sh` | **push 前全量检查**（文档死链 → 后端 lint/测试 → 前端 lint → 密钥扫描） |
 | `bash scripts/doc-link-check.sh` | 仅检查文档死链 |
-| 开发日志（查看/编辑） | 唯一真源在 `dev-log` 分支：worktree `D:\Project_Mine\InsightGraph\.devlog`；登记/完成用 `bash devlog.sh add/done`（AI 代笔走同一条路）；网页直读见其 DEV_LOG.md 头部链接 |
+| 开发日志（查看/编辑） | 唯一真源在 `dev-log` 分支：worktree `D:\Project_Mine\InsightGraph\.devlog`；**口述给 AI 登记 / 完成即可**（`add/done` 为内部命令，人不需要记）；网页直读见其 DEV_LOG.md 头部链接 |
 | `bash devlog.sh sync` | 在 devlog worktree 内运行：格式校验 → 提交 → pull --rebase → push（被拒自动重试） |
 | `bash devlog.sh pull` | 仅拉取开发日志（不提交不推送；供 start.bat 启动时自动调用） |
 | `git config core.hooksPath .githooks` | 一次性安装 Git Hooks（pre-commit / pre-push / commit-msg；新环境必须执行，main / dev 与 .devlog 工作树共用） |
