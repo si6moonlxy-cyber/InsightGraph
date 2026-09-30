@@ -208,6 +208,7 @@ Evidence Relationship
 - 文件名/模块: 要点     ← 可选：主题行后空行，再以 bullet 逐项列改动明细
 
 类型白名单: feat / fix / refactor / chore / docs / test / style / perf / ci / revert
+dev-log 分支专用类型: dlog（仅用于 dev-log 分支的日志提交，不用于代码提交）
 ```
 
 反例（会被 hook 拒绝）：
