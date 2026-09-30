@@ -7,6 +7,8 @@
 # 用法:
 #   bash devlog.sh sync [提交说明]     # 提交说明可选，默认 "dlog: 更新开发日志"
 #   bash devlog.sh pull                # 仅拉取（不提交不推送；供 start.bat 等自动化调用）
+#   bash devlog.sh add "任务 @区域"     # 登记当前任务（自动定位本人区块与当日日期）
+#   bash devlog.sh done "关键词"        # 删除本人区块中匹配的任务行
 #
 # 流程:
 #   [1] 格式校验（scripts/check-devlog.sh，错误则中止）
@@ -28,9 +30,14 @@ MSG="${2:-dlog: 更新开发日志}"
 case "$CMD" in
     sync) ;;
     pull) ;;
+    add) ;;
+    done) ;;
     *)
-        echo "用法: bash devlog.sh sync [提交说明]   # 校验 + 提交 + 拉取 + 推送"
-        echo "      bash devlog.sh pull              # 仅拉取（供 start.bat 等自动化调用）"
+        echo "用法:"
+        echo "  bash devlog.sh sync [提交说明]    # 校验 + 提交 + 拉取 + 推送"
+        echo "  bash devlog.sh add \"任务 @区域\"   # 登记当前任务（自动提交推送）"
+        echo "  bash devlog.sh done \"关键词\"      # 删除本人区块中匹配的任务行（自动提交推送）"
+        echo "  bash devlog.sh pull               # 仅拉取（供 start.bat 等自动化调用）"
         exit 1
         ;;
 esac
@@ -58,6 +65,69 @@ if [ "$CMD" = "pull" ]; then
         echo "✅ 已是最新"
     fi
     exit 0
+fi
+
+# ── add：登记一条当前任务（自动定位本人区块与日期；随后走校验/提交/推送） ──
+if [ "$CMD" = "add" ]; then
+    TASK="${2:-}"
+    if [ -z "$TASK" ]; then
+        echo "用法: bash devlog.sh add \"任务描述 @区域\""
+        exit 1
+    fi
+    NAME="$(git config user.name 2>/dev/null || true)"
+    if [ -z "$NAME" ]; then
+        echo "❌ 未配置 git user.name，无法定位你的区块"
+        exit 1
+    fi
+    if ! grep -q "^## ${NAME}（" DEV_LOG.md; then
+        echo "❌ 未找到「## ${NAME}（…）」区块；现有区块："
+        grep "^## " DEV_LOG.md | sed 's/^/   /'
+        exit 1
+    fi
+    LINE="- [$(date +%F)] ${TASK}"
+    awk -v name="$NAME" -v line="$LINE" '
+        { print }
+        $0 ~ ("^## " name "（") && !inserted { print line; inserted = 1 }
+    ' DEV_LOG.md > DEV_LOG.md.tmp && mv DEV_LOG.md.tmp DEV_LOG.md
+    echo "✅ 已登记：${LINE}（区块：${NAME}）"
+    MSG="dlog: 更新开发日志"
+fi
+
+# ── done：从本人区块删除包含关键词的任务行（随后走校验/提交/推送） ──
+if [ "$CMD" = "done" ]; then
+    KEY="${2:-}"
+    if [ -z "$KEY" ]; then
+        echo "用法: bash devlog.sh done \"关键词\""
+        exit 1
+    fi
+    NAME="$(git config user.name 2>/dev/null || true)"
+    if [ -z "$NAME" ]; then
+        echo "❌ 未配置 git user.name，无法定位你的区块"
+        exit 1
+    fi
+    if ! grep -q "^## ${NAME}（" DEV_LOG.md; then
+        echo "❌ 未找到「## ${NAME}（…）」区块；现有区块："
+        grep "^## " DEV_LOG.md | sed 's/^/   /'
+        exit 1
+    fi
+    awk -v name="$NAME" -v key="$KEY" '
+        /^## / { ins = ($0 ~ ("^## " name "（")); print; next }
+        {
+            if (ins && /^- / && index($0, key) > 0) { print $0 | "cat 1>&2"; next }
+            print
+        }
+    ' DEV_LOG.md > DEV_LOG.md.tmp 2> DEV_LOG.md.removed
+    if [ -s DEV_LOG.md.removed ]; then
+        mv DEV_LOG.md.tmp DEV_LOG.md
+        echo "✅ 已从「${NAME}」区块删除："
+        sed 's/^/   /' DEV_LOG.md.removed
+        rm -f DEV_LOG.md.removed
+        MSG="dlog: 更新开发日志"
+    else
+        rm -f DEV_LOG.md.tmp DEV_LOG.md.removed
+        echo "ℹ️  未找到包含「${KEY}」的任务行（区块：${NAME}），未做修改"
+        exit 0
+    fi
 fi
 
 # ── [1] 格式校验 ──
