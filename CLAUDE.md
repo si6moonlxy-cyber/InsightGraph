@@ -3,8 +3,8 @@
 > Solo dev 项目，Agent 辅助开发。
 > **核心法则：Evidence First（证据优先）。文档过时 = 生产 Bug，优先级等同。**
 >
-> 当前阶段：仓库初始化 / MVP 骨架期 —— 工程基础设施（CI / Docker / 评测骨架）已就位，
-> `backend/`、`frontend/` 代码尚未建立（见 §五 5.3 当前代码-文档现实）。
+> 当前阶段：Phase 2A —— 工程基础设施与 `backend/` 架构骨架已就位，Collector、Analyzer、
+> 持久化适配器、GraphRAG 引擎与 `frontend/` 尚未建立（见 §五 5.3 当前代码-文档现实）。
 
 ---
 
@@ -50,8 +50,9 @@
 
 ### 1.6 架构疑问先查文档
 
-架构 / 技术栈类问题，先查 [docs/architecture.md](docs/architecture.md) 与
-[docs/InsightGraph_Engineering Infrastructure.md](docs/InsightGraph_Engineering%20Infrastructure.md)；
+架构 / 技术栈类问题，先查 [docs/architecture.md](docs/architecture.md)（系统架构真源：当前状态、边界、依赖方向与演进路线）与
+[docs/初始化架构思想导论.md](docs/初始化架构思想导论.md)（设计哲学：为什么这样分）；工程细则见
+[docs/InsightGraph_Engineering Infrastructure.md](docs/InsightGraph_Engineering%20Infrastructure.md)。
 查不到细颗粒度信息，再搜索整个仓库。目的：节省时间、保持宏观视角。
 
 ---
@@ -227,7 +228,7 @@ update something       ← 缺类型前缀
 
 | 部分 | 技术栈 | 端口 |
 |------|--------|------|
-| `backend/` | FastAPI + SQLAlchemy(async) + Pydantic Settings + uv（Python 3.12） | 4000 |
+| `backend/` | FastAPI + Pydantic Settings + uv（Python 3.12）；SQLAlchemy 等适配器按阶段接入 | 4000 |
 | `frontend/` | Vite + React（Phase 3 建立） | 3000 |
 | 存储 | PostgreSQL 16 + pgvector（元数据 / 向量）、Neo4j（GraphRAG）、Redis（checkpoint / job 状态） | 5432 / 7474 / 7687 / 6379 |
 | 编排 | LangGraph（分析工作流） | — |
@@ -241,7 +242,8 @@ update something       ← 缺类型前缀
 | `bash scripts/doc-link-check.sh` | 仅检查文档死链 |
 | 开发日志（查看/编辑） | 唯一真源在 `dev-log` 分支：worktree `D:\Project_Mine\InsightGraph\.devlog`；网页直读见其 DEV_LOG.md 头部链接 |
 | `bash devlog.sh sync` | 在 devlog worktree 内运行：格式校验 → 提交 → pull --rebase → push（被拒自动重试） |
-| `git config core.hooksPath .githooks` | 一次性安装 Git Hooks（pre-commit / pre-push / commit-msg） |
+| `bash devlog.sh pull` | 仅拉取开发日志（不提交不推送；供 start.bat 启动时自动调用） |
+| `git config core.hooksPath .githooks` | 一次性安装 Git Hooks（pre-commit / pre-push / commit-msg；新环境必须执行，main / dev 与 .devlog 工作树共用） |
 | `cd backend && uv run ruff check app/` | 后端 Ruff（0 错误 hard gate，backend 建立后可用） |
 
 ### 5.3 当前代码-文档现实（实际状态地图 · 迁移中间态）
@@ -256,15 +258,25 @@ update something       ← 缺类型前缀
 | `.github/workflows/ci.yml` | ✅ 就绪 | docs 立即可用；backend / frontend 用存在性守卫，建立后自动生效 |
 | `scripts/` + `.githooks/`（pre-commit / pre-push / commit-msg） | ✅ 就绪 | 需一次性安装：`git config core.hooksPath .githooks` |
 | `eval/` | ✅ 骨架 | 规则已定；第一个 evaluator 随第一个分析能力落地 |
-| 开发日志（`dev-log` 分支） | ✅ 就绪 | 独立 orphan 分支为唯一真源，main / dev 不含日志；CI 只读校验 + 7 天陈旧提醒；Setup 后续并入 start.bat 一键脚本（规划中） |
-| `backend/` | ⏳ 未建立 | Phase 2：FastAPI 骨架 + Settings(fail-fast) + ruff/mypy/pytest 配置 |
+| 开发日志（`dev-log` 分支） | ✅ 就绪 | 独立 orphan 分支为唯一真源；工作树 .devlog 自带钩子（校验 / 强制 dlog / 提交后自动推送）；devlog.sh sync / pull；CI 只读校验 + 7 天陈旧提醒；Setup 与启动自动 pull 并入 start.bat（规划中） |
+| `backend/` | ✅ Phase 2A 骨架 | FastAPI + Settings + 错误/日志 + domain/application/infrastructure 分层 + 测试门禁 |
 | `frontend/` | ⏳ 未建立 | Phase 3：Vite + React + 视觉回归双守卫 |
-| CodeGraph / GraphRAG 引擎 | ⏳ 未建立 | LangGraph 主链路：Collector → CodeAnalyzer → GraphBuilder → Reviewer → Reporter |
+| CodeGraph / GraphRAG 领域契约 | 🟡 初版 | CodeGraph IR、Evidence、Claim、扫描端口已定义；真实 Collector/Analyzer/Repository 未实现 |
+| LangGraph 工作流 | ⏳ 未建立 | `workflows/` 仅声明“编排不承载业务”的边界，尚未引入 LangGraph |
 | 真实 LLM 评测 workflow | ⏳ 未建立 | Phase 3：手动触发 + gate 脚本（不进常驻 CI） |
 
 ### 5.4 模块速查（以代码实际目录为准）
 
-待 backend 骨架建立后补充（每个模块：职责 + 关键文件）。
+| 模块 | 职责 | 关键文件 |
+|------|------|----------|
+| `api/` | HTTP 协议、请求校验和响应转换 | `api/router.py`、`api/health.py` |
+| `application/scans/` | 编排 Collector、Analyzer 与 Repository 端口 | `service.py`、`ports.py`、`models.py` |
+| `domain/codegraph/` | CodeGraph IR、不变量与持久化端口 | `models.py`、`ports.py` |
+| `domain/evidence/` | Evidence 来源与可信状态 | `models.py` |
+| `domain/graphrag/` | 知识节点与 Evidence First Claim | `models.py` |
+| `infrastructure/` | Collector、Analyzer、Persistence、LLM 外部适配器 | 当前仅建立边界，未实现适配器 |
+| `workflows/` | LangGraph 编排入口 | 当前仅建立边界 |
+| `foundation/` | 配置、日志与统一错误处理 | `config.py`、`logging.py`、`errors.py` |
 
 ### 5.5 文档索引
 
@@ -272,7 +284,8 @@ update something       ← 缺类型前缀
 |------|------|
 | [docs/README.md](docs/README.md) | 文档入口与维护规则 |
 | [docs/Standards.md](docs/Standards.md) | 仓库信息、目录约定、版本控制约定 |
-| [docs/architecture.md](docs/architecture.md) | 目标架构（草稿） |
+| [docs/architecture.md](docs/architecture.md) | 系统架构真源：当前状态、边界、数据流与演进路线 |
+| [docs/初始化架构思想导论.md](docs/初始化架构思想导论.md) | Evidence First、依赖倒置、双图分离与确定性优先 |
 | [docs/InsightGraph_Engineering Infrastructure.md](docs/InsightGraph_Engineering%20Infrastructure.md) | 工程基础设施借鉴方案（v2 · 证据版）——CI / Docker / 评测 / 文档治理全部细则 |
 | [docs/adr/README.md](docs/adr/README.md) | 架构决策记录（模板 + 首批清单） |
 | [eval/README.md](eval/README.md) | 评测目录规则（Baseline / Golden） |
