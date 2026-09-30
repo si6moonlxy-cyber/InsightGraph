@@ -237,6 +237,7 @@ update something       ← 缺类型前缀
 
 | 命令 | 说明 |
 |------|------|
+| `start.bat` | 一键启动（当前：dev-log 自动同步 + 钩子配置；依赖 / Docker / 前后端启动后续逐步加法） |
 | `docker compose up -d` | 启动 PostgreSQL(pgvector) + Neo4j + Redis |
 | `bash scripts/ci-check.sh` | **push 前全量检查**（文档死链 → 后端 lint/测试 → 前端 lint → 密钥扫描） |
 | `bash scripts/doc-link-check.sh` | 仅检查文档死链 |
@@ -258,7 +259,7 @@ update something       ← 缺类型前缀
 | `.github/workflows/ci.yml` | ✅ 就绪 | docs 立即可用；backend / frontend 用存在性守卫，建立后自动生效 |
 | `scripts/` + `.githooks/`（pre-commit / pre-push / commit-msg） | ✅ 就绪 | 需一次性安装：`git config core.hooksPath .githooks` |
 | `eval/` | ✅ 骨架 | 规则已定；第一个 evaluator 随第一个分析能力落地 |
-| 开发日志（`dev-log` 分支） | ✅ 就绪 | 独立 orphan 分支为唯一真源；工作树 .devlog 自带钩子（校验 / 强制 dlog / 提交后自动推送）；devlog.sh sync / pull；CI 只读校验 + 7 天陈旧提醒；Setup 与启动自动 pull 并入 start.bat（规划中） |
+| 开发日志（`dev-log` 分支） | ✅ 就绪 | 独立 orphan 分支为唯一真源；工作树 .devlog 自带钩子（校验 / 强制 dlog / 提交后自动推送）；devlog.sh sync / pull；CI 只读校验 + 7 天陈旧提醒；Setup 与启动自动 pull 已并入 start.bat |
 | `backend/` | ✅ Phase 2A 骨架 | FastAPI + Settings + 错误/日志 + domain/application/infrastructure 分层 + 测试门禁 |
 | `frontend/` | ⏳ 未建立 | Phase 3：Vite + React + 视觉回归双守卫 |
 | CodeGraph / GraphRAG 领域契约 | 🟡 初版 | CodeGraph IR、Evidence、Claim、扫描端口已定义；真实 Collector/Analyzer/Repository 未实现 |
