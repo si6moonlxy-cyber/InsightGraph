@@ -10,8 +10,8 @@ InsightGraph 同时需要事务元数据、向量检索、图关系、任务状�
 
 ## Decision
 
-暂定 PostgreSQL 保存 Repository、Scan、Job 与报告元数据，pgvector 保存证据向量，Neo4j 保存
-GraphRAG 关系，Redis 保存短期 Job 状态与 checkpoint。CodeGraph 第一阶段使用 JSON Artifact，
+暂定 **PostgreSQL** 保存 Repository、Scan、Job 与报告元数据，**pgvector** 保存证据向量，**Neo4j** 保存
+GraphRAG 关系，**Redis** 保存短期 Job 状态与 checkpoint。**CodeGraph** 第一阶段使用 JSON Artifact，
 最终存储延后决策。所有访问通过端口和适配器完成。
 
 ## Alternatives
