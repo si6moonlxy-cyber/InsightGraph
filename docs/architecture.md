@@ -1,6 +1,6 @@
 # InsightGraph 系统架构
 
-> 最后更新：2026-09-30
+> 最后更新：2026-10-01
 >
 > 当前阶段：Phase 2A——后端架构骨架已建立，CodeGraph 分析能力尚未实现。
 >
@@ -221,3 +221,5 @@ Baseline First → Change → Same Eval → Delta
 | [ADR-004](adr/ADR-004-evidence-first-claims.md) | Evidence First 结论约束 | Accepted |
 | [ADR-005](adr/ADR-005-local-python-mvp.md) | MVP 先支持本地 Python 仓库 | Accepted |
 | [ADR-006](adr/ADR-006-codegraph-json-artifact-first.md) | CodeGraph 首先使用 JSON Artifact | Proposed |
+| [ADR-007](adr/ADR-007-datamodel-sqlalchemy-first.md) | 数据模型视图第一版从 SQLAlchemy 模型静态提取 | Proposed |
+| [ADR-008](adr/ADR-008-datamodel-independent-third-layer.md) | 数据模型视图作为独立第三语义层 | Proposed |

@@ -1,0 +1,35 @@
+# ADR-007：数据模型视图第一版从 SQLAlchemy 模型静态提取
+
+- 状态：Proposed
+- 日期：2026-10-01
+
+## Context
+
+InsightGraph 计划在 CodeGraph 视图与 GraphRAG 证据视图之外，新增第三类视图：目标仓库的数据模型视图，
+展示表、列、约束、ORM 关系与跨表耦合，帮助学习者理解一个项目的数据是如何组织的。第一版必须确定
+“数据库结构从哪里读”，这决定分析输入边界、确定性范围与评测口径。
+
+候选来源有四种：SQLAlchemy 模型、Alembic 迁移演进史、裸 SQL DDL 文件、连接目标数据库做
+introspection。“模型 + 演进史”合体是期望终态，但同时实现会显著放大第一版复杂度。
+
+## Decision
+
+第一版只静态解析目标仓库中的 SQLAlchemy 模型（Declarative Base 子类及其关系声明），产出数据模型视图；
+不连接目标数据库，不解析 Alembic 迁移与裸 SQL DDL。口径是“数据库即代码”：走与 CodeGraph 相同的
+确定性纪律——源码行号证据、稳定排序与确定性 Artifact。
+
+Alembic 迁移演进史在 MVP 验证通过后作为第二阶段证据源加入，终态为“模型 + 演进史”合体，并可扩展
+“模型与迁移一致性”核验。
+
+## Alternatives
+
+- 模型与迁移同时做：一步到位，但重放 DDL 操作的复杂度与噪音会淹没 MVP 验证，拒绝。
+- 先做 Alembic 迁移史：能看到 schema 如何演进，教学价值高，但缺少与代码模型的直接绑定，后置。
+- 解析裸 SQL DDL 文件：需要引入 SQL 解析器，违背 ADR-005 的 Python-first 边界，拒绝。
+- 连接目标数据库 introspection：违背本地优先与静态分析原则，且要求目标数据库先可运行，拒绝。
+
+## Consequences
+
+- 第一版覆盖面限于 SQLAlchemy 声明式模型；模型与真实数据库的漂移不在第一版可观测范围内。
+- 提取复用 Python AST 分析设施与确定性纪律，共用 Golden Dataset 方法论，可用本地 Python 项目狗粮验证。
+- 需要为数据模型视图建立独立 IR、证据回溯与评测口径；存储沿用 ADR-006 的 Artifact 优先思路。
