@@ -1,6 +1,6 @@
 # InsightGraph 文档索引
 
-> 最后更新：2026-09-30 | 本文档是所有文档的入口
+> 最后更新：2026-10-01 | 本文档是所有文档的入口
 
 ---
 
@@ -12,7 +12,7 @@
 | [基础约定.md](Standards.md) | 仓库信息、目录约定、版本控制约定 |
 | [系统架构.md](architecture.md) | 系统架构真源：当前状态、边界、依赖方向、数据流与演进路线 |
 | [初始化架构思想导论.md](Introduction%20to%20Initialization%20Architecture%20Concepts.md) | 初始化架构哲学：Evidence First、依赖倒置、双图分离与确定性优先 |
-| [开发计划.md](Development%20Plan.md) | 0～9 建设顺序、完成门槛、当前进度与下一步行动 |
+| [开发计划.md](Development%20Plan.md) | 0～10 建设顺序、完成门槛、当前进度与下一步行动 |
 | [工程基础设施.md](InsightGraph_Engineering%20Infrastructure.md) | 工程基础设施借鉴方案（v2 · 证据版）——CI / Docker / 评测 / 文档治理全部细则 |
 
 ## 文档分类（新增文档必须进这些目录）

@@ -42,6 +42,7 @@
 | [ADR-006](ADR-006-codegraph-json-artifact-first.md) | CodeGraph 第一阶段使用 JSON Artifact | Proposed |
 | [ADR-007](ADR-007-datamodel-sqlalchemy-first.md) | 数据模型视图第一版从 SQLAlchemy 模型静态提取 | Proposed |
 | [ADR-008](ADR-008-datamodel-independent-third-layer.md) | 数据模型视图作为独立第三语义层 | Proposed |
+| [ADR-009](ADR-009-database-schema-normalization.md) | 数据库 Schema 推导与范式纪律 | Proposed |
 
 > `Proposed` 决策需要真实数据或实现验证后转为 `Accepted`；不得因为代码暂时采用某种实现而自动
 > 视为长期决策。

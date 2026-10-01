@@ -1,6 +1,6 @@
 # InsightGraph Development Plan
 
-> 最后更新：2026-09-30
+> 最后更新：2026-10-01
 >
 > 当前阶段：Phase 2A，建设步骤 0、1 已完成，步骤 2 已建立初版契约；下一步完成步骤 2 的剩余契约，
 > 然后进入步骤 3“本地仓库采集器”。
@@ -20,9 +20,10 @@ InsightGraph 按“先确定性地理解代码，再用证据组织知识，最�
 → 4 Python 分析器
 → 5 调用关系
 → 6 持久化
-→ 7 API 与任务
-→ 8 GraphRAG
-→ 9 编排与产品层
+→ 7 数据模型视图
+→ 8 API 与任务
+→ 9 GraphRAG
+→ 10 编排与产品层
 ```
 
 每一步都必须形成可运行、可测试、可复现的增量。目标架构已经写入文档但尚未实现的部分，统一标记为
@@ -41,16 +42,17 @@ InsightGraph 按“先确定性地理解代码，再用证据组织知识，最�
 
 | 步骤 | 建设内容 | 状态 | 当前事实 |
 | --- | --- | --- | --- |
-| 0 | 校准真源 | ✅ 已完成 | 架构真源、思想导论、6 份 ADR 和文档索引已经建立 |
+| 0 | 校准真源 | ✅ 已完成 | 架构真源、思想导论、ADR 体系与文档索引已经建立 |
 | 1 | 后端工程骨架 | ✅ 已完成 | FastAPI、Settings、日志、错误、分层目录、依赖锁和质量门禁已通过 |
 | 2 | 领域模型 | 🟡 进行中 | CodeGraph、Evidence、GraphRAG Claim、扫描端口已有初版；稳定 ID 与完整扫描结果契约待补 |
 | 3 | 本地采集器 | ⏭ 下一步 | 只有 `RepositoryCollector` Protocol，尚不能读取真实仓库 |
 | 4 | Python 分析器 | ⬜ 未开始 | 只有 `CodeAnalyzer` Protocol，尚无 AST 实现和 Golden Dataset |
 | 5 | 调用关系 | ⬜ 未开始 | `CALLS` 仅存在于 EdgeKind，尚无符号解析实现 |
 | 6 | 持久化 | ⬜ 未开始 | 只有 `CodeGraphRepository` Protocol，尚无 JSON/数据库适配器 |
-| 7 | API 与任务 | ⬜ 未开始 | 当前只有健康检查，没有扫描、进度或查询 API |
-| 8 | GraphRAG | ⬜ 未开始 | 只有知识节点与 Claim 不变量，没有证据抽取、检索或图构建 |
-| 9 | 编排与产品层 | ⬜ 未开始 | LangGraph、Reporter 和 React 图谱浏览器均未实现 |
+| 7 | 数据模型视图（datamodel） | ⬜ 未开始 | ADR-007/008/009 已定；复用步骤 3/4 解析设施与步骤 6 Artifact 纪律 |
+| 8 | API 与任务 | ⬜ 未开始 | 当前只有健康检查，没有扫描、进度或查询 API |
+| 9 | GraphRAG | ⬜ 未开始 | 只有知识节点与 Claim 不变量，没有证据抽取、检索或图构建 |
+| 10 | 编排与产品层 | ⬜ 未开始 | LangGraph、Reporter 和 React 图谱浏览器均未实现 |
 
 ## 4. 分步建设计划
 
@@ -202,6 +204,8 @@ InsightGraph 按“先确定性地理解代码，再用证据组织知识，最�
 - 规范化 JSON Artifact Repository。
 - Artifact Schema 版本、原子写入和内容哈希。
 - PostgreSQL 中的 Repository、Scan、Job 元数据与 Alembic。
+- Schema 按 ADR-009 执行：访问模式先行（每张表先写必须回答的查询），默认 3NF + 例外登记。
+- 表/列注释描述“为什么存在”，并产出 `docs/architecture/数据模型.md`（表 → 契约/用例映射与耦合清单）。
 - 基于真实查询样本评审 CodeGraph 最终物理存储。
 
 **完成门槛**
@@ -209,11 +213,40 @@ InsightGraph 按“先确定性地理解代码，再用证据组织知识，最�
 - 保存再读取不改变领域对象。
 - Baseline 不会被默认覆盖。
 - 中断写入不会留下被误认为完整的 Artifact。
+- 每张表、每个索引都能指向具体查询或业务不变量；每个范式例外都有登记理由。
 - 用测量结果决定是否接受或替代 ADR-002、ADR-006。
 
 **状态：⬜ 未开始。**
 
-### 7. API 与任务
+### 7. 数据模型视图（datamodel）
+
+**目标**
+
+在 CodeGraph 解析设施（步骤 3/4）与 Artifact 纪律（步骤 6）就绪后，静态解析目标仓库的
+SQLAlchemy 模型，产出第二类确定性分析产出：数据模型视图（视图页 UI 归属产品层）。与 CodeGraph
+单向引用，与 GraphRAG 解耦。
+
+**应实现**
+
+- 复用 Collector 与 Python AST 设施解析 SQLAlchemy 模型（Declarative Base 子类及关系声明）。
+- datamodel IR：表、列、物理约束（外键 / 主键 / 唯一 / 非空）与 ORM 声明关系（relationship /
+  backref / 关联表）；命名约定推断不入第一版。
+- 每个节点与每条边带源码行号证据；确定性 Artifact 与独立 Golden Dataset / 评测口径。
+- 与 CodeGraph 单向引用（表 → 定义它的 Class），跨层 join 只发生在查询与展示层。
+- “使用耦合”（哪些类 / 函数读写哪张表）为第二版第一优先，另行评审。
+
+**完成门槛**
+
+- 相同输入产生字节级稳定的 datamodel Artifact。
+- 首个 Golden Dataset 上表 / 列 / 约束 / 关系达到 100%。
+- 不连接目标数据库；不含命名约定推断。
+- CodeGraph 基础评测不发生回归。
+
+**状态：⬜ 未开始。**
+
+关联决策：ADR-007（输入边界）、ADR-008（语义边界）。
+
+### 8. API 与任务
 
 **目标**
 
@@ -235,7 +268,7 @@ InsightGraph 按“先确定性地理解代码，再用证据组织知识，最�
 
 **状态：⬜ 未开始。**
 
-### 8. GraphRAG
+### 9. GraphRAG
 
 **目标**
 
@@ -258,7 +291,7 @@ InsightGraph 按“先确定性地理解代码，再用证据组织知识，最�
 
 **状态：⬜ 未开始。**
 
-### 9. 编排与产品层
+### 10. 编排与产品层
 
 **目标**
 

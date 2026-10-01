@@ -223,3 +223,4 @@ Baseline First → Change → Same Eval → Delta
 | [ADR-006](adr/ADR-006-codegraph-json-artifact-first.md) | CodeGraph 首先使用 JSON Artifact | Proposed |
 | [ADR-007](adr/ADR-007-datamodel-sqlalchemy-first.md) | 数据模型视图第一版从 SQLAlchemy 模型静态提取 | Proposed |
 | [ADR-008](adr/ADR-008-datamodel-independent-third-layer.md) | 数据模型视图作为独立第三语义层 | Proposed |
+| [ADR-009](adr/ADR-009-database-schema-normalization.md) | 数据库 Schema 推导与范式纪律 | Proposed |

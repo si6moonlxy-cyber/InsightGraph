@@ -288,7 +288,7 @@ update something       ← 缺类型前缀
 | [docs/Standards.md](docs/Standards.md) | 仓库信息、目录约定、版本控制约定 |
 | [docs/architecture.md](docs/architecture.md) | 系统架构真源：当前状态、边界、数据流与演进路线 |
 | [docs/初始化架构思想导论.md](docs/Introduction%20to%20Initialization%20Architecture%20Concepts.md) | Evidence First、依赖倒置、双图分离与确定性优先 |
-| [docs/Development Plan.md](docs/Development%20Plan.md) | 0～9 建设顺序、完成门槛、当前进度与下一步行动 |
+| [docs/Development Plan.md](docs/Development%20Plan.md) | 0～10 建设顺序、完成门槛、当前进度与下一步行动 |
 | [docs/InsightGraph_Engineering Infrastructure.md](docs/InsightGraph_Engineering%20Infrastructure.md) | 工程基础设施借鉴方案（v2 · 证据版）——CI / Docker / 评测 / 文档治理全部细则 |
 | [docs/adr/README.md](docs/adr/README.md) | 架构决策记录（模板 + 首批清单） |
 | [eval/README.md](eval/README.md) | 评测目录规则（Baseline / Golden） |
