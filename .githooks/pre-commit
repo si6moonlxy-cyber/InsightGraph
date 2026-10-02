@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # ================================================================
-# pre-commit hook — 文档死链检查
+# pre-commit hook — 文档死链 + 机器特定绝对路径检查
 # ================================================================
-# 只做一件事：检查 Markdown 文档的相对链接全部可达。
+# 只做两件快检查：
+#   1. Markdown 文档的相对链接全部可达
+#   2. 仓库内不含开发者本机的绝对路径
 # （lint / 类型检查太慢，放在 scripts/ci-check.sh 与 CI 里）
 #
 # 安装（一次性）: git config core.hooksPath .githooks
@@ -15,3 +17,6 @@ ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 
 echo "▶ [pre-commit] 检查文档链接..."
 bash "$ROOT_DIR/scripts/doc-link-check.sh"
+
+echo "▶ [pre-commit] 检查机器特定绝对路径..."
+bash "$ROOT_DIR/scripts/abs-path-check.sh"

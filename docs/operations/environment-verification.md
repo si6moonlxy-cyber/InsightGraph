@@ -14,11 +14,15 @@
 
 本文只记录**可复现的核验事实**；建设进度以 [`Development Plan.md`](../Development%20Plan.md) 为唯一真源。
 
+> **本文不记录本机绝对路径。** 仓库内一律使用相对路径、占位符或标准环境变量形式
+> （`%ProgramFiles%`、`%SystemRoot%` 等）。由 `scripts/abs-path-check.sh` 自动拦截。
+> 具体盘符属于个人的机器信息，写在仓库里对他人无意义且会泄露目录结构。
+
 ---
 
 ## 2. 核验结果
 
-**核验时间**：2026-10-02 · **仓库位置**：`D:\Code\InsightGraph` · **分支**：`dev`
+**核验时间**：2026-10-02 · **分支**：`dev`
 
 ### 2.1 `start.bat` — 四段全绿
 
@@ -44,7 +48,8 @@ REDIS_URL=redis://localhost:6379/0
 | Ruff Format | ✅ 41 files already formatted |
 | Mypy | ✅ Success: no issues found in 41 source files |
 | Pytest（`-m "not integration"`） | ✅ 45 passed, 1 deselected |
-| 文档死链 | ✅ 22 个文件全部可达 |
+| 文档死链 | ✅ 全部可达 |
+| 绝对路径检查 | ✅ 未发现机器特定路径 |
 | 密钥扫描 | ✅ 未发现疑似硬编码密钥 |
 
 > 直接运行 `uv run pytest -q` 为 46 passed；`ci-check` 排除了 1 个 integration 用例。
@@ -53,43 +58,32 @@ REDIS_URL=redis://localhost:6379/0
 
 | 项 | 状态 | 位置 / 版本 |
 | --- | --- | --- |
-| Docker Desktop | ✅ 已安装 | **程序 `F:\Program Files\Docker`**；CLI 插件在 `C:\Program Files\Docker\cli-plugins`（Docker 强制，`--installation-dir` 不可覆盖） |
+| Docker Desktop | ✅ 已安装 | 程序位于**独立软件卷**（非系统卷，避免占用系统盘）；CLI 插件固定在 `%ProgramFiles%\Docker\cli-plugins`（Docker 强制，`--installation-dir` 不可覆盖） |
 | Docker 引擎 | ✅ 运行中 | Client / Server **29.8.1**，OSType `linux` |
 | Docker Compose | ✅ | v5.5.1 |
-| WSL 数据根 | ✅ | **`F:\Program Files\DockerData`**（`--wsl-default-data-root`），WSL 平台默认版本 2 |
+| WSL 数据根 | ✅ | 与 Docker 程序**同卷**（`--wsl-default-data-root`），WSL 平台默认版本 2 |
 | docker-users 组 | ✅ | 当前用户已在组内 |
-| Git Bash | ✅ | `C:\Program Files\Git\bin\bash.exe` |
+| Git Bash | ✅ | `%ProgramFiles%\Git\bin\bash.exe` |
 | uv | ✅ | 0.11.7 |
 | Node / pnpm | ✅ | Node 22 / pnpm 11 |
 
-> ⚠️ 系统自带的 `C:\WINDOWS\system32\bash.exe` 是 **WSL 启动器**，未安装发行版时执行会直接失败。
+> ⚠️ 系统自带的 `%SystemRoot%\System32\bash.exe` 是 **WSL 启动器**，未安装发行版时执行会直接失败。
 > 需要 shell 时请显式调用 Git Bash 的 `bash.exe`。
 
-### 2.4 磁盘预算
+### 2.4 空间影响
 
-本机有两块 NVMe：Disk 0（致态 1TB，承载 F / G）与 Disk 1（Micron 512GB，承载 C / D）。
+| 项 | 占用 | 说明 |
+| --- | --- | --- |
+| Docker 程序本体 | 3366 MB | 静态，装在独立软件卷 |
+| WSL 磁盘镜像 | 2444 MB | 随镜像 / 卷增长 |
+| CLI 插件 | 675 MB | 固定在系统卷，无法迁移 |
+| 容器镜像 | 689 MB | `pgvector/pgvector:pg16` 631 MB + `redis:7-alpine` 57.8 MB |
 
-| 卷 | 未装 Docker | Docker 装到 D 盘 | **迁到 F 盘后（当前）** |
-| --- | --- | --- | --- |
-| C: | 38.5 GB | 39.9 GB | 39.3 GB |
-| **D:** | 11.6 GB | **5.9 GB** | **11.6 GB** ✅ |
-| F: | 61.3 GB | 61.3 GB | 55.7 GB |
+**装到哪一卷**：Docker 全套约 5.8 GB，后续还会叠加 Neo4j 镜像（约 600 MB ~ 1 GB）与
+目标仓库快照（做代码分析时持续增长）。因此**不应装在容量紧张的工作卷上**——
+本机最初装在只剩余约 6 GB 的工作卷，随即迁移到余量充裕的独立软件卷。
 
-**为什么迁到 F 盘**：D 盘只有 28.8 GB 分区，装 Docker 后仅剩 5.9 GB，而后端还需
-克隆目标仓库做代码分析（持续增长），空间不足以支撑。F 盘（默认软件盘）余量充裕，
-且位于另一块物理盘，可分担 IO。
-
-**Docker 当前占用**（F 盘）：
-
-```text
-F:\Program Files\Docker      3366 MB   程序本体（静态）
-F:\Program Files\DockerData  2444 MB   WSL 磁盘镜像（随镜像/卷增长）
-C:\Program Files\Docker       675 MB   CLI 插件（Docker 强制放 C 盘）
-```
-
-镜像本体：`pgvector/pgvector:pg16` 631 MB + `redis:7-alpine` 57.8 MB。
-
-后续仍需空间：Neo4j 镜像约 600 MB ~ 1 GB。清理手段：`docker system prune -a`。
+清理手段：`docker system prune -a`（删除未使用镜像）。
 
 ---
 
@@ -97,9 +91,11 @@ C:\Program Files\Docker       675 MB   CLI 插件（Docker 强制放 C 盘）
 
 | 位置 | 偏差 | 处理 |
 | --- | --- | --- |
-| `CLAUDE.md` §5.2 | 开发日志 worktree 硬编码为 `D:\Project_Mine\InsightGraph\.devlog`（另一台机器的路径） | 改为相对路径 `<仓库根>\.devlog`，并注明由 `start.bat` 首次运行自动创建 |
-| `CLAUDE.md` §5.3 | 「postgres/redis 已在本机启动并 healthy（2026-10-02）」中的「本机」指向不明确 | 改为逐机器表述，并指向本文作为机器级证据 |
-| 本文 §2.3 / §2.4 | Docker 安装位置由 `D:\Docker` / `D:\DockerData` 变更为 F 盘 | 迁移完成后立即同步，避免状态地图引用过期路径 |
+| `CLAUDE.md` §5.2 | 开发日志 worktree 硬编码了某一台机器的绝对路径 | 改为相对路径 `<仓库根>\.devlog`，并注明由 `start.bat` 首次运行自动创建 |
+| `CLAUDE.md` §5.3 | 「postgres/redis 已在本机启动并 healthy」中的「本机」指向不明确 | 改为逐机器表述，并指向本文作为机器级证据 |
+| `docs/Standards.md` | 「本地开发目录」写死了某一台机器的绝对路径 | 改为说明各开发者自定、不写入仓库 |
+| `docs/InsightGraph_Engineering Infrastructure.md` | 引用参考仓库时写死了本机检出路径 | 改为通用表述 |
+| 本文 | 初版写入了本机盘符与绝对路径 | 全面改为占位符与环境变量形式，并新增 `scripts/abs-path-check.sh` 自动拦截 |
 
 ---
 
@@ -109,13 +105,13 @@ C:\Program Files\Docker       675 MB   CLI 插件（Docker 强制放 C 盘）
 - [ ] 安装 Docker Desktop（Windows 家庭版走 WSL2 后端）：
 
       ```powershell
-      # 管理员权限执行；路径按目标机器调整
+      # 管理员权限执行；把 <目标卷> 换成余量充裕的卷
       "Docker Desktop Installer.exe" install --quiet --accept-license `
-        --installation-dir="F:\Program Files\Docker" `
-        --wsl-default-data-root="F:\Program Files\DockerData"
+        --installation-dir="<目标卷>:\Program Files\Docker" `
+        --wsl-default-data-root="<目标卷>:\Program Files\DockerData"
       ```
 
-      安装前先确认目标卷为 **NTFS**（WSL2 的 vhdx 不支持 exFAT / FAT32）。
+      前置条件：目标卷必须是 **NTFS**（WSL2 的 vhdx 不支持 exFAT / FAT32）。
 - [ ] 首次启动 Docker Desktop 并等待引擎就绪（会导入 WSL 发行版到数据根）
 - [ ] `start.bat` → [1]~[4] 全绿（两容器 healthy，5432 / 6379 监听）
 - [ ] `cd backend && uv sync && uv run pytest -q` 全绿

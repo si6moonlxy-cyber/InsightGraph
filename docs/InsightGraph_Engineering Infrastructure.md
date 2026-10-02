@@ -2,7 +2,7 @@
 
 > 目标：从 CoSense 项目（仓库 `love-lobster`）中筛选适合 InsightGraph 复用的工程基础设施，仅关注工程地基，不迁移 CoSense 的业务域设计。
 >
-> 方法：v2 版本的全部结论来自对 `D:\Project_Mine\Love-lobster\love-lobster` 的逐文件真实读取（2026-09-29）。每个借鉴项标注来源文件；与 v1 的推测性描述不一致处已修正。
+> 方法：v2 版本的全部结论来自对参考仓库 CoSense（love-lobster）本机检出目录的逐文件真实读取（2026-09-29）。每个借鉴项标注来源文件；与 v1 的推测性描述不一致处已修正。
 >
 > 当前阶段：InsightGraph 仓库初始化完成；本方案对应的 **Phase 1 基础设施已落地**（见 §20、§21），backend / frontend 代码骨架尚未建立。
 >

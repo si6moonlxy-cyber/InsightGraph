@@ -127,6 +127,7 @@ Evidence Relationship
 | 禁止版本号文件模式 | 新增文件不准用 `XxxV2` / `V3` 这类命名 |
 | 注释必须用中文 | 代码注释一律用中文；改到旧文件时顺手将英文注释转为中文 |
 | 密钥只能从环境变量读取 | 禁止硬编码 API Key / 密码 / 令牌（见 §六 安全扫描） |
+| 禁止提交机器特定绝对路径 | 仓库内不写本机盘符路径与家目录；改用相对路径、占位符或 `%ProgramFiles%` / `%SystemRoot%` 等环境变量形式。由 `scripts/abs-path-check.sh` 在 pre-commit 与 CI 拦截，确需保留的行加注释 `abs-path-check: allow` |
 | 日志用 `logging.getLogger(__name__)` | 禁止 `print()`；禁止在日志中打印密钥 |
 | 数据库访问走统一数据层 | SQLAlchemy ORM / 统一 Repository，禁止在 Router 中散写 SQL |
 | Evidence 不许伪造 | 没有直接证据的结论必须标记 inference / hypothesis / unsupported，见 §二 |
@@ -246,6 +247,7 @@ update something       ← 缺类型前缀
 | `cd backend && uv run python ../eval/codegraph/validate.py <工件.json> --repo-root <仓库根>` | CodeGraph 产物三项不变量校验（DEFINES 入边 / content_hash 重算 / imports 目标；CI 经 pytest 强制执行） |
 | `bash scripts/ci-check.sh` | **push 前全量检查**（文档死链 → 后端 lint/测试 → 前端 lint → 密钥扫描） |
 | `bash scripts/doc-link-check.sh` | 仅检查文档死链 |
+| `bash scripts/abs-path-check.sh` | 仅检查机器特定绝对路径（本机盘符 / 家目录） |
 | 开发日志（查看/编辑） | 唯一真源在 `dev-log` 分支：worktree `<仓库根>\.devlog`（首次 `start.bat` 自动创建）；**口述给 AI 登记 / 完成即可**（`add/done` 为内部命令，人不需要记）；网页直读见其 DEV_LOG.md 头部链接 |
 | `bash devlog.sh sync "<提交说明>"` | 在 devlog worktree 内运行：格式校验 → 提交 → pull --rebase → push（被拒自动重试；说明必填，add/done 自动派生消息） |
 | `bash devlog.sh pull` | 仅拉取开发日志（不提交不推送；供 start.bat 启动时自动调用） |

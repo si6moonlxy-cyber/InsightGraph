@@ -39,7 +39,7 @@ HAS_ERROR=0
 # ================================================================
 # 1. 文档死链检查
 # ================================================================
-echo -e "${CYAN}[1/4] Docs — 死链检查${NC}"
+echo -e "${CYAN}[1/5] Docs — 死链检查${NC}"
 if bash "$ROOT/scripts/doc-link-check.sh"; then
     pass "文档链接全部可达"
 else
@@ -48,10 +48,22 @@ else
 fi
 
 # ================================================================
-# 2. 后端 — Ruff + Format + Mypy + Pytest（mock 单测）
+# 2. 机器特定绝对路径检查
 # ================================================================
 echo ""
-echo -e "${CYAN}[2/4] Backend — Ruff + Format + Mypy + Pytest（mock 单测）${NC}"
+echo -e "${CYAN}[2/5] Docs — 机器特定绝对路径检查${NC}"
+if bash "$ROOT/scripts/abs-path-check.sh"; then
+    pass "未发现机器特定绝对路径"
+else
+    fail "发现机器特定绝对路径（改用相对路径 / 占位符 / 环境变量形式）"
+    HAS_ERROR=1
+fi
+
+# ================================================================
+# 3. 后端 — Ruff + Format + Mypy + Pytest（mock 单测）
+# ================================================================
+echo ""
+echo -e "${CYAN}[3/5] Backend — Ruff + Format + Mypy + Pytest（mock 单测）${NC}"
 if [ -f "$ROOT/backend/pyproject.toml" ]; then
     if ! command -v uv >/dev/null 2>&1; then
         fail "未找到 uv（安装: https://docs.astral.sh/uv/），无法运行后端检查"
@@ -91,10 +103,10 @@ else
 fi
 
 # ================================================================
-# 3. 前端 — ESLint（0 警告 hard gate）+ tsc 类型检查
+# 4. 前端 — ESLint（0 警告 hard gate）+ tsc 类型检查
 # ================================================================
 echo ""
-echo -e "${CYAN}[3/4] Frontend — ESLint + tsc${NC}"
+echo -e "${CYAN}[4/5] Frontend — ESLint + tsc${NC}"
 if [ -f "$ROOT/frontend/package.json" ]; then
     echo "  ▶ ESLint"
     if (cd "$ROOT/frontend" && pnpm lint); then
@@ -115,10 +127,10 @@ else
 fi
 
 # ================================================================
-# 4. 安全门禁 — 疑似硬编码密钥扫描
+# 5. 安全门禁 — 疑似硬编码密钥扫描
 # ================================================================
 echo ""
-echo -e "${CYAN}[4/4] Security — 疑似硬编码密钥扫描${NC}"
+echo -e "${CYAN}[5/5] Security — 疑似硬编码密钥扫描${NC}"
 SUSPECTS=""
 for scan_dir in backend/app frontend/src; do
     [ -d "$scan_dir" ] || continue
