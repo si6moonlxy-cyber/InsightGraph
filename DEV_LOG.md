@@ -13,6 +13,7 @@
 > 网页直读：https://github.com/si6moonlxy-cyber/InsightGraph/blob/dev-log/DEV_LOG.md
 
 ## Sixmoonlxy（main）
+- [2026-10-02] docker 基础设施架子（postgres+redis 启动 / 修复 redis 空密码 bug） @infra
 
 - [2026-10-02] domain 领域契约补全（稳定 ID / 扫描结果契约 / 确定性序列化） @backend
 - [2026-10-01] 数据模型视图（第三类视图）架构决策：ADR-007 输入边界 / ADR-008 独立第三语义层 @docs
