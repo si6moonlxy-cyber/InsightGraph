@@ -53,10 +53,10 @@ REDIS_URL=redis://localhost:6379/0
 
 | 项 | 状态 | 位置 / 版本 |
 | --- | --- | --- |
-| Docker Desktop | ✅ 已安装 | **程序 `D:\Docker`**（4.93.0 安装器）；CLI 插件在 `C:\Program Files\Docker\cli-plugins`（Docker 强制，`--installation-dir` 不可覆盖） |
+| Docker Desktop | ✅ 已安装 | **程序 `F:\Program Files\Docker`**；CLI 插件在 `C:\Program Files\Docker\cli-plugins`（Docker 强制，`--installation-dir` 不可覆盖） |
 | Docker 引擎 | ✅ 运行中 | Client / Server **29.8.1**，OSType `linux` |
 | Docker Compose | ✅ | v5.5.1 |
-| WSL 数据根 | ✅ | **`D:\DockerData`**（`--wsl-default-data-root`），WSL 平台默认版本 2 |
+| WSL 数据根 | ✅ | **`F:\Program Files\DockerData`**（`--wsl-default-data-root`），WSL 平台默认版本 2 |
 | docker-users 组 | ✅ | 当前用户已在组内 |
 | Git Bash | ✅ | `C:\Program Files\Git\bin\bash.exe` |
 | uv | ✅ | 0.11.7 |
@@ -67,17 +67,29 @@ REDIS_URL=redis://localhost:6379/0
 
 ### 2.4 磁盘预算
 
-| 卷 | 核验前剩余 | 核验后剩余 | 说明 |
+本机有两块 NVMe：Disk 0（致态 1TB，承载 F / G）与 Disk 1（Micron 512GB，承载 C / D）。
+
+| 卷 | 未装 Docker | Docker 装到 D 盘 | **迁到 F 盘后（当前）** |
 | --- | --- | --- | --- |
-| C: | 38.5 GB | 39.9 GB | 只承担 CLI 插件（675 MB）；Docker 桌面端数据不在 C |
-| **D:** | 11.6 GB | **5.9 GB** | 承担 `D:\Docker`（3366 MB）+ `D:\DockerData`（2444 MB）+ 镜像（689 MB）+ 卷（48 MB） |
+| C: | 38.5 GB | 39.9 GB | 39.3 GB |
+| **D:** | 11.6 GB | **5.9 GB** | **11.6 GB** ✅ |
+| F: | 61.3 GB | 61.3 GB | 55.7 GB |
 
-**D 盘余量偏紧**，后续需注意：
+**为什么迁到 F 盘**：D 盘只有 28.8 GB 分区，装 Docker 后仅剩 5.9 GB，而后端还需
+克隆目标仓库做代码分析（持续增长），空间不足以支撑。F 盘（默认软件盘）余量充裕，
+且位于另一块物理盘，可分担 IO。
 
-- 目标仓库的快照会克隆到本地，做代码分析时占用会持续增长；
-- 追加 Neo4j 镜像（`neo4j:5.26-community`）预计还需约 600 MB～1 GB；
-- 清理手段：`docker system prune -a`（会删除未使用镜像）、或把
-  `D:\DockerData` 迁到余量更大的卷（Docker Desktop → Settings → Resources → Disk image location）。
+**Docker 当前占用**（F 盘）：
+
+```text
+F:\Program Files\Docker      3366 MB   程序本体（静态）
+F:\Program Files\DockerData  2444 MB   WSL 磁盘镜像（随镜像/卷增长）
+C:\Program Files\Docker       675 MB   CLI 插件（Docker 强制放 C 盘）
+```
+
+镜像本体：`pgvector/pgvector:pg16` 631 MB + `redis:7-alpine` 57.8 MB。
+
+后续仍需空间：Neo4j 镜像约 600 MB ~ 1 GB。清理手段：`docker system prune -a`。
 
 ---
 
@@ -87,6 +99,7 @@ REDIS_URL=redis://localhost:6379/0
 | --- | --- | --- |
 | `CLAUDE.md` §5.2 | 开发日志 worktree 硬编码为 `D:\Project_Mine\InsightGraph\.devlog`（另一台机器的路径） | 改为相对路径 `<仓库根>\.devlog`，并注明由 `start.bat` 首次运行自动创建 |
 | `CLAUDE.md` §5.3 | 「postgres/redis 已在本机启动并 healthy（2026-10-02）」中的「本机」指向不明确 | 改为逐机器表述，并指向本文作为机器级证据 |
+| 本文 §2.3 / §2.4 | Docker 安装位置由 `D:\Docker` / `D:\DockerData` 变更为 F 盘 | 迁移完成后立即同步，避免状态地图引用过期路径 |
 
 ---
 
@@ -94,7 +107,15 @@ REDIS_URL=redis://localhost:6379/0
 
 - [ ] `git config core.hooksPath .githooks`（新克隆不会携带此配置）
 - [ ] 安装 Docker Desktop（Windows 家庭版走 WSL2 后端）：
-      `"Docker Desktop Installer.exe" install --quiet --accept-license --installation-dir=D:\Docker --wsl-default-data-root=D:\DockerData`
+
+      ```powershell
+      # 管理员权限执行；路径按目标机器调整
+      "Docker Desktop Installer.exe" install --quiet --accept-license `
+        --installation-dir="F:\Program Files\Docker" `
+        --wsl-default-data-root="F:\Program Files\DockerData"
+      ```
+
+      安装前先确认目标卷为 **NTFS**（WSL2 的 vhdx 不支持 exFAT / FAT32）。
 - [ ] 首次启动 Docker Desktop 并等待引擎就绪（会导入 WSL 发行版到数据根）
 - [ ] `start.bat` → [1]~[4] 全绿（两容器 healthy，5432 / 6379 监听）
 - [ ] `cd backend && uv sync && uv run pytest -q` 全绿
@@ -103,6 +124,21 @@ REDIS_URL=redis://localhost:6379/0
 
 > **注意**：安装 Docker 后，**已打开的终端不会自动刷新 PATH**。必须新开终端，
 > 或直接双击 `start.bat`（资源管理器启动的 cmd 会读取最新环境变量）。
+
+### 变更 Docker 安装位置的方法
+
+Docker Desktop 的 Windows 服务与注册表项都记录了绝对路径，**手工搬目录会让
+`com.docker.service` 失效**，`--installation-dir` 也只在安装时生效。因此换位置必须
+**卸载后重装**：
+
+1. `docker compose down` 停容器
+2. `docker desktop stop`，再结束 `Docker Desktop` 进程
+3. 用已安装目录下的 `Docker Desktop Installer.exe uninstall --quiet` 卸载（需提权）
+4. **手工删除数据根残留**：卸载只注销 WSL 发行版，vhdx 文件会留在原数据根
+5. 用新的 `--installation-dir` / `--wsl-default-data-root` 重装
+
+容器与卷会在卸载时一并丢失，重装后需重新 `docker compose up -d`。仍在开发早期、
+无持久化业务数据时执行本操作成本最低。
 
 ---
 
