@@ -246,7 +246,7 @@ update something       ← 缺类型前缀
 | `cd backend && uv run python ../eval/codegraph/validate.py <工件.json> --repo-root <仓库根>` | CodeGraph 产物三项不变量校验（DEFINES 入边 / content_hash 重算 / imports 目标；CI 经 pytest 强制执行） |
 | `bash scripts/ci-check.sh` | **push 前全量检查**（文档死链 → 后端 lint/测试 → 前端 lint → 密钥扫描） |
 | `bash scripts/doc-link-check.sh` | 仅检查文档死链 |
-| 开发日志（查看/编辑） | 唯一真源在 `dev-log` 分支：worktree `D:\Project_Mine\InsightGraph\.devlog`；**口述给 AI 登记 / 完成即可**（`add/done` 为内部命令，人不需要记）；网页直读见其 DEV_LOG.md 头部链接 |
+| 开发日志（查看/编辑） | 唯一真源在 `dev-log` 分支：worktree `<仓库根>\.devlog`（首次 `start.bat` 自动创建）；**口述给 AI 登记 / 完成即可**（`add/done` 为内部命令，人不需要记）；网页直读见其 DEV_LOG.md 头部链接 |
 | `bash devlog.sh sync "<提交说明>"` | 在 devlog worktree 内运行：格式校验 → 提交 → pull --rebase → push（被拒自动重试；说明必填，add/done 自动派生消息） |
 | `bash devlog.sh pull` | 仅拉取开发日志（不提交不推送；供 start.bat 启动时自动调用） |
 | `git config core.hooksPath .githooks` | 一次性安装 Git Hooks（pre-commit / pre-push / commit-msg；新环境必须执行，main / dev 与 .devlog 工作树共用） |
@@ -260,7 +260,7 @@ update something       ← 缺类型前缀
 
 | 资产 | 状态 | 说明 |
 |------|------|------|
-| `docker-compose.yml` + `docker/postgres/init.sql` | ✅ 就绪 | postgres/redis 已在本机启动并 healthy（2026-10-02）；neo4j 未启动；api、web 服务待代码建立后加入 |
+| `docker-compose.yml` + `docker/postgres/init.sql` | ✅ 就绪 | **容器启停逐机器验证**：开发机（2026-10-02）postgres/redis 已启动并 healthy、neo4j 未启动；未安装 Docker 的机器需先安装才能跑 `start.bat` [2]~[4]（机器级证据见 [docs/operations/environment-verification.md](docs/operations/environment-verification.md)）。api、web 服务待代码建立后加入 |
 | `.github/workflows/ci.yml` | ✅ 就绪 | docs 立即可用；backend / frontend 用存在性守卫，建立后自动生效 |
 | `scripts/` + `.githooks/`（pre-commit / pre-push / commit-msg） | ✅ 就绪 | 需一次性安装：`git config core.hooksPath .githooks` |
 | `eval/` | ✅ 首个 evaluator 已落地 | `eval/codegraph/`：Golden Dataset（golden-python-basic）+ evaluator（语义 100%）+ Baseline v1 |

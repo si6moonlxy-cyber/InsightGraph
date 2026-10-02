@@ -24,7 +24,7 @@
 | `architecture/` | 子系统设计（GraphRAG / 工作流等，按需创建）；系统总览由根 `architecture.md` 维护 | 需要时创建 |
 | `engineering/` | 工程流程规范（评测驱动开发、视觉回归等） | 需要时创建 |
 | `evaluation/` | 评测方法、指标口径 | 需要时创建 |
-| `operations/` | 环境配置、排障、迁移 | 需要时创建 |
+| [operations/](operations/environment-verification.md) | 环境配置、排障、迁移 | ✅ 已建立 |
 
 > 新建文档的准入：只有新模块设计、架构评审产出、决策记录三类允许。
 > 临时调试 / 个人笔记不建文档（写进 commit message 或评测记录）。
