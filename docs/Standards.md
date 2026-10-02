@@ -11,7 +11,7 @@
 
 | 项目 | 值 |
 | --- | --- |
-| 本地开发目录 | `D:\Project_Mine\InsightGraph` |
+| 本地开发目录 | 各开发者自定，**不写入仓库**（机器特定路径由 `scripts/abs-path-check.sh` 拦截） |
 | 远程仓库 | `git@github.com:si6moonlxy-cyber/InsightGraph.git` |
 | 默认分支 | `main` |
 | 换行符规范 | 强制 LF（见 `.gitattributes`） |

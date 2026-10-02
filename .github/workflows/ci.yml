@@ -21,10 +21,10 @@ on:
 
 jobs:
   # ------------------------------------------------------------
-  # 文档死链检查（立即可用）
+  # 文档死链 + 机器特定绝对路径检查（立即可用）
   # ------------------------------------------------------------
   docs:
-    name: Docs — 死链检查
+    name: Docs — 死链 + 绝对路径检查
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -33,6 +33,9 @@ jobs:
 
       - name: Check document links
         run: bash scripts/doc-link-check.sh
+
+      - name: Check machine-specific absolute paths
+        run: bash scripts/abs-path-check.sh
 
   # ------------------------------------------------------------
   # 后端：ruff + format + mypy + pytest（mock 单测，不依赖 PG/Redis）
