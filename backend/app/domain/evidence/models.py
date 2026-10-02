@@ -17,7 +17,7 @@ class EvidenceStatus(StrEnum):
 class SourceReference(BaseModel):
     """证据来源，可指向文档或代码范围。"""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     path: str = Field(min_length=1)
     line_start: int | None = Field(default=None, ge=1)
@@ -28,7 +28,7 @@ class SourceReference(BaseModel):
 class Evidence(BaseModel):
     """支撑结论的最小证据单元。"""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     id: str = Field(min_length=1)
     status: EvidenceStatus

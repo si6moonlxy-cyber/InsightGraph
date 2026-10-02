@@ -18,7 +18,7 @@ class KnowledgeNodeKind(StrEnum):
 class KnowledgeNode(BaseModel):
     """GraphRAG 知识节点，不得复用 CodeGraph 的代码节点类型。"""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     id: str = Field(min_length=1)
     kind: KnowledgeNodeKind
@@ -28,7 +28,7 @@ class KnowledgeNode(BaseModel):
 class Claim(BaseModel):
     """关于项目的结论及其证据引用。"""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     id: str = Field(min_length=1)
     statement: str = Field(min_length=1)

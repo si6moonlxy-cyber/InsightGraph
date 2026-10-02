@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "repository_id": "insightgraph",
+  "revision": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "parser_version": "python-ast/0.1",
+  "nodes": [
+    {
+      "id": "insightgraph:module:app.main",
+      "kind": "module",
+      "qualified_name": "app.main",
+      "language": "python",
+      "source": {
+        "file_path": "app/main.py",
+        "line_start": 1,
+        "line_end": 40
+      },
+      "content_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "id": "insightgraph:class:app.main.Service",
+      "kind": "class",
+      "qualified_name": "app.main.Service",
+      "language": "python",
+      "source": {
+        "file_path": "app/main.py",
+        "line_start": 5,
+        "line_end": 30
+      },
+      "content_hash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    {
+      "id": "insightgraph:module:app.主逻辑",
+      "kind": "module",
+      "qualified_name": "app.主逻辑",
+      "language": "python",
+      "source": {
+        "file_path": "app/主逻辑.py",
+        "line_start": 1,
+        "line_end": 12
+      },
+      "content_hash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+    },
+    {
+      "id": "insightgraph:function:app.主逻辑.run",
+      "kind": "function",
+      "qualified_name": "app.主逻辑.run",
+      "language": "python",
+      "source": {
+        "file_path": "app/主逻辑.py",
+        "line_start": 3,
+        "line_end": 6
+      },
+      "content_hash": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+    },
+    {
+      "id": "insightgraph:function:app.主逻辑.run#2",
+      "kind": "function",
+      "qualified_name": "app.主逻辑.run",
+      "language": "python",
+      "source": {
+        "file_path": "app/主逻辑.py",
+        "line_start": 9,
+        "line_end": 12
+      },
+      "content_hash": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    }
+  ],
+  "edges": [
+    {
+      "id": "defines:insightgraph:module:app.main->insightgraph:class:app.main.Service",
+      "kind": "defines",
+      "source_id": "insightgraph:module:app.main",
+      "target_id": "insightgraph:class:app.main.Service"
+    },
+    {
+      "id": "defines:insightgraph:module:app.主逻辑->insightgraph:function:app.主逻辑.run",
+      "kind": "defines",
+      "source_id": "insightgraph:module:app.主逻辑",
+      "target_id": "insightgraph:function:app.主逻辑.run"
+    },
+    {
+      "id": "defines:insightgraph:module:app.主逻辑->insightgraph:function:app.主逻辑.run#2",
+      "kind": "defines",
+      "source_id": "insightgraph:module:app.主逻辑",
+      "target_id": "insightgraph:function:app.主逻辑.run#2"
+    },
+    {
+      "id": "imports:insightgraph:module:app.main->insightgraph:module:app.主逻辑",
+      "kind": "imports",
+      "source_id": "insightgraph:module:app.main",
+      "target_id": "insightgraph:module:app.主逻辑"
+    }
+  ]
+}
