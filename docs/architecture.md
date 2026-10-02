@@ -1,8 +1,8 @@
 # InsightGraph 系统架构
 
-> 最后更新：2026-10-01
+> 最后更新：2026-10-02
 >
-> 当前阶段：Phase 2A——后端架构骨架已建立，CodeGraph 分析能力尚未实现。
+> 当前阶段：Phase 2A——后端骨架与领域契约已建立，Collector 与分析能力尚未实现。
 >
 > 本文档是系统架构真源；哲学与设计理由见[Introduction to Initialization Architecture Concepts](Introduction%20to%20Initialization%20Architecture%20Concepts.md)，
 > 分步执行与当前进度见 [Development Plan](Development%20Plan.md)。
@@ -23,7 +23,7 @@ MVP 首先分析本地 Python 仓库，产出可重复验证的 CodeGraph。多�
 | --- | --- | --- |
 | 工程基础设施 | 已建立 | CI、Git Hooks、Docker Compose、文档治理和评测规则存在 |
 | 后端骨架 | 已建立 | FastAPI、Settings、统一错误、健康检查、领域/应用/基础设施分层 |
-| 领域契约 | 初版已建立 | CodeGraph、Evidence、GraphRAG Claim、扫描用例端口 |
+| 领域契约 | 稳定契约已建立 | CodeGraph 稳定 ID、ScanResult 与阶段错误契约、确定性序列化与 schema_version（ADR-010/011）；真实适配器未实现 |
 | CodeGraph Collector | 未实现 | 尚不能读取真实仓库 |
 | Python Analyzer | 未实现 | 尚不能解析 Module/Class/Function/IMPORTS/DEFINES |
 | 持久化适配器 | 未实现 | 当前只有 Repository Protocol，没有数据库或 JSON 实现 |
@@ -98,12 +98,15 @@ infrastructure ──┴──────────────────�
 CodeGraph 是程序分析图：
 
 ```text
-Repository / Module / Class / Function
+Module / Class / Function
 DEFINES / IMPORTS / CALLS
 ```
 
-节点必须包含稳定 ID、仓库版本、语言、文件路径、源码行号、内容哈希和解析器版本。相同仓库、
-Commit 与配置应产生相同结果。
+Repository 是图的作用域（由图的 `repository_id` + `revision` 界定），不是节点类型。图的根
+携带 `schema_version`、`repository_id`、`revision` 与 `parser_version`；节点携带稳定 ID、语言、
+文件路径、源码行号与内容哈希。稳定 ID、路径与哈希口径、确定性序列化纪律见
+[ADR-010](adr/ADR-010-codegraph-contract-discipline.md)；扫描结果与错误契约见
+[ADR-011](adr/ADR-011-scan-result-contract.md)。相同仓库、Commit 与配置应产生相同结果。
 
 ### 5.2 GraphRAG
 
@@ -224,3 +227,5 @@ Baseline First → Change → Same Eval → Delta
 | [ADR-007](adr/ADR-007-datamodel-sqlalchemy-first.md) | 数据模型视图第一版从 SQLAlchemy 模型静态提取 | Proposed |
 | [ADR-008](adr/ADR-008-datamodel-independent-third-layer.md) | 数据模型视图作为独立第三语义层 | Proposed |
 | [ADR-009](adr/ADR-009-database-schema-normalization.md) | 数据库 Schema 推导与范式纪律 | Proposed |
+| [ADR-010](adr/ADR-010-codegraph-contract-discipline.md) | CodeGraph 契约纪律：稳定 ID、路径与哈希口径、确定性序列化 | Proposed |
+| [ADR-011](adr/ADR-011-scan-result-contract.md) | 扫描结果契约：单一 ScanResult、阶段 Outcome 与错误模型 | Proposed |

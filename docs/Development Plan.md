@@ -1,9 +1,9 @@
 # InsightGraph Development Plan
 
-> 最后更新：2026-10-01
+> 最后更新：2026-10-02
 >
-> 当前阶段：Phase 2A，建设步骤 0、1 已完成，步骤 2 已建立初版契约；下一步完成步骤 2 的剩余契约，
-> 然后进入步骤 3“本地仓库采集器”。
+> 当前阶段：Phase 2A，建设步骤 0、1、2 已完成（领域契约冻结：ADR-010/011）；下一步进入
+> 步骤 3“本地仓库采集器”。
 >
 > 架构真源见[系统架构](architecture.md)，设计哲学见
 > [初始化架构思想导论](Introduction%20to%20Initialization%20Architecture%20Concepts.md)。
@@ -40,19 +40,19 @@ InsightGraph 按“先确定性地理解代码，再用证据组织知识，最�
 
 ## 3. 当前进度总览
 
-| 步骤 | 建设内容 | 状态 | 当前事实 |
-| --- | --- | --- | --- |
-| 0 | 校准真源 | ✅ 已完成 | 架构真源、思想导论、ADR 体系与文档索引已经建立 |
-| 1 | 后端工程骨架 | ✅ 已完成 | FastAPI、Settings、日志、错误、分层目录、依赖锁和质量门禁已通过 |
-| 2 | 领域模型 | 🟡 进行中 | CodeGraph、Evidence、GraphRAG Claim、扫描端口已有初版；稳定 ID 与完整扫描结果契约待补 |
-| 3 | 本地采集器 | ⏭ 下一步 | 只有 `RepositoryCollector` Protocol，尚不能读取真实仓库 |
-| 4 | Python 分析器 | ⬜ 未开始 | 只有 `CodeAnalyzer` Protocol，尚无 AST 实现和 Golden Dataset |
-| 5 | 调用关系 | ⬜ 未开始 | `CALLS` 仅存在于 EdgeKind，尚无符号解析实现 |
-| 6 | 持久化 | ⬜ 未开始 | 只有 `CodeGraphRepository` Protocol，尚无 JSON/数据库适配器 |
-| 7 | 数据模型视图（datamodel） | ⬜ 未开始 | ADR-007/008/009 已定；复用步骤 3/4 解析设施与步骤 6 Artifact 纪律 |
-| 8 | API 与任务 | ⬜ 未开始 | 当前只有健康检查，没有扫描、进度或查询 API |
-| 9 | GraphRAG | ⬜ 未开始 | 只有知识节点与 Claim 不变量，没有证据抽取、检索或图构建 |
-| 10 | 编排与产品层 | ⬜ 未开始 | LangGraph、Reporter 和 React 图谱浏览器均未实现 |
+| 步骤  | 建设内容              | 状态     | 当前事实                                                         |
+| --- | ----------------- | ------ | ------------------------------------------------------------ |
+| 0   | 校准真源              | ✅ 已完成  | 架构真源、思想导论、ADR 体系与文档索引已经建立                                    |
+| 1   | 后端工程骨架            | ✅ 已完成  | FastAPI、Settings、日志、错误、分层目录、依赖锁和质量门禁已通过                      |
+| 2   | 领域模型              | ✅ 已完成  | 稳定 ID、ScanResult 与阶段错误契约、确定性序列化纪律已定（ADR-010/011），完成门槛由测试验证 |
+| 3   | 本地采集器             | ⏭ 下一步  | 只有 `RepositoryCollector` Protocol，尚不能读取真实仓库                  |
+| 4   | Python 分析器        | ⬜ 未开始  | 只有 `CodeAnalyzer` Protocol，尚无 AST 实现和 Golden Dataset         |
+| 5   | 调用关系              | ⬜ 未开始  | `CALLS` 仅存在于 EdgeKind，尚无符号解析实现                               |
+| 6   | 持久化               | ⬜ 未开始  | 只有 `CodeGraphRepository` Protocol，尚无 JSON/数据库适配器             |
+| 7   | 数据模型视图（datamodel） | ⬜ 未开始  | ADR-007/008/009 已定；复用步骤 3/4 解析设施与步骤 6 Artifact 纪律            |
+| 8   | API 与任务           | ⬜ 未开始  | 当前只有健康检查，没有扫描、进度或查询 API                                      |
+| 9   | GraphRAG          | ⬜ 未开始  | 只有知识节点与 Claim 不变量，没有证据抽取、检索或图构建                              |
+| 10  | 编排与产品层            | ⬜ 未开始  | LangGraph、Reporter 和 React 图谱浏览器均未实现                         |
 
 ## 4. 分步建设计划
 
@@ -111,13 +111,12 @@ InsightGraph 按“先确定性地理解代码，再用证据组织知识，最�
 - `Evidence`、`EvidenceStatus`、`SourceReference`。
 - `KnowledgeNode` 与强制 Evidence 的 `Claim`。
 - `ScanRequest`、`SourceManifest`、Collector/Analyzer/Repository Protocol。
-
-**剩余工作**
-
-- 定义稳定 ID 生成规则并实现纯函数构造器。
-- 增加 `ScanResult`、阶段错误、单文件失败和统计契约。
-- 明确路径规范化、语言标识、哈希算法和 Schema 版本。
-- 增加序列化稳定性与 Schema 兼容测试。
+- 稳定 ID 构造器与规则（`ids.py` / `kinds.py`）：无 revision 可读串、重名 `#n` 后缀、
+  边去重、图完整性校验（ADR-010）。
+- `ScanResult`、`ScanError`、`ScanStats`、`CollectOutcome` / `AnalyzeOutcome` 与
+  状态不变量（ADR-011）。
+- 路径（仓库根相对 POSIX）、哈希（SHA-256 + CRLF→LF 归一）、`schema_version`
+  与 `extra="forbid"` 序列化纪律（ADR-010）。
 
 **完成门槛**
 
@@ -125,7 +124,15 @@ InsightGraph 按“先确定性地理解代码，再用证据组织知识，最�
 - 所有阶段都能用结构化类型表达成功、局部失败和整体失败。
 - 领域契约无需启动 FastAPI 或数据库即可完整测试。
 
-**状态：🟡 进行中。**
+**验证**
+
+- `test_serialization_stability.py`：双次序列化字节相等、反序列化往返相等、
+  golden fixture 字节级回归。
+- `test_scan_contracts.py` 与 `test_scan_repository.py`：三种扫描状态的
+  不变量与编排行为。
+- 后端全量质量门禁（ruff / format / mypy / pytest）通过，全部单测不连接外部服务。
+
+**状态：✅ 已完成。**
 
 ### 3. 本地采集器
 
@@ -318,17 +325,10 @@ SQLAlchemy 模型，产出第二类确定性分析产出：数据模型视图（
 
 当前不要直接接 Neo4j、LangGraph、LLM 或前端。下一阶段按下面顺序推进：
 
-### 当前任务 A：完成步骤 2
-
-1. 实现 CodeGraph 稳定 ID 构造器。
-2. 增加 `ScanResult`、`ScanError`、统计与 Schema 版本。
-3. 增加稳定序列化和错误契约测试。
-4. 复核领域层依赖守卫。
-
-### 紧接任务 B：实现步骤 3
+### 当前任务：实现步骤 3
 
 1. 实现本地 Git 仓库 Collector。
-2. 生成确定性 `SourceManifest`。
+2. 生成确定性 `SourceManifest`（局部失败与统计口径遵循 ADR-010/011）。
 3. 覆盖 ignore、Unicode、软链接和局部失败测试。
 4. 暂时不解析 AST。
 

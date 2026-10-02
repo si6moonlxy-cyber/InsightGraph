@@ -43,6 +43,8 @@
 | [ADR-007](ADR-007-datamodel-sqlalchemy-first.md) | 数据模型视图第一版从 SQLAlchemy 模型静态提取 | Proposed |
 | [ADR-008](ADR-008-datamodel-independent-third-layer.md) | 数据模型视图作为独立第三语义层 | Proposed |
 | [ADR-009](ADR-009-database-schema-normalization.md) | 数据库 Schema 推导与范式纪律 | Proposed |
+| [ADR-010](ADR-010-codegraph-contract-discipline.md) | CodeGraph 契约纪律：稳定 ID、路径与哈希口径、确定性序列化 | Proposed |
+| [ADR-011](ADR-011-scan-result-contract.md) | 扫描结果契约：单一 ScanResult、阶段 Outcome 与错误模型 | Proposed |
 
 > `Proposed` 决策需要真实数据或实现验证后转为 `Accepted`；不得因为代码暂时采用某种实现而自动
 > 视为长期决策。

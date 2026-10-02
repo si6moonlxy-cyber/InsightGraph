@@ -3,8 +3,8 @@
 > Solo dev 项目，Agent 辅助开发。
 > **核心法则：Evidence First（证据优先）。文档过时 = 生产 Bug，优先级等同。**
 >
-> 当前阶段：Phase 2A —— 工程基础设施与 `backend/` 架构骨架已就位，Collector、Analyzer、
-> 持久化适配器、GraphRAG 引擎与 `frontend/` 尚未建立（见 §五 5.3 当前代码-文档现实）。
+> 当前阶段：Phase 2A —— 工程基础设施、`backend/` 架构骨架与领域契约已就位（ADR-010/011），
+> Collector、Analyzer、持久化适配器、GraphRAG 引擎与 `frontend/` 尚未建立（见 §五 5.3 当前代码-文档现实）。
 
 ---
 
@@ -263,7 +263,7 @@ update something       ← 缺类型前缀
 | 开发日志（`dev-log` 分支） | ✅ 就绪 | 独立 orphan 分支为唯一真源；工作树 .devlog 自带钩子（校验 / 强制 dlog / 提交后自动推送）；devlog.sh sync / pull；CI 只读校验 + 7 天陈旧提醒；Setup 与启动自动 pull 已并入 start.bat |
 | `backend/` | ✅ Phase 2A 骨架 | FastAPI + Settings + 错误/日志 + domain/application/infrastructure 分层 + 测试门禁 |
 | `frontend/` | ⏳ 未建立 | Phase 3：Vite + React + 视觉回归双守卫 |
-| CodeGraph / GraphRAG 领域契约 | 🟡 初版 | CodeGraph IR、Evidence、Claim、扫描端口已定义；真实 Collector/Analyzer/Repository 未实现 |
+| CodeGraph / GraphRAG 领域契约 | ✅ 稳定版 | 稳定 ID、ScanResult/错误/统计契约、确定性序列化与 schema_version 已定（ADR-010/011）；真实 Collector/Analyzer/Repository 未实现 |
 | LangGraph 工作流 | ⏳ 未建立 | `workflows/` 仅声明“编排不承载业务”的边界，尚未引入 LangGraph |
 | 真实 LLM 评测 workflow | ⏳ 未建立 | Phase 3：手动触发 + gate 脚本（不进常驻 CI） |
 
@@ -272,8 +272,8 @@ update something       ← 缺类型前缀
 | 模块 | 职责 | 关键文件 |
 |------|------|----------|
 | `api/` | HTTP 协议、请求校验和响应转换 | `api/router.py`、`api/health.py` |
-| `application/scans/` | 编排 Collector、Analyzer 与 Repository 端口 | `service.py`、`ports.py`、`models.py` |
-| `domain/codegraph/` | CodeGraph IR、不变量与持久化端口 | `models.py`、`ports.py` |
+| `application/scans/` | 编排 Collector、Analyzer 与 Repository 端口；扫描结果与错误契约 | `service.py`、`ports.py`、`models.py` |
+| `domain/codegraph/` | CodeGraph IR、稳定 ID 构造与持久化端口 | `models.py`、`ids.py`、`kinds.py`、`ports.py` |
 | `domain/evidence/` | Evidence 来源与可信状态 | `models.py` |
 | `domain/graphrag/` | 知识节点与 Evidence First Claim | `models.py` |
 | `infrastructure/` | Collector、Analyzer、Persistence、LLM 外部适配器 | 当前仅建立边界，未实现适配器 |
