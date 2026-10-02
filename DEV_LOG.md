@@ -13,6 +13,7 @@
 > 网页直读：https://github.com/si6moonlxy-cyber/InsightGraph/blob/dev-log/DEV_LOG.md
 
 ## Sixmoonlxy（main）
+- [2026-10-02] start.bat 集成 docker/pgsql/redis 启动与检验 @infra
 
 - [2026-10-02] docker 基础设施架子（postgres+redis 启动 / 修复 redis 空密码 bug） @infra
 - [2026-10-02] domain 领域契约补全（稳定 ID / 扫描结果契约 / 确定性序列化） @backend
