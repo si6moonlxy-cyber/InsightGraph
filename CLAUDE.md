@@ -256,7 +256,7 @@ update something       ← 缺类型前缀
 
 | 资产 | 状态 | 说明 |
 |------|------|------|
-| `docker-compose.yml` + `docker/postgres/init.sql` | ✅ 就绪 | postgres(pgvector) / neo4j / redis；api、web 服务待代码建立后加入 |
+| `docker-compose.yml` + `docker/postgres/init.sql` | ✅ 就绪 | postgres/redis 已在本机启动并 healthy（2026-10-02）；neo4j 未启动；api、web 服务待代码建立后加入 |
 | `.github/workflows/ci.yml` | ✅ 就绪 | docs 立即可用；backend / frontend 用存在性守卫，建立后自动生效 |
 | `scripts/` + `.githooks/`（pre-commit / pre-push / commit-msg） | ✅ 就绪 | 需一次性安装：`git config core.hooksPath .githooks` |
 | `eval/` | ✅ 骨架 | 规则已定；第一个 evaluator 随第一个分析能力落地 |

@@ -30,7 +30,7 @@ MVP 首先分析本地 Python 仓库，产出可重复验证的 CodeGraph。多�
 | GraphRAG 引擎 | 未实现 | 只有严格隔离的最小领域契约 |
 | LangGraph 工作流 | 未实现 | `workflows/` 只声明边界，尚未引入依赖 |
 | 前端 | 未建立 | Phase 3 再建立 Vite + React 应用 |
-| 基础设施运行状态 | 未验证 | Compose 配置存在，不等同于服务已经健康运行 |
+| 基础设施运行状态 | 部分已启动 | postgres 与 redis 容器本机运行且 healthy（2026-10-02 验证，宿主端口可达）；neo4j 未启动；宿主 5432/6379 与 love-lobster 冲突——跑本栈前先停其容器 |
 
 ## 3. 系统上下文
 
