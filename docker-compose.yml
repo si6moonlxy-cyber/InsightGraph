@@ -68,9 +68,11 @@ services:
     image: redis:7-alpine
     container_name: insightgraph-redis
     restart: unless-stopped
-    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru --requirepass ${REDIS_PASSWORD:-}
+    # 空密码 = 不启用认证（本地默认）；shell 条件展开避免空 --requirepass 导致启动失败
+    command: sh -c 'exec redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru $${REDIS_PASSWORD:+--requirepass "$$REDIS_PASSWORD"}'
     environment:
-      # REDISCLI_AUTH 让 redis-cli 自动带密码，健康检查在启用/未启用密码时都成立
+      # 供 command 条件展开与 redis-cli 健康检查共用；空值时两者都退化为无认证
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
       REDISCLI_AUTH: ${REDIS_PASSWORD:-}
     ports:
       - "6379:6379"
