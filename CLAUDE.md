@@ -238,7 +238,7 @@ update something       ← 缺类型前缀
 
 | 命令 | 说明 |
 |------|------|
-| `start.bat` | 一键启动（当前：dev-log 自动同步 + 钩子配置；依赖 / Docker / 前后端启动后续逐步加法） |
+| `start.bat` | 一键启动（当前：dev-log 自动同步 + Docker 引擎自动拉起 + postgres/redis 容器启动与健康检验；依赖安装 / 前后端启动后续逐步加法） |
 | `docker compose up -d` | 启动 PostgreSQL(pgvector) + Neo4j + Redis |
 | `bash scripts/ci-check.sh` | **push 前全量检查**（文档死链 → 后端 lint/测试 → 前端 lint → 密钥扫描） |
 | `bash scripts/doc-link-check.sh` | 仅检查文档死链 |
