@@ -39,7 +39,7 @@ class ScanRepository:
                 errors=collect_outcome.errors,
             )
         manifest = collect_outcome.manifest
-        analyze_outcome = await self._analyzer.analyze(manifest)
+        analyze_outcome = await self._analyzer.analyze(request, manifest)
         errors = collect_outcome.errors + analyze_outcome.errors
         stats = _build_stats(manifest, analyze_outcome)
         if analyze_outcome.graph is None:

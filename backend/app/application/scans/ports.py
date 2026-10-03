@@ -12,6 +12,10 @@ class RepositoryCollector(Protocol):
 
 
 class CodeAnalyzer(Protocol):
-    """把文件清单转换为 CodeGraph IR。"""
+    """把文件清单转换为 CodeGraph IR。
 
-    async def analyze(self, manifest: SourceManifest) -> AnalyzeOutcome: ...
+    request.path 必须为仓库根（由 Collector 的管道不变量强制）；
+    manifest 中路径均相对该根，本端口不做子目录推导。
+    """
+
+    async def analyze(self, request: ScanRequest, manifest: SourceManifest) -> AnalyzeOutcome: ...

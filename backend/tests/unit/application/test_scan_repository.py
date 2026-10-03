@@ -58,12 +58,12 @@ class FakeAnalyzer:
     def __init__(self, outcome: AnalyzeOutcome) -> None:
         self._outcome = outcome
 
-    async def analyze(self, manifest: SourceManifest) -> AnalyzeOutcome:
+    async def analyze(self, request: ScanRequest, manifest: SourceManifest) -> AnalyzeOutcome:
         return self._outcome
 
 
 class ExplodingAnalyzer:
-    async def analyze(self, manifest: SourceManifest) -> AnalyzeOutcome:
+    async def analyze(self, request: ScanRequest, manifest: SourceManifest) -> AnalyzeOutcome:
         raise AssertionError("整体失败时不应继续调用分析")
 
 

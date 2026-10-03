@@ -69,6 +69,9 @@ class CodeGraph(BaseModel):
         if len(node_ids) != len(set(node_ids)):
             raise ValueError("CodeGraph 内节点 ID 重复")
         node_id_set = set(node_ids)
+        edge_ids = [edge.id for edge in self.edges]
+        if len(edge_ids) != len(set(edge_ids)):
+            raise ValueError("CodeGraph 内边 ID 重复（同一关系只保留一条）")
         for node in self.nodes:
             if not node_id_matches(node.id, self.repository_id, node.kind, node.qualified_name):
                 raise ValueError(f"节点 ID 不符合构造规则: {node.id}")

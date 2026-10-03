@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 from app.application.scans.models import CollectOutcome, ScanErrorCode, ScanErrorSeverity, ScanRequest
-from app.infrastructure.collectors import GitRepositoryCollector
+from app.infrastructure.collectors import GitRepositoryCollector, resolve_repository_root
 
 _SHA256_PREFIX = "sha256:"
 
@@ -193,13 +193,24 @@ async def test_internal_symlink_is_followed(tmp_path: Path) -> None:
 
 
 @pytest.mark.asyncio
-async def test_subdirectory_path_resolves_to_repository_root(tmp_path: Path) -> None:
+async def test_subdirectory_path_is_rejected(tmp_path: Path) -> None:
     repo = _make_repo(tmp_path, {"pkg/mod.py": "x = 1\n", "root.py": "y = 1\n"})
 
     outcome = await _scan(repo / "pkg")
 
-    assert outcome.manifest is not None
-    assert [source.path for source in outcome.manifest.files] == ["pkg/mod.py", "root.py"]
+    assert outcome.manifest is None
+    assert [error.code for error in outcome.errors] == [ScanErrorCode.PATH_INVALID]
+
+
+@pytest.mark.asyncio
+async def test_resolve_repository_root_returns_toplevel_for_subdirectory(tmp_path: Path) -> None:
+    repo = _make_repo(tmp_path, {"pkg/mod.py": "x = 1\n"})
+    plain = tmp_path / "plain"
+    plain.mkdir()
+
+    assert resolve_repository_root(repo / "pkg") == repo.resolve()
+    assert resolve_repository_root(repo) == repo.resolve()
+    assert resolve_repository_root(plain) is None
 
 
 @pytest.mark.asyncio

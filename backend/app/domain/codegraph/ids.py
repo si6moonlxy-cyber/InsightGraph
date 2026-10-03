@@ -3,6 +3,9 @@
 ID 不含 revision：GraphRAG 与 datamodel 通过稳定 ID 跨层引用 CodeGraph 节点
 （ADR-001 / ADR-008），引用必须在新提交后继续有效；扫描作用域由
 CodeGraph 的 repository_id + revision 界定。完整决策见 ADR-010。
+
+边 ID 解析规则：两侧 ID 自身含 `:`，解析时先按第一个 `->` 切分 source 与 target，
+再从左侧按第一个 `:` 切出 kind（kind 为闭枚举，无歧义）。
 """
 
 from app.domain.codegraph.kinds import EdgeKind, NodeKind

@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 from app.application.scans.models import ScanRequest
-from app.infrastructure.collectors.git_repository import GitRepositoryCollector
+from app.infrastructure.collectors.git_repository import GitRepositoryCollector, resolve_repository_root
 
 _LOGGER = logging.getLogger("insightgraph.scan_repo")
 
@@ -24,7 +24,7 @@ def build_parser() -> argparse.ArgumentParser:
         prog="python -m app.infrastructure.collectors",
         description="把本地 Git 仓库采集为确定性 SourceManifest",
     )
-    parser.add_argument("path", type=Path, help="仓库路径（子目录会解析到仓库根）")
+    parser.add_argument("path", type=Path, help="仓库路径（子目录会被自动归一为仓库根）")
     parser.add_argument("--repository-id", default=None, help="repository_id；默认取路径目录名")
     parser.add_argument("--json", action="store_true", help="输出规范 JSON Manifest（不打印摘要）")
     return parser
@@ -33,8 +33,9 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(message)s", stream=sys.stdout)
     args = build_parser().parse_args(argv)
-    repository_id = args.repository_id or args.path.resolve().name
-    request = ScanRequest(repository_id=repository_id, path=args.path)
+    path = resolve_repository_root(args.path) or args.path
+    repository_id = args.repository_id or path.resolve().name
+    request = ScanRequest(repository_id=repository_id, path=path)
 
     outcome = asyncio.run(GitRepositoryCollector().collect(request))
 

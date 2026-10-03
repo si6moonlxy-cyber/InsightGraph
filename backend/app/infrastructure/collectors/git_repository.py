@@ -43,8 +43,9 @@ class _GitCommandError(Exception):
 class GitRepositoryCollector:
     """RepositoryCollector 的本地 Git 实现。
 
-    扫描边界为 `git rev-parse --show-toplevel` 确定的仓库根：请求指向子目录时
-    等价于扫描整个仓库。子模块（gitlink 目录项）不参与采集。
+    扫描边界为 `git rev-parse --show-toplevel` 确定的仓库根：**请求必须是仓库根**，
+    子目录会被拒绝（组合方可用 `resolve_repository_root` 先归一）；
+    子模块（gitlink 目录项）不参与采集。
     """
 
     async def collect(self, request: ScanRequest) -> CollectOutcome:
@@ -62,6 +63,14 @@ class GitRepositoryCollector:
             return _fatal(str(error), ScanErrorCode.GIT_ERROR)
         except _GitCommandError as error:
             return _fatal(f"不是可用的 Git 仓库（{path}）: {error}", ScanErrorCode.PATH_INVALID)
+
+        # 管道不变量：request.path 必须为仓库根——manifest 路径相对该根，
+        # 下游 Analyzer 不做子目录推导，这里 fail-fast 拦截
+        if str(root).casefold() != str(path.resolve()).casefold():
+            return _fatal(
+                f"请指向仓库根而不是子目录: {path}（仓库根为 {root}）",
+                ScanErrorCode.PATH_INVALID,
+            )
 
         try:
             revision = _run_git(root, "rev-parse", "HEAD")
@@ -92,6 +101,18 @@ class GitRepositoryCollector:
             files=tuple(files),
         )
         return CollectOutcome(manifest=manifest, errors=tuple(errors))
+
+
+def resolve_repository_root(path: Path) -> Path | None:
+    """把路径解析为所在 Git 仓库的根（toplevel）；不在仓库内或 git 不可用时返回 None。
+
+    供流水线组合方（CLI / 未来的 API 层）在接受用户输入后归一
+    `ScanRequest.path` 使用；SourceManifest 中的路径均相对该仓库根。
+    """
+    try:
+        return Path(_run_git(path, "rev-parse", "--show-toplevel")).resolve()
+    except (_GitUnavailableError, _GitCommandError):
+        return None
 
 
 def _extensions_for(languages: tuple[str, ...]) -> tuple[str, ...]:

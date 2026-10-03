@@ -93,6 +93,20 @@ def test_duplicate_node_ids_are_rejected() -> None:
         _graph(nodes=(module, module))
 
 
+def test_duplicate_edges_are_rejected() -> None:
+    module = _node("repo:module:app.main", NodeKind.MODULE, "app.main")
+    cls = _node("repo:class:app.main.Foo", NodeKind.CLASS, "app.main.Foo")
+    edge = CodeEdge(
+        id="defines:repo:module:app.main->repo:class:app.main.Foo",
+        kind=EdgeKind.DEFINES,
+        source_id=module.id,
+        target_id=cls.id,
+    )
+
+    with pytest.raises(ValidationError, match="边 ID 重复"):
+        _graph(nodes=(module, cls), edges=(edge, edge))
+
+
 def test_edge_id_must_follow_construction_rule() -> None:
     module = _node("repo:module:app.main", NodeKind.MODULE, "app.main")
     cls = _node("repo:class:app.main.Foo", NodeKind.CLASS, "app.main.Foo")
