@@ -14,6 +14,7 @@
 
 ## Sixmoonlxy（main）
 
+- [2026-10-03] dev-log 防退化规范（sync 必传说明 / add·done 自动派生消息 / 钩子拒绝空话条目） @协作流程
 - [2026-10-03] codegraph 产物不变量校验脚本（DEFINES 入边 / content_hash 重算 / imports 目标）+ CI 集成 @backend
 - [2026-10-03] 步骤 4 Python AST 分析器（CodeGraph IR + 首个 Golden Dataset 与 evaluator） @backend
 - [2026-10-03] 本地 Git Collector（确定性 SourceManifest + 采集 CLI） @backend
