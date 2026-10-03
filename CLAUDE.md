@@ -211,7 +211,7 @@ Evidence Relationship
 - 文件名/模块: 要点     ← 可选：主题行后空行，再以 bullet 逐项列改动明细
 
 类型白名单: feat / fix / refactor / chore / docs / test / style / perf / ci / revert
-dev-log 分支专用类型: dlog（仅用于 dev-log 分支的日志提交，不用于代码提交）
+dev-log 分支专用类型: dlog（仅用于 dev-log 分支的日志提交，不用于代码提交；消息必须描述实际工作内容，禁止「更新开发日志」类空话——钩子直接拒绝）
 ```
 
 反例（会被 hook 拒绝）：
@@ -246,7 +246,7 @@ update something       ← 缺类型前缀
 | `bash scripts/ci-check.sh` | **push 前全量检查**（文档死链 → 后端 lint/测试 → 前端 lint → 密钥扫描） |
 | `bash scripts/doc-link-check.sh` | 仅检查文档死链 |
 | 开发日志（查看/编辑） | 唯一真源在 `dev-log` 分支：worktree `D:\Project_Mine\InsightGraph\.devlog`；**口述给 AI 登记 / 完成即可**（`add/done` 为内部命令，人不需要记）；网页直读见其 DEV_LOG.md 头部链接 |
-| `bash devlog.sh sync` | 在 devlog worktree 内运行：格式校验 → 提交 → pull --rebase → push（被拒自动重试） |
+| `bash devlog.sh sync "<提交说明>"` | 在 devlog worktree 内运行：格式校验 → 提交 → pull --rebase → push（被拒自动重试；说明必填，add/done 自动派生消息） |
 | `bash devlog.sh pull` | 仅拉取开发日志（不提交不推送；供 start.bat 启动时自动调用） |
 | `git config core.hooksPath .githooks` | 一次性安装 Git Hooks（pre-commit / pre-push / commit-msg；新环境必须执行，main / dev 与 .devlog 工作树共用） |
 | `cd backend && uv run ruff check app/` | 后端 Ruff（0 错误 hard gate，backend 建立后可用） |
