@@ -5,10 +5,10 @@
 # 在 dev-log 分支的工作树（.devlog/）内运行。
 #
 # 用法:
-#   bash devlog.sh sync [提交说明]     # 提交说明可选，默认 "dlog: 更新开发日志"
+#   bash devlog.sh sync "<提交说明>"     # 说明必填：一句话描述本次实际改动（如 dlog: 回写 3 条…）
 #   bash devlog.sh pull                # 仅拉取（不提交不推送；供 start.bat 等自动化调用）
-#   bash devlog.sh add "任务 @区域"     # 登记当前任务（自动定位本人区块与当日日期）
-#   bash devlog.sh done "关键词"        # 删除本人区块中匹配的任务行
+#   bash devlog.sh add "任务 @区域"     # 登记当前任务（消息自动派生 dlog: 登记「…」）
+#   bash devlog.sh done "关键词"        # 删除匹配任务行（消息自动派生 dlog: 完成「…」）
 #
 # 流程:
 #   [1] 格式校验（scripts/check-devlog.sh，错误则中止）
@@ -25,7 +25,7 @@ ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$ROOT"
 
 CMD="${1:-sync}"
-MSG="${2:-dlog: 更新开发日志}"
+MSG="${2:-}"
 
 case "$CMD" in
     sync) ;;
@@ -34,13 +34,21 @@ case "$CMD" in
     done) ;;
     *)
         echo "用法:"
-        echo "  bash devlog.sh sync [提交说明]    # 校验 + 提交 + 拉取 + 推送"
-        echo "  bash devlog.sh add \"任务 @区域\"   # 登记当前任务（自动提交推送）"
-        echo "  bash devlog.sh done \"关键词\"      # 删除本人区块中匹配的任务行（自动提交推送）"
+        echo "  bash devlog.sh sync \"<提交说明>\"  # 校验 + 提交 + 拉取 + 推送（说明必填）"
+        echo "  bash devlog.sh add \"任务 @区域\"   # 登记当前任务（消息自动派生；自动提交推送）"
+        echo "  bash devlog.sh done \"关键词\"      # 删除匹配任务行（消息自动派生；自动提交推送）"
         echo "  bash devlog.sh pull               # 仅拉取（供 start.bat 等自动化调用）"
         exit 1
         ;;
 esac
+
+# ── sync：提交说明必填（空话消息会被钩子拒绝） ──
+if [ "$CMD" = "sync" ] && [ -z "$MSG" ]; then
+    echo "❌ sync 缺少提交说明：请用一句话描述本次实际改动"
+    echo "   用法: bash devlog.sh sync \"dlog: <动词+内容>\""
+    echo "   例:   bash devlog.sh sync \"dlog: 回写 3 条 main 提交（ADR-007~009） @docs\""
+    exit 1
+fi
 
 # ── pull：仅拉取，不提交、不推送、失败静默 ──
 if [ "$CMD" = "pull" ]; then
@@ -87,10 +95,16 @@ if [ "$CMD" = "add" ]; then
     LINE="- [$(date +%F)] ${TASK}"
     awk -v name="$NAME" -v line="$LINE" '
         { print }
-        $0 ~ ("^## " name "（") && !inserted { print line; inserted = 1 }
+        $0 ~ ("^## " name "（") && !inserted {
+            if (getline nxt > 0) {
+                if (nxt == "") { print nxt; print line }
+                else { print ""; print line; print nxt }
+            } else { print ""; print line }
+            inserted = 1
+        }
     ' DEV_LOG.md > DEV_LOG.md.tmp && mv DEV_LOG.md.tmp DEV_LOG.md
     echo "✅ 已登记：${LINE}（区块：${NAME}）"
-    MSG="dlog: 更新开发日志"
+    MSG="dlog: 登记「${TASK}」"
 fi
 
 # ── done：从本人区块删除包含关键词的任务行（随后走校验/提交/推送） ──
@@ -118,11 +132,17 @@ if [ "$CMD" = "done" ]; then
         }
     ' DEV_LOG.md > DEV_LOG.md.tmp 2> DEV_LOG.md.removed
     if [ -s DEV_LOG.md.removed ]; then
+        N_REMOVED=$(wc -l < DEV_LOG.md.removed | tr -d ' ')
+        FIRST_REMOVED="$(head -n 1 DEV_LOG.md.removed | sed -E 's/^- \[[0-9]{4}-[0-9]{2}-[0-9]{2}\] //')"
         mv DEV_LOG.md.tmp DEV_LOG.md
         echo "✅ 已从「${NAME}」区块删除："
         sed 's/^/   /' DEV_LOG.md.removed
         rm -f DEV_LOG.md.removed
-        MSG="dlog: 更新开发日志"
+        if [ "$N_REMOVED" -eq 1 ]; then
+            MSG="dlog: 完成「${FIRST_REMOVED}」"
+        else
+            MSG="dlog: 完成「${FIRST_REMOVED}」等 ${N_REMOVED} 条"
+        fi
     else
         rm -f DEV_LOG.md.tmp DEV_LOG.md.removed
         echo "ℹ️  未找到包含「${KEY}」的任务行（区块：${NAME}），未做修改"

@@ -10,8 +10,17 @@ esac
 if ! printf '%s' "$SUBJECT" | grep -Eq '^dlog: .+'; then
     echo ""
     echo "❌ [commit-msg] dev-log 分支的提交信息必须为「dlog: 中文描述」"
-    echo "   例: dlog: 更新开发日志"
+    echo "   例: dlog: 回写 3 条 main 提交（ADR-007~009） @docs"
     echo "   本次: ${SUBJECT}"
+    echo ""
+    exit 1
+fi
+# 空话消息拦截（精确黑名单；消息必须描述本次实际改动）
+if [ "$SUBJECT" = "dlog: 更新开发日志" ]; then
+    echo ""
+    echo "❌ [commit-msg] 提交消息必须描述本次实际改动，禁止「dlog: 更新开发日志」类空话"
+    echo "   例: dlog: 登记「本地 Git Collector @backend」"
+    echo "       dlog: 回写 3 条 main 提交（ADR-007~009） @docs"
     echo ""
     exit 1
 fi

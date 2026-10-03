@@ -4,7 +4,7 @@
 > - 只编辑自己名字对应的区块；不要改动别人的区块（跨区块改动会在同步时被覆盖）。
 > - 只记录**当前进行中**的任务；完成或放弃后**直接删除该行**（历史一律看 `git log`）。
 > - 条目格式：`- [yyyy-mm-dd] 一句话任务 @区域/模块`
-> - 编辑后运行 `bash devlog.sh sync`（自动：格式校验 → 提交（信息为 `dlog: …`）→ pull --rebase → push；被拒自动重试）。
+> - 编辑后运行 `bash devlog.sh sync "<提交说明>"`（**说明必填**：一句话描述本次实际改动，如 `dlog: 回写 3 条 main 提交 @docs`；空话消息会被钩子拒绝。自动：格式校验 → 提交 → pull --rebase → push；被拒自动重试）。
 > - 本分支已启用本地钩子：提交前自动校验格式、提交信息强制 `dlog:`、提交后自动推送（无需手动 push）。
 > - 登记 / 完成：**向 AI 口述即可**——AI 代写 + 自动提交推送；`bash devlog.sh add/done` 是 AI 的内部命令，人不需要记。格式 / 日期 / 区块 / 颗粒度均由 AI 决定，人只做轻量 review。
 > - 条目超过 **7 天**未更新会被 CI 提醒（仅提醒，不阻断）。
@@ -13,8 +13,8 @@
 > 网页直读：https://github.com/si6moonlxy-cyber/InsightGraph/blob/dev-log/DEV_LOG.md
 
 ## Sixmoonlxy（main）
-- [2026-10-03] 步骤 4 Python AST 分析器（CodeGraph IR + 首个 Golden Dataset 与 evaluator） @backend
 
+- [2026-10-03] 步骤 4 Python AST 分析器（CodeGraph IR + 首个 Golden Dataset 与 evaluator） @backend
 - [2026-10-03] 本地 Git Collector（确定性 SourceManifest + 采集 CLI） @backend
 - [2026-10-02] start.bat 集成 docker/pgsql/redis 启动与检验 @infra
 - [2026-10-02] docker 基础设施架子（postgres+redis 启动 / 修复 redis 空密码 bug） @infra
