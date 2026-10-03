@@ -243,6 +243,7 @@ update something       ← 缺类型前缀
 | `docker compose up -d` | 启动 PostgreSQL(pgvector) + Neo4j + Redis |
 | `cd backend && uv run python -m app.infrastructure.collectors <路径>` | 采集本地 Git 仓库为 `SourceManifest`（步骤 3 采集 CLI，`--json` 输出规范 JSON） |
 | `cd backend && uv run python -m app.infrastructure.analyzers <路径>` | 采集+分析一条链输出 `CodeGraph`（步骤 4 CLI，`--json` 输出规范 JSON） |
+| `cd backend && uv run python ../eval/codegraph/validate.py <工件.json> --repo-root <仓库根>` | CodeGraph 产物三项不变量校验（DEFINES 入边 / content_hash 重算 / imports 目标；CI 经 pytest 强制执行） |
 | `bash scripts/ci-check.sh` | **push 前全量检查**（文档死链 → 后端 lint/测试 → 前端 lint → 密钥扫描） |
 | `bash scripts/doc-link-check.sh` | 仅检查文档死链 |
 | 开发日志（查看/编辑） | 唯一真源在 `dev-log` 分支：worktree `D:\Project_Mine\InsightGraph\.devlog`；**口述给 AI 登记 / 完成即可**（`add/done` 为内部命令，人不需要记）；网页直读见其 DEV_LOG.md 头部链接 |
