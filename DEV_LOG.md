@@ -14,6 +14,7 @@
 
 ## Sixmoonlxy（main）
 
+- [2026-10-03] 步骤 5 前置调研（开源调用图项目参考笔记 + 借鉴/否决清单 + ADR-012 草案） @docs
 - [2026-10-03] 步骤 5 先行件：入口识别规则 + CALLS 语料夹具（期望未冻结） @backend
 - [2026-10-03] dev-log 防退化规范（sync 必传说明 / add·done 自动派生消息 / 钩子拒绝空话条目） @协作流程
 - [2026-10-03] codegraph 产物不变量校验脚本（DEFINES 入边 / content_hash 重算 / imports 目标）+ CI 集成 @backend
