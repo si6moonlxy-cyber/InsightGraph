@@ -3,8 +3,9 @@
 > Solo dev 项目，Agent 辅助开发。
 > **核心法则：Evidence First（证据优先）。文档过时 = 生产 Bug，优先级等同。**
 >
-> 当前阶段：Phase 2A —— 工程基础设施、`backend/` 架构骨架、领域契约（ADR-010/011）与本地 Collector（步骤 3）已就位，
-> Analyzer、持久化适配器、GraphRAG 引擎与 `frontend/` 尚未建立（见 §五 5.3 当前代码-文档现实）。
+> 当前阶段：Phase 2A —— 工程基础设施、`backend/` 架构骨架、领域契约（ADR-010/011）、本地 Collector 与
+> Python Analyzer（步骤 3/4，含首个 Golden Dataset）已就位，持久化适配器、GraphRAG 引擎与 `frontend/` 尚未建立
+> （见 §五 5.3 当前代码-文档现实）。
 
 ---
 
@@ -241,6 +242,7 @@ update something       ← 缺类型前缀
 | `start.bat` | 一键启动（当前：dev-log 自动同步 + Docker 引擎自动拉起 + postgres/redis 容器启动与健康检验；依赖安装 / 前后端启动后续逐步加法） |
 | `docker compose up -d` | 启动 PostgreSQL(pgvector) + Neo4j + Redis |
 | `cd backend && uv run python -m app.infrastructure.collectors <路径>` | 采集本地 Git 仓库为 `SourceManifest`（步骤 3 采集 CLI，`--json` 输出规范 JSON） |
+| `cd backend && uv run python -m app.infrastructure.analyzers <路径>` | 采集+分析一条链输出 `CodeGraph`（步骤 4 CLI，`--json` 输出规范 JSON） |
 | `bash scripts/ci-check.sh` | **push 前全量检查**（文档死链 → 后端 lint/测试 → 前端 lint → 密钥扫描） |
 | `bash scripts/doc-link-check.sh` | 仅检查文档死链 |
 | 开发日志（查看/编辑） | 唯一真源在 `dev-log` 分支：worktree `D:\Project_Mine\InsightGraph\.devlog`；**口述给 AI 登记 / 完成即可**（`add/done` 为内部命令，人不需要记）；网页直读见其 DEV_LOG.md 头部链接 |
@@ -260,11 +262,11 @@ update something       ← 缺类型前缀
 | `docker-compose.yml` + `docker/postgres/init.sql` | ✅ 就绪 | postgres/redis 已在本机启动并 healthy（2026-10-02）；neo4j 未启动；api、web 服务待代码建立后加入 |
 | `.github/workflows/ci.yml` | ✅ 就绪 | docs 立即可用；backend / frontend 用存在性守卫，建立后自动生效 |
 | `scripts/` + `.githooks/`（pre-commit / pre-push / commit-msg） | ✅ 就绪 | 需一次性安装：`git config core.hooksPath .githooks` |
-| `eval/` | ✅ 骨架 | 规则已定；第一个 evaluator 随第一个分析能力落地 |
+| `eval/` | ✅ 首个 evaluator 已落地 | `eval/codegraph/`：Golden Dataset（golden-python-basic）+ evaluator（语义 100%）+ Baseline v1 |
 | 开发日志（`dev-log` 分支） | ✅ 就绪 | 独立 orphan 分支为唯一真源；工作树 .devlog 自带钩子（校验 / 强制 dlog / 提交后自动推送）；devlog.sh sync / pull；CI 只读校验 + 7 天陈旧提醒；Setup 与启动自动 pull 已并入 start.bat |
 | `backend/` | ✅ Phase 2A 骨架 | FastAPI + Settings + 错误/日志 + domain/application/infrastructure 分层 + 测试门禁 |
 | `frontend/` | ⏳ 未建立 | Phase 3：Vite + React + 视觉回归双守卫 |
-| CodeGraph / GraphRAG 领域契约 | ✅ 稳定版 | 稳定 ID、ScanResult/错误/统计契约、确定性序列化与 schema_version 已定（ADR-010/011）；Collector 已实现（步骤 3）；Analyzer/Repository 未实现 |
+| CodeGraph / GraphRAG 领域契约 | ✅ 稳定版 | 稳定 ID、ScanResult/错误/统计契约、确定性序列化与 schema_version 已定（ADR-010/011）；Collector 与 Analyzer 已实现（步骤 3/4）；Repository 未实现 |
 | LangGraph 工作流 | ⏳ 未建立 | `workflows/` 仅声明“编排不承载业务”的边界，尚未引入 LangGraph |
 | 真实 LLM 评测 workflow | ⏳ 未建立 | Phase 3：手动触发 + gate 脚本（不进常驻 CI） |
 
@@ -277,7 +279,7 @@ update something       ← 缺类型前缀
 | `domain/codegraph/` | CodeGraph IR、稳定 ID 构造与持久化端口 | `models.py`、`ids.py`、`kinds.py`、`ports.py` |
 | `domain/evidence/` | Evidence 来源与可信状态 | `models.py` |
 | `domain/graphrag/` | 知识节点与 Evidence First Claim | `models.py` |
-| `infrastructure/` | Collector、Analyzer、Persistence、LLM 外部适配器 | `collectors/git_repository.py` 已实现（步骤 3）；其余未建立 |
+| `infrastructure/` | Collector、Analyzer、Persistence、LLM 外部适配器 | `collectors/`（步骤 3）与 `analyzers/`（步骤 4）已实现；Persistence/LLM 未建立 |
 | `workflows/` | LangGraph 编排入口 | 当前仅建立边界 |
 | `foundation/` | 配置、日志与统一错误处理 | `config.py`、`logging.py`、`errors.py` |
 

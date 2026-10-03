@@ -2,8 +2,8 @@
 
 > 最后更新：2026-10-03
 >
-> 当前阶段：Phase 2A，建设步骤 0~3 已完成（领域契约冻结 + 本地 Git 采集器）；下一步进入
-> 步骤 4“Python 分析器”（第一个产品能力里程碑）。
+> 当前阶段：Phase 2A，建设步骤 0~4 已完成（领域契约 + 本地采集器 + Python 分析器与首个 Golden
+> Dataset，产品能力里程碑已达成）；下一步进入步骤 5“调用关系”（含前置调研）。
 >
 > 架构真源见[系统架构](architecture.md)，设计哲学见
 > [初始化架构思想导论](Introduction%20to%20Initialization%20Architecture%20Concepts.md)。
@@ -46,7 +46,7 @@ InsightGraph 按“先确定性地理解代码，再用证据组织知识，最�
 | 1   | 后端工程骨架            | ✅ 已完成  | FastAPI、Settings、日志、错误、分层目录、依赖锁和质量门禁已通过                      |
 | 2   | 领域模型              | ✅ 已完成  | 稳定 ID、ScanResult 与阶段错误契约、确定性序列化纪律已定（ADR-010/011），完成门槛由测试验证 |
 | 3   | 本地采集器             | ✅ 已完成  | `GitRepositoryCollector`：git 枚举（ignore 单一真源）+ LF 归一 SHA-256 + 局部错误通道；含最小采集 CLI |
-| 4   | Python 分析器        | ⬜ 未开始  | 只有 `CodeAnalyzer` Protocol，尚无 AST 实现和 Golden Dataset         |
+| 4   | Python 分析器        | ✅ 已完成  | `PythonAstAnalyzer`（Module/Class/Function + DEFINES/IMPORTS，`__qualname__` 与行号证据）；eval/codegraph 首个 Golden Dataset + evaluator（语义 100%） |
 | 5   | 调用关系              | ⬜ 未开始  | `CALLS` 仅存在于 EdgeKind，尚无符号解析实现                               |
 | 6   | 持久化               | ⬜ 未开始  | 只有 `CodeGraphRepository` Protocol，尚无 JSON/数据库适配器             |
 | 7   | 数据模型视图（datamodel） | ⬜ 未开始  | ADR-007/008/009 已定；复用步骤 3/4 解析设施与步骤 6 Artifact 纪律            |
@@ -186,13 +186,32 @@ InsightGraph 按“先确定性地理解代码，再用证据组织知识，最�
 - 相同输入输出字节级稳定的规范化 Artifact。
 - 每个节点可回溯到真实文件与源码行范围。
 
-**状态：⬜ 未开始。**
+**验证**
+
+- `test_python_ast_analyzer.py`（13 项）：qualname 语义（含 `<locals>`）、装饰器进入 span、
+  span 哈希、重名 `#2` 序号、IMPORTS 精确/后缀/歧义/子模块追加/相对导入、语法错误隔离、
+  双跑字节一致与排序、缺失根 fatal、非 `.py` 跳过。
+- `eval/codegraph/`：首个 Golden Dataset（`golden-python-basic`，19 节点 / 17 边，人工复核 +
+  独立哈希复算）+ evaluator（语义集合 100%，Primary = 1.0000）+ Baseline v1。
+- 真实仓库狗粮：自扫描 InsightGraph 成功（295 节点 / 303 边、零局部错误；
+  DEFINES 240 = class 44 + function 196 自洽）。
+- 修复管道不变量缺陷：`request.path` 必须为仓库根（Collector fail-fast 拒绝子目录，
+  CLI 自动归一）——狗粮暴露并修复。
+- 后端全量质量门禁（ruff / format / mypy / pytest）通过。
+
+**状态：✅ 已完成。**
 
 ### 5. 调用关系
 
 **目标**
 
 在基础结构图稳定后增加 CALLS、入口识别和跨模块符号解析。
+
+**前置调研（步骤 4 完成后执行）**
+
+参考开源 CodeGraph / 调用图项目（候选：PyCG、JARVIS/HeaderGen、astroid、griffe、SCIP/LSIF、Sourcetrail），
+产出「参考笔记 + 借鉴/否决清单」（含许可证与维护状态核实），以 ADR 形式落账后再进入本步骤设计；
+Parser Wrapper 抽象与图遍历性能优化在出现明确触发条件前不引入。
 
 **应实现**
 
@@ -334,22 +353,24 @@ SQLAlchemy 模型，产出第二类确定性分析产出：数据模型视图（
 
 当前不要直接接 Neo4j、LangGraph、LLM 或前端。下一阶段按下面顺序推进：
 
-### 当前任务：实现步骤 4（第一个产品能力里程碑）
+### 当前任务：实现步骤 5（前置调研后开工）
 
-1. Python AST Analyzer：Module / Class / Function 节点与 DEFINES / IMPORTS 关系。
-2. qualified name（遵循 Python `__qualname__` 约定）、装饰器、异步函数、嵌套定义与准确行号。
-3. 语法错误隔离与解析统计（阶段局部失败不中断整体）。
-4. 首个 Golden Repository + 固定期望 JSON + evaluator。
+1. 执行步骤 5 前置调研（见上：参考开源 CodeGraph / 调用图项目，产出笔记 → ADR）。
+2. CALLS 与符号解析：本地函数 / 方法 / 导入别名 / 模块属性调用，明确区分
+   resolved / ambiguous / dynamic / unresolved。
+3. 入口识别（CLI、FastAPI、脚本）与调用关系独立 Golden Cases 与误报/漏报指标。
+
+### 首个产品能力里程碑：已达成（步骤 4）
 
 ```text
 本地 Python 仓库
-→ SourceManifest（步骤 3，已完成）
-→ CodeGraph IR
+→ SourceManifest（步骤 3）
+→ CodeGraph IR（步骤 4）
 → 确定性 JSON
-→ Golden Dataset 验证
+→ Golden Dataset 验证（eval/codegraph，语义 100%）
 ```
 
-只有这条闭环通过，才进入 CALLS、数据库和异步任务。
+下一步进入 CALLS、数据库和异步任务（步骤 5~8）。
 
 ## 6. 更新纪律
 

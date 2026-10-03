@@ -19,7 +19,8 @@ Python Analyzer 即将动工，为避免每个下游模块各自发明一套规�
    时，按 line_start 升序编号：首个保持裸名，第 2..N 个追加 `#2`..`#N`；编号由
    Analyzer 负责赋值，ID 构造器只做纯函数拼接与校验。
 3. **边 ID** = `{kind}:{source_id}->{target_id}`；同一 (kind, source, target) 关系
-   去重，只保留一条边。
+   去重，只保留一条边。解析规则：先按第一个 `->` 切分 source 与 target，再从左侧
+   按第一个 `:` 切出 kind（kind 为闭枚举，故不存在解析歧义）。
 4. **图模型边界**：NodeKind 只有 module / class / function；Repository 是图作用域，
    不是节点类型；`SourceSpan` 对所有节点保持必填。CodeGraph 校验：节点 ID 唯一、
    节点 ID 符合构造规则、边 ID 符合构造规则、边两端必须引用已存在的节点。
