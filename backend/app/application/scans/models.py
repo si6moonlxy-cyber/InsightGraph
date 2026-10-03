@@ -34,13 +34,18 @@ class SourceFile(BaseModel):
 
 
 class SourceManifest(BaseModel):
-    """特定 Git revision 下的确定性文件清单。"""
+    """特定 Git revision 下的确定性文件清单。
+
+    files 来自工作区读取；worktree_dirty 表示采集时存在未提交改动
+    （此时清单反映工作区状态而非纯 revision 快照，供确定性审计）。
+    """
 
     model_config = _FROZEN
 
     schema_version: int = Field(default=1, ge=1)
     repository_id: str = Field(min_length=1)
     revision: str = Field(min_length=1)
+    worktree_dirty: bool = False
     files: tuple[SourceFile, ...] = ()
 
 

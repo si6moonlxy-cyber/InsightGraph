@@ -1,9 +1,9 @@
 # InsightGraph Development Plan
 
-> 最后更新：2026-10-02
+> 最后更新：2026-10-03
 >
-> 当前阶段：Phase 2A，建设步骤 0、1、2 已完成（领域契约冻结：ADR-010/011）；下一步进入
-> 步骤 3“本地仓库采集器”。
+> 当前阶段：Phase 2A，建设步骤 0~3 已完成（领域契约冻结 + 本地 Git 采集器）；下一步进入
+> 步骤 4“Python 分析器”（第一个产品能力里程碑）。
 >
 > 架构真源见[系统架构](architecture.md)，设计哲学见
 > [初始化架构思想导论](Introduction%20to%20Initialization%20Architecture%20Concepts.md)。
@@ -45,7 +45,7 @@ InsightGraph 按“先确定性地理解代码，再用证据组织知识，最�
 | 0   | 校准真源              | ✅ 已完成  | 架构真源、思想导论、ADR 体系与文档索引已经建立                                    |
 | 1   | 后端工程骨架            | ✅ 已完成  | FastAPI、Settings、日志、错误、分层目录、依赖锁和质量门禁已通过                      |
 | 2   | 领域模型              | ✅ 已完成  | 稳定 ID、ScanResult 与阶段错误契约、确定性序列化纪律已定（ADR-010/011），完成门槛由测试验证 |
-| 3   | 本地采集器             | ⏭ 下一步  | 只有 `RepositoryCollector` Protocol，尚不能读取真实仓库                  |
+| 3   | 本地采集器             | ✅ 已完成  | `GitRepositoryCollector`：git 枚举（ignore 单一真源）+ LF 归一 SHA-256 + 局部错误通道；含最小采集 CLI |
 | 4   | Python 分析器        | ⬜ 未开始  | 只有 `CodeAnalyzer` Protocol，尚无 AST 实现和 Golden Dataset         |
 | 5   | 调用关系              | ⬜ 未开始  | `CALLS` 仅存在于 EdgeKind，尚无符号解析实现                               |
 | 6   | 持久化               | ⬜ 未开始  | 只有 `CodeGraphRepository` Protocol，尚无 JSON/数据库适配器             |
@@ -155,7 +155,16 @@ InsightGraph 按“先确定性地理解代码，再用证据组织知识，最�
 - 不进入 `.git`、虚拟环境、构建产物或密钥文件。
 - Windows 路径、Unicode 文件名和软链接有自动测试。
 
-**状态：⏭ 下一步。**
+**验证**
+
+- `test_git_repository_collector.py`：同 revision 幂等、ignore/venv/构建产物排除、Unicode 文件名、
+  CRLF 归一哈希、单文件错误隔离、空仓库、无效路径 fatal、软链接越界拒绝/内部跟随
+  （Windows 无符号链接权限时自动跳过，CI 的 ubuntu 真实执行）。
+- 真实仓库狗粮：`uv run python -m app.infrastructure.collectors . --repository-id insightgraph`
+  自扫描成功产出 Manifest，`worktree_dirty` 正确反映未提交改动。
+- 后端全量质量门禁（ruff / format / mypy / pytest）通过。
+
+**状态：✅ 已完成。**
 
 ### 4. Python 分析器
 
@@ -325,20 +334,16 @@ SQLAlchemy 模型，产出第二类确定性分析产出：数据模型视图（
 
 当前不要直接接 Neo4j、LangGraph、LLM 或前端。下一阶段按下面顺序推进：
 
-### 当前任务：实现步骤 3
+### 当前任务：实现步骤 4（第一个产品能力里程碑）
 
-1. 实现本地 Git 仓库 Collector。
-2. 生成确定性 `SourceManifest`（局部失败与统计口径遵循 ADR-010/011）。
-3. 覆盖 ignore、Unicode、软链接和局部失败测试。
-4. 暂时不解析 AST。
-
-### 第一个产品能力里程碑：完成步骤 4
-
-Collector 稳定后，建立 Python AST Analyzer 和首个 Golden Repository，形成：
+1. Python AST Analyzer：Module / Class / Function 节点与 DEFINES / IMPORTS 关系。
+2. qualified name（遵循 Python `__qualname__` 约定）、装饰器、异步函数、嵌套定义与准确行号。
+3. 语法错误隔离与解析统计（阶段局部失败不中断整体）。
+4. 首个 Golden Repository + 固定期望 JSON + evaluator。
 
 ```text
 本地 Python 仓库
-→ SourceManifest
+→ SourceManifest（步骤 3，已完成）
 → CodeGraph IR
 → 确定性 JSON
 → Golden Dataset 验证
