@@ -1,0 +1,16 @@
+{
+  "feature": "codegraph-parser",
+  "dataset_version": "eval-v1",
+  "git_sha": "47d6349f9acd29a34a59a92b7e09d1a3ece8793f",
+  "timestamp": "2026-10-03T03:17:16.731517+00:00",
+  "runner": "eval/codegraph/evaluator.py",
+  "model_or_algorithm": "python-ast/0.1",
+  "metrics": {
+    "primary": 1.0,
+    "node_recall": 1.0,
+    "node_precision": 1.0,
+    "edge_recall": 1.0,
+    "edge_precision": 1.0
+  },
+  "raw_outputs": "eval/codegraph/.outputs/golden-python-basic.candidate.json"
+}

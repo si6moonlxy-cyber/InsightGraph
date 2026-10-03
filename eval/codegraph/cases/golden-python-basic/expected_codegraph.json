@@ -1,0 +1,340 @@
+{
+  "schema_version": 1,
+  "repository_id": "golden-python-basic",
+  "revision": "fixture-v1",
+  "parser_version": "python-ast/0.1",
+  "nodes": [
+    {
+      "id": "golden-python-basic:class:app.main.App",
+      "kind": "class",
+      "qualified_name": "app.main.App",
+      "language": "python",
+      "source": {
+        "file_path": "app/main.py",
+        "line_start": 23,
+        "line_end": 28
+      },
+      "content_hash": "sha256:ac3b91b81fba14d5dd9ac009492277e53310e1e9776dd6057c42731436dbcc8d"
+    },
+    {
+      "id": "golden-python-basic:class:app.service.Service",
+      "kind": "class",
+      "qualified_name": "app.service.Service",
+      "language": "python",
+      "source": {
+        "file_path": "app/service.py",
+        "line_start": 6,
+        "line_end": 11
+      },
+      "content_hash": "sha256:19162dd0abf2664f986491231a9c56a6a0b25b6d89ad1a13891437b158a83a09"
+    },
+    {
+      "id": "golden-python-basic:function:app.main.App.__init__",
+      "kind": "function",
+      "qualified_name": "app.main.App.__init__",
+      "language": "python",
+      "source": {
+        "file_path": "app/main.py",
+        "line_start": 24,
+        "line_end": 25
+      },
+      "content_hash": "sha256:9c3d7cde20c80a28373c35aeba1d1f1e6153f2d947885ed2d5af5ea974df6c9a"
+    },
+    {
+      "id": "golden-python-basic:function:app.main.App.run",
+      "kind": "function",
+      "qualified_name": "app.main.App.run",
+      "language": "python",
+      "source": {
+        "file_path": "app/main.py",
+        "line_start": 27,
+        "line_end": 28
+      },
+      "content_hash": "sha256:de4d8248855418c0833e5c7f102acb5e94c7b8f6bb860fdaddfbeeb72713d171"
+    },
+    {
+      "id": "golden-python-basic:function:app.main.build_service",
+      "kind": "function",
+      "qualified_name": "app.main.build_service",
+      "language": "python",
+      "source": {
+        "file_path": "app/main.py",
+        "line_start": 15,
+        "line_end": 20
+      },
+      "content_hash": "sha256:9060c1b9172dcdba9d83bdf905a64a2ace9f69c7129b2500ce662de3a545b5e7"
+    },
+    {
+      "id": "golden-python-basic:function:app.main.build_service.<locals>.normalize",
+      "kind": "function",
+      "qualified_name": "app.main.build_service.<locals>.normalize",
+      "language": "python",
+      "source": {
+        "file_path": "app/main.py",
+        "line_start": 17,
+        "line_end": 18
+      },
+      "content_hash": "sha256:9fb593534592f366f804c598f5dd547f09725e8474c7154c34dc7656e2d2665d"
+    },
+    {
+      "id": "golden-python-basic:function:app.main.logged",
+      "kind": "function",
+      "qualified_name": "app.main.logged",
+      "language": "python",
+      "source": {
+        "file_path": "app/main.py",
+        "line_start": 8,
+        "line_end": 12
+      },
+      "content_hash": "sha256:41387a263c0b827b02797f957475a03a8456089b0133f230a3ea79e6610d8ebe"
+    },
+    {
+      "id": "golden-python-basic:function:app.main.logged.<locals>.wrapper",
+      "kind": "function",
+      "qualified_name": "app.main.logged.<locals>.wrapper",
+      "language": "python",
+      "source": {
+        "file_path": "app/main.py",
+        "line_start": 9,
+        "line_end": 10
+      },
+      "content_hash": "sha256:0d679f23890375296a6e96503a91f098fe45c55b5c7698d099b64167ac68e609"
+    },
+    {
+      "id": "golden-python-basic:function:app.main.main",
+      "kind": "function",
+      "qualified_name": "app.main.main",
+      "language": "python",
+      "source": {
+        "file_path": "app/main.py",
+        "line_start": 31,
+        "line_end": 33
+      },
+      "content_hash": "sha256:6fb7ebf42be82112cef37d7e6285b79a2e3d04da2e8d6e7bdc04786903583850"
+    },
+    {
+      "id": "golden-python-basic:function:app.service.Service.__init__",
+      "kind": "function",
+      "qualified_name": "app.service.Service.__init__",
+      "language": "python",
+      "source": {
+        "file_path": "app/service.py",
+        "line_start": 7,
+        "line_end": 8
+      },
+      "content_hash": "sha256:70ae163b0d610718a97457e759639d4556661cc43e038a9db7c847286db9ba80"
+    },
+    {
+      "id": "golden-python-basic:function:app.service.Service.describe",
+      "kind": "function",
+      "qualified_name": "app.service.Service.describe",
+      "language": "python",
+      "source": {
+        "file_path": "app/service.py",
+        "line_start": 10,
+        "line_end": 11
+      },
+      "content_hash": "sha256:f205b76f31366b73034ebdad940bf34ff479da7e02108919452083a775c608e2"
+    },
+    {
+      "id": "golden-python-basic:function:app.utils.helpers.format_name",
+      "kind": "function",
+      "qualified_name": "app.utils.helpers.format_name",
+      "language": "python",
+      "source": {
+        "file_path": "app/utils/helpers.py",
+        "line_start": 6,
+        "line_end": 7
+      },
+      "content_hash": "sha256:7fa134ce7e657b790715c404e02cdc7791d238cfb495a6490a9d5044ec9b9c14"
+    },
+    {
+      "id": "golden-python-basic:function:app.utils.text_utils.clean",
+      "kind": "function",
+      "qualified_name": "app.utils.text_utils.clean",
+      "language": "python",
+      "source": {
+        "file_path": "app/utils/text_utils.py",
+        "line_start": 4,
+        "line_end": 5
+      },
+      "content_hash": "sha256:bd50cafc89d04928ec22d6755057130ea42f092ccc6b4cfab784599055ea1a40"
+    },
+    {
+      "id": "golden-python-basic:module:app",
+      "kind": "module",
+      "qualified_name": "app",
+      "language": "python",
+      "source": {
+        "file_path": "app/__init__.py",
+        "line_start": 1,
+        "line_end": 3
+      },
+      "content_hash": "sha256:dfd7f85ec03cc42444a4efd71360beda0d1b52cae7017c5d1f52beaf5ec5c5e7"
+    },
+    {
+      "id": "golden-python-basic:module:app.main",
+      "kind": "module",
+      "qualified_name": "app.main",
+      "language": "python",
+      "source": {
+        "file_path": "app/main.py",
+        "line_start": 1,
+        "line_end": 33
+      },
+      "content_hash": "sha256:96b562a0db72aaa316e68165ca06f6f1ac33041c5ac02f98fe9deadd2ae6c205"
+    },
+    {
+      "id": "golden-python-basic:module:app.service",
+      "kind": "module",
+      "qualified_name": "app.service",
+      "language": "python",
+      "source": {
+        "file_path": "app/service.py",
+        "line_start": 1,
+        "line_end": 11
+      },
+      "content_hash": "sha256:23be267cafba33b1b150eda6d402a67970bd6e49c1accb15a12e888db29787cb"
+    },
+    {
+      "id": "golden-python-basic:module:app.utils",
+      "kind": "module",
+      "qualified_name": "app.utils",
+      "language": "python",
+      "source": {
+        "file_path": "app/utils/__init__.py",
+        "line_start": 1,
+        "line_end": 3
+      },
+      "content_hash": "sha256:f1dcf20b1337c008b5574477f02029d2e99aae47cbd78e243e5169551b29f5cb"
+    },
+    {
+      "id": "golden-python-basic:module:app.utils.helpers",
+      "kind": "module",
+      "qualified_name": "app.utils.helpers",
+      "language": "python",
+      "source": {
+        "file_path": "app/utils/helpers.py",
+        "line_start": 1,
+        "line_end": 7
+      },
+      "content_hash": "sha256:6ce27b1827261ca715657f23be1abc12a86e7aa7db4957891f840316bfeb4725"
+    },
+    {
+      "id": "golden-python-basic:module:app.utils.text_utils",
+      "kind": "module",
+      "qualified_name": "app.utils.text_utils",
+      "language": "python",
+      "source": {
+        "file_path": "app/utils/text_utils.py",
+        "line_start": 1,
+        "line_end": 5
+      },
+      "content_hash": "sha256:4c24703266ad8cc6fd04bf2cc6937662e2251538659cd5001b5a56c00bcb8b3a"
+    }
+  ],
+  "edges": [
+    {
+      "id": "defines:golden-python-basic:class:app.main.App->golden-python-basic:function:app.main.App.__init__",
+      "kind": "defines",
+      "source_id": "golden-python-basic:class:app.main.App",
+      "target_id": "golden-python-basic:function:app.main.App.__init__"
+    },
+    {
+      "id": "defines:golden-python-basic:class:app.main.App->golden-python-basic:function:app.main.App.run",
+      "kind": "defines",
+      "source_id": "golden-python-basic:class:app.main.App",
+      "target_id": "golden-python-basic:function:app.main.App.run"
+    },
+    {
+      "id": "defines:golden-python-basic:class:app.service.Service->golden-python-basic:function:app.service.Service.__init__",
+      "kind": "defines",
+      "source_id": "golden-python-basic:class:app.service.Service",
+      "target_id": "golden-python-basic:function:app.service.Service.__init__"
+    },
+    {
+      "id": "defines:golden-python-basic:class:app.service.Service->golden-python-basic:function:app.service.Service.describe",
+      "kind": "defines",
+      "source_id": "golden-python-basic:class:app.service.Service",
+      "target_id": "golden-python-basic:function:app.service.Service.describe"
+    },
+    {
+      "id": "defines:golden-python-basic:function:app.main.build_service->golden-python-basic:function:app.main.build_service.<locals>.normalize",
+      "kind": "defines",
+      "source_id": "golden-python-basic:function:app.main.build_service",
+      "target_id": "golden-python-basic:function:app.main.build_service.<locals>.normalize"
+    },
+    {
+      "id": "defines:golden-python-basic:function:app.main.logged->golden-python-basic:function:app.main.logged.<locals>.wrapper",
+      "kind": "defines",
+      "source_id": "golden-python-basic:function:app.main.logged",
+      "target_id": "golden-python-basic:function:app.main.logged.<locals>.wrapper"
+    },
+    {
+      "id": "defines:golden-python-basic:module:app.main->golden-python-basic:class:app.main.App",
+      "kind": "defines",
+      "source_id": "golden-python-basic:module:app.main",
+      "target_id": "golden-python-basic:class:app.main.App"
+    },
+    {
+      "id": "defines:golden-python-basic:module:app.main->golden-python-basic:function:app.main.build_service",
+      "kind": "defines",
+      "source_id": "golden-python-basic:module:app.main",
+      "target_id": "golden-python-basic:function:app.main.build_service"
+    },
+    {
+      "id": "defines:golden-python-basic:module:app.main->golden-python-basic:function:app.main.logged",
+      "kind": "defines",
+      "source_id": "golden-python-basic:module:app.main",
+      "target_id": "golden-python-basic:function:app.main.logged"
+    },
+    {
+      "id": "defines:golden-python-basic:module:app.main->golden-python-basic:function:app.main.main",
+      "kind": "defines",
+      "source_id": "golden-python-basic:module:app.main",
+      "target_id": "golden-python-basic:function:app.main.main"
+    },
+    {
+      "id": "defines:golden-python-basic:module:app.service->golden-python-basic:class:app.service.Service",
+      "kind": "defines",
+      "source_id": "golden-python-basic:module:app.service",
+      "target_id": "golden-python-basic:class:app.service.Service"
+    },
+    {
+      "id": "defines:golden-python-basic:module:app.utils.helpers->golden-python-basic:function:app.utils.helpers.format_name",
+      "kind": "defines",
+      "source_id": "golden-python-basic:module:app.utils.helpers",
+      "target_id": "golden-python-basic:function:app.utils.helpers.format_name"
+    },
+    {
+      "id": "defines:golden-python-basic:module:app.utils.text_utils->golden-python-basic:function:app.utils.text_utils.clean",
+      "kind": "defines",
+      "source_id": "golden-python-basic:module:app.utils.text_utils",
+      "target_id": "golden-python-basic:function:app.utils.text_utils.clean"
+    },
+    {
+      "id": "imports:golden-python-basic:module:app.main->golden-python-basic:module:app.service",
+      "kind": "imports",
+      "source_id": "golden-python-basic:module:app.main",
+      "target_id": "golden-python-basic:module:app.service"
+    },
+    {
+      "id": "imports:golden-python-basic:module:app.service->golden-python-basic:module:app.utils.helpers",
+      "kind": "imports",
+      "source_id": "golden-python-basic:module:app.service",
+      "target_id": "golden-python-basic:module:app.utils.helpers"
+    },
+    {
+      "id": "imports:golden-python-basic:module:app.utils->golden-python-basic:module:app.utils.text_utils",
+      "kind": "imports",
+      "source_id": "golden-python-basic:module:app.utils",
+      "target_id": "golden-python-basic:module:app.utils.text_utils"
+    },
+    {
+      "id": "imports:golden-python-basic:module:app.utils.helpers->golden-python-basic:module:app.utils.text_utils",
+      "kind": "imports",
+      "source_id": "golden-python-basic:module:app.utils.helpers",
+      "target_id": "golden-python-basic:module:app.utils.text_utils"
+    }
+  ]
+}
