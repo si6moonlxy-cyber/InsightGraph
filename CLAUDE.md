@@ -280,7 +280,7 @@ update something       ← 缺类型前缀
 | `domain/codegraph/` | CodeGraph IR、稳定 ID 构造与持久化端口 | `models.py`、`ids.py`、`kinds.py`、`ports.py` |
 | `domain/evidence/` | Evidence 来源与可信状态 | `models.py` |
 | `domain/graphrag/` | 知识节点与 Evidence First Claim | `models.py` |
-| `infrastructure/` | Collector、Analyzer、Persistence、LLM 外部适配器 | `collectors/`（步骤 3）与 `analyzers/`（步骤 4）已实现；Persistence/LLM 未建立 |
+| `infrastructure/` | Collector、Analyzer、Persistence、LLM 外部适配器 | `collectors/`（步骤 3）与 `analyzers/`（步骤 4）已实现；`analyzers/entry_points.py` 为步骤 5 先行件（仅识别，表示层待定）；Persistence/LLM 未建立 |
 | `workflows/` | LangGraph 编排入口 | 当前仅建立边界 |
 | `foundation/` | 配置、日志与统一错误处理 | `config.py`、`logging.py`、`errors.py` |
 
