@@ -13,6 +13,7 @@
 > 网页直读：https://github.com/si6moonlxy-cyber/InsightGraph/blob/dev-log/DEV_LOG.md
 
 ## Sixmoonlxy（main）
+- [2026-10-03] 步骤 4 Python AST 分析器（CodeGraph IR + 首个 Golden Dataset 与 evaluator） @backend
 
 - [2026-10-03] 本地 Git Collector（确定性 SourceManifest + 采集 CLI） @backend
 - [2026-10-02] start.bat 集成 docker/pgsql/redis 启动与检验 @infra
