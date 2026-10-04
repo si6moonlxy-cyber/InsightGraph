@@ -151,15 +151,21 @@ OSS Engine（看懂代码）→ Canonical Adapter（统一语义与证据）→ 
 5. **对照与判定**：按夹具归属表逐项打分（命中 / 偏差 / 缺失），专项检查 **call-site 行号是否出现**。
 6. **产出**：`eval/codegraph/.outputs/codegraph-ai-poc/{raw_responses, scorecard.md}`（原始响应 + 记分卡）；结论摘要回填本文 §5.4。
 
-### 5.4 结果（占位，POC 执行后回填）
+### 5.4 POC 结果（2026-10-04 执行）
 
 | 检查项 | 结果 | 证据文件 |
 | --- | --- | --- |
-| 夹具意图命中率（≥80%？） | 待执行 | — |
-| call-site 行号证据 | 待执行 | — |
-| 入口识别对账（先行件规则） | 待执行 | — |
-| 补充探针（inheritance/decorator/DI） | 待执行 | — |
-| 实际引擎版本与稳定性 | 待执行 | — |
+| 夹具意图命中率（≥80%？） | ❌ **未达标**：契约口径 2/6（≈33%，含 1 部分命中）｜宽口径内在调用 4/9（≈44%）；**假阳性 0 观察** | `.outputs/codegraph-ai-poc/scorecard.md` |
+| call-site 行号证据 | ❌ **不可得**：`call_site` 字段实为调用者符号 span（`end_column=10000` 哨兵）→ AST 定向补扫确认必要 | `raw/c_callers_*.json` |
+| 入口识别对账（先行件规则） | 部分：`main` ✓；**FastAPI web_app 未检出**（夹具无路由）；另 8 条 public_api 噪声 + 1 条 event_handler 误标 | `raw/a_find_entry_points.json` |
+| 补充探针（inheritance/decorator/DI） | 未执行（先定方向） | — |
+| 实际引擎版本与稳定性 | v0.20.1 win-x64，sha256 通过；36/36 rc=0，one-shot 稳定；数据落点 `C:\Users\dell\.codegraph`（C 盘，未见重定向开关） | `raw/*.meta.txt` |
+
+**POC 结论（2026-10-04）**
+
+- 命中不足（<80%），触发 §5.1 失败分支；缺失集中：① **类方法体内调用全缺**（`run` callees 空，含 `self._format` 与 `greet`）；② **模块属性/别名调用未解析**（`helpers.shout` ×2、`import ... as` 别名）；③ 局部实例方法（原属“待定”）。precision 观察无损（0 假阳性）。
+- 已确认：无调用点行号证据 → 调用点补扫为刚需（ADR-012 v2 决策 2 预案成立）。
+- 下一步分支（**已决 2026-10-04：A 混合增强**）：Engine 负责跨文件图 / 入口 / 高精度直呼边；**自研 AST 调用补扫器**补齐方法体 / self / 别名盲区 + call-site 行号证据（stdlib AST，零新依赖，复用既有解析设施）；B（Pyright/astroid 第二分析器）与 C（纯 Engine）否决或备选，代价见 scorecard。
 
 ## 6. ADR-012 v2 草案：CALLS 获取与归一化纪律（供 Human 审核后落账 `docs/adr/`）
 
@@ -176,7 +182,7 @@ OSS Engine（看懂代码）→ Canonical Adapter（统一语义与证据）→ 
 
 1. **获取层（引擎 ≠ 契约）**：CALLS 解析默认经外部引擎（首选 codegraph-ai/CodeGraph，经 POC 验证后定版；备选 L2：Pyright/scip-python/astroid 增强）；引擎以 **headless 一次性模式**（`--run-tool`）接入，不引入 MCP 运行时依赖；引擎位于 infrastructure 层适配器，**引擎可替换**（Canonical Adapter 契约才是稳定接口）。
 2. **归一化层（本仓库职责）**：引擎原始输出必须经 Canonical Adapter（含 Resolution Normalizer 职责）——产出四态（resolved / ambiguous / dynamic / unresolved）+ source_span + 漏斗计数 + 稳定 ID 映射（ADR-010）+ 确定性排序去重；引擎未给出调用点行号时，用本地 AST 定向补扫补齐证据（只补证据，不重做解析）。
-3. **契约部分（承接 v1 草案，不变）**：`CodeEdge` 增可选 `source_span`（calls 必填）与 `resolution`（calls 必填）；`ScanStats` 增调用漏斗计数；`CodeGraph.schema_version` 1→2；不新增错误码。
+3. **契约部分（v2 范围，grill 2026-10-04 冻结）**：`CodeEdge` 增可选 `source_span`（calls 必填）与 `resolution`（calls 必填）；**ambiguous 物化 + 防爆护栏**（候选上限 5 / `is_truncated` 标记 / `ScanStats.oversized_ambiguous_calls`）；**CodeGraph 增图级 `entries` 清单**（与 nodes/edges 平级，不入 EdgeKind）；`ScanStats` 增调用漏斗计数；`CodeGraph.schema_version` 1→2；不新增错误码。
 4. **引擎准入条件**：Apache-2.0 等宽松许可登记；版本 pin + 二进制 sha256 校验；平台资产（本机 win-x64、CI linux-x64）；离线可运行（`--graph-only`）；**引擎故障/不可用时降级**为既有 AST 能力 + 显式 unresolved 计数（不虚假成功、不静默）。
 5. **自研保底**：`PythonAstAnalyzer` 既有 DEFINES/IMPORTS 能力不回退；自研 resolver 仅用于补齐引擎无法覆盖的 gap（L4）。
 6. **落地顺序**：POC（§5）→ 通过线与缺口清单 → 集成设计（Canonical Adapter 接口 + 四态判定规则 + Golden 期望冻结）→ 评测 Baseline v2（只用新建不覆盖纪律）→ ADR 落账与架构文档同步。
@@ -200,7 +206,7 @@ OSS Engine（看懂代码）→ Canonical Adapter（统一语义与证据）→ 
 **待 Human 决策（本次）**
 
 1. 本选型文档（`docs/codegraph/codegraph-oss-adoption.md`）是否认可为步骤 5 落地策略；
-2. **POC 执行方式**：引擎二进制获取方式——（a）授权 Agent 下载（sha256 校验、存仓库外）；（b）Human 手动下载后 Agent 执行；（c）暂缓 POC 先评审文档；
+2. **POC 执行方式**：已决（grill Q1）——Human 手动下载（sha256 校验、存仓库外），Agent 校验并执行 POC 与记分；
 3. POC 通过后再落 ADR-012 v2（`docs/adr/`）与契约变更实施。
 
 **POC 通过后的文档同步清单（预告，非本次执行）**

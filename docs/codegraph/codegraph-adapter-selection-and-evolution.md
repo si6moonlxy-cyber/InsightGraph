@@ -191,6 +191,8 @@ REFERENCES
 ENTRY_POINT
 ```
 
+> 2026-10-04 已决（grill Q3/Q4）：**ENTRY_POINT 不属于结构关系**——入口是 Graph-level Metadata（角色标注），作为与 nodes / edges 平级的独立 top-level 清单存在，不并入 EdgeKind；CONTAINS 与既有 DEFINES 语义归并；IMPLEMENTS / INHERITS 汇总处理留 v2.x（grill Q4）。
+
 第三方关系名称不直接向上暴露。
 
 未来无论输入来自：
@@ -925,16 +927,16 @@ GraphRAG
 ## 16. 契约差量与决策记录（2026-10-04）
 
 > 来源：契约影响分析（P1–P6，2026-10-04）＋与冻结契约 ADR-010 / ADR-011 的差量定责；
-> 「已决」= Human 决定，「建议」= 待 POC / ADR-012 落账时点确认。
+> 「已决」= Human 决定（2026-10-04，含 grill 收口 Q1–Q5）；本表全部条目已决，POC 与 ADR-012 落账只影响实施时点。
 
 | # | 差量 | 现契约 | 本文档诉求 | 影响面 | 处置 |
 | --- | --- | --- | --- | --- | --- |
 | **P1** | SymbolKind 闭集 | `NodeKind = {module, class, function}`；方法 = function + `Class.method`（步骤 4 口径） | +METHOD / VARIABLE / INTERFACE / TYPE / PARAMETER / UNKNOWN | kinds.py、validator、Golden/evaluator、CLAUDE.md §二、architecture.md §5.1 | ✅ **已决 1-A**：扩类**不进入对外契约**——仅作 Adapter 内部维度；对外保持 3 类；未来如需对外扩类 → 单独立 ADR（走 schema_version 流程） |
-| **P2** | SourceSpan | `file_path + line_start + line_end`；节点必填、边无 | +`start_col/end_col`；symbol span 与 callsite span 区分 | SourceSpan 模型与校验、content_hash 口径、边证据 | 建议：**callsite span 进 v2**（`CodeEdge.source_span`，calls 必填——承接既有提案）；**列号 v1 不承诺**（声明“可选、以引擎实际能力为准”；引擎响应现仅 file/line/end_line，POC 验证后定） |
-| **P3** | EdgeKind 闭集 | `{defines, imports, calls}` | +CONTAINS / INHERITS / IMPLEMENTS / REFERENCES / ENTRY_POINT | kinds.py、validator、evaluator、文档 3 处同步 | 建议**分批**：v2 首批候选 = **ENTRY_POINT + CONTAINS**（前者先行件已识别、表示层随 ADR 定；后者定义树可得）；v2.x = INHERITS / IMPLEMENTS；REFERENCES 最后。每批 = 一次受控升级 |
-| **P4** | 身份格式 | ADR-010 `{repository_id}:{kind}:{qualified_name}` | 示例 `symbol://python/...` 与 `python:function:...` 并存 | 全部 ID 构造与跨层引用（GraphRAG / datamodel 依赖稳定 ID） | 建议：**canonical ID 沿用 ADR-010**（§3.1 已加注）；文档两示例收敛为一个并标注“示意，以 ADR-010 为准”；`upstream_node_id` 只存在于 Adapter 映射，不进入 Artifact |
-| **P5** | Evidence 粒度 | 边无 provenance 字段 | 逐边 `EdgeEvidence(provider/version/node_id/method)` | CodeEdge 字段、Artifact 体积、多后端融合 | 建议：**v2 = 扫描级 provenance**（图根 / ScanResult 元数据：provider、version、query 方法集合、资产哈希）；多后端 Evidence Fusion 启动时再逐边化（届时再升级） |
-| **P6** | 状态枚举 | `resolution ∈ {resolved, ambiguous}`（v2 提案） | “conflict” 第五态（文档留待后议） | 枚举闭集纪律、evaluator | 建议：**v1 不引入**；写入 ADR 复审触发（多后端融合时评审） |
+| **P2** | SourceSpan | `file_path + line_start + line_end`；节点必填、边无 | +`start_col/end_col`；symbol span 与 callsite span 区分 | SourceSpan 模型与校验、content_hash 口径、边证据 | ✅ **已决**：**callsite span 进 v2**（`CodeEdge.source_span`，calls 必填——承接既有提案）；**列号 v1 不承诺**（声明“可选、以引擎实际能力为准”；引擎响应现仅 file/line/end_line，POC 复核）；同行多次调用的精确区分留待未来 schema 升级 |
+| **P3** | EdgeKind 闭集 | `{defines, imports, calls}` | +CONTAINS / INHERITS / IMPLEMENTS / REFERENCES / ENTRY_POINT | kinds.py、validator、evaluator、文档 3 处同步 | ✅ **已决（grill Q3/Q4）**：v2 = **CALLS 相关 + 图级入口清单**（EntryPoint 为 Graph-level Metadata，与 nodes/edges 平级，**不并入 EdgeKind**）；**CONTAINS 同义归并 DEFINES**（引擎 Contains → DEFINES 映射）；INHERITS / IMPLEMENTS 留 v2.x 独立批次；REFERENCES 最后 |
+| **P4** | 身份格式 | ADR-010 `{repository_id}:{kind}:{qualified_name}` | 示例 `symbol://python/...` 与 `python:function:...` 并存 | 全部 ID 构造与跨层引用（GraphRAG / datamodel 依赖稳定 ID） | ✅ **已决**：**canonical ID 沿用 ADR-010**（契约约束，无替代；§3.1 已加注）；文档两示例收敛为一个并标注“示意，以 ADR-010 为准”；`upstream_node_id` 只存在于 Adapter 映射，不进入 Artifact |
+| **P5** | Evidence 粒度 | 边无 provenance 字段 | 逐边 `EdgeEvidence(provider/version/node_id/method)` | CodeEdge 字段、Artifact 体积、多后端融合 | ✅ **已决**：**v2 = 扫描级 provenance**（图根 / ScanResult 元数据：provider、version、query 方法集合、资产哈希）；**不逐边存**；多后端 Evidence Fusion 启动时再逐边化 |
+| **P6** | 状态枚举 | `resolution ∈ {resolved, ambiguous}`（v2 提案） | “conflict” 第五态（文档留待后议） | 枚举闭集纪律、evaluator | ✅ **已决**：**v1 不引入**第五状态；ADR 复审触发 = 多后端融合 **或自研 Resolver 升级为独立并行解析**时 |
 
 **升级节奏耦合**
 
@@ -948,12 +950,30 @@ GraphRAG
 - ✅ P7 已决「同一个」：Canonical Artifact = 既有 `app/domain/codegraph` 域模型的演进（单域模型）；§7 目录已按调整版更新，不设独立 `domain/` 与 `validation/` 子层。
 - ✅ P9 命名收敛：「Canonical Adapter」为统一术语；「Resolution Normalizer」降级为其内部组件名（`adapter/resolution.py`）。
 
-**决策状态**
+**决策状态（grill 收口后：全部已决）**
 
 | 项 | 状态 |
 | --- | --- |
-| P1 = 1-A（扩类仅 Adapter 内部维度） | ✅ 已决（2026-10-04） |
-| P7 = 同一个（Canonical = 域模型演进） | ✅ 已决（2026-10-04） |
-| P2 列号策略 / P3 首批边型 / P4 收敛表述 / P5 provenance 粒度 / P6 不引入 conflict | ⏳ 建议（POC 与 ADR-012 v2 落账时点确认） |
+| P1 = 1-A（扩类仅 Adapter 内部维度） | ✅ 已决 |
+| P2 = callsite span 进 v2；列号 v1 不承诺 | ✅ 已决 |
+| P3 = v2 范围：CALLS + 入口清单；CONTAINS 归并 DEFINES；继承类边留 v2.x | ✅ 已决 |
+| P4 = canonical ID 沿用 ADR-010（契约约束，无替代） | ✅ 已决 |
+| P5 = 扫描级 provenance（不逐边存） | ✅ 已决 |
+| P6 = 不引入 conflict；复审触发含自研并行解析 | ✅ 已决 |
+| P7 = 同一个（Canonical = 域模型演进） | ✅ 已决 |
+| 入口表示层 = 图级清单（与 nodes/edges 平级，不入 EdgeKind） | ✅ 已决（grill Q3） |
+| ambiguous = 物化歧义边 + 防爆护栏（见下） | ✅ 已决（grill Q5） |
+| schema_version 1→2 一次性承载（CALLS 字段 + entries 清单） | ✅ 已决（grill Q4） |
+
+**ambiguous 防爆护栏（grill Q5 附加，Human 口径）**
+
+- 候选上限 **5 个 / 调用点**；超出时按候选 ID 排序**截断取前 5**，并对所物化边标记 `is_truncated=True`（候选本身按 ID 排序去重）。
+- `ScanStats` 记录 **`oversized_ambiguous_calls`** 计数（候选数 > 5 的调用点数量）。
+- `dynamic` / `unresolved` 维持“不建边、只进统计漏斗”。
+
+**开工顺序（grill Q1）**
+
+- 引擎获取：**Human 手动下载** `codegraph-server-win32-x64.exe`（v0.20.1，含 sha256）→ Agent 校验并执行 POC → 集成设计 → Adapter 骨架。
+- POC 已执行（2026-10-04）：夹具命中未达 80%（契约口径 ≈33%；无假阳性；call-site 行号不可得）→ **已决混合增强（A）**：Engine + 自研 AST 调用补扫 + Canonical Adapter（结果见 oss-adoption §5.4 与 scorecard）。
 
 > 本记录随 §3–§5 一并作为 POC 与 ADR-012 v2 的决策输入；POC 通过后并入 ADR 正式稿。

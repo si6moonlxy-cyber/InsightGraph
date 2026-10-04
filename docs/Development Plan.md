@@ -223,6 +223,7 @@ ADR-012 草案待 Human 审核后落账 `docs/adr/`，通过后再进入本步�
 含 codegraph-ai/CodeGraph 核实、修订优先级与 POC Spike 计划）；ADR-012 草案 v2 见该文 §6，待 POC 结果与 Human 决策后落账 `docs/adr/`。
 Adapter 职责边界与长期演进决策见 [codegraph-adapter-selection-and-evolution.md](codegraph/codegraph-adapter-selection-and-evolution.md)（Provider + Canonical Adapter + Phase 演进）；
 契约差量与决策记录（P1–P6；1-A / 同一个）见其 §16。
+方案 B 开工前 grill 收口（2026-10-04）：schema v2 范围（CALLS + 入口清单）、歧义防爆护栏（候选 ≤5 / is_truncated / oversized_ambiguous_calls）已冻结于 §16。
 
 **先行件已落地（2026-10-03，不依赖调研结论）**
 
