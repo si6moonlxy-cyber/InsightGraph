@@ -14,6 +14,7 @@
 
 ## Sixmoonlxy（main）
 
+- [2026-10-04] Adapter 契约影响分析（P1–P6）+ 结构决议（1-A / 同一个） @docs
 - [2026-10-04] local-memory-skill 换行补丁：write_text 增加 newline（含 3 个记忆仓脚本副本；自检 38 文件 0 CRLF） @协作流程
 - [2026-10-04] 工作区整理：LF 归一化 295 文件 + 死链修复 22 处 + 幽灵 M 清理（主仓 3 组提交） @协作流程
 - [2026-10-04] CALLS 调研反馈修订：OSS 选型与 Adapter 落地路线文档（含 POC 计划） @docs
