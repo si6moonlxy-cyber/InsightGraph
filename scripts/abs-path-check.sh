@@ -29,7 +29,9 @@ NC='\033[0m'
 echo "🔍 检查机器特定绝对路径..."
 
 # 盘符路径的正则里，反斜杠在 ERE 中需转义为 \\
-PATTERN='[A-Za-z]:\\|/Users/[A-Za-z]|/home/[a-z]'
+# 盘符前必须不是字母 / 数字 / 下划线：否则 Python 里 `True:\n`、`"key":\n`
+# 这类"冒号 + 转义序列"会被误判成盘符路径（2026-10-04 实测踩到）。
+PATTERN='(^|[^A-Za-z0-9_])[A-Za-z]:\\|/Users/[A-Za-z]|/home/[a-z]'
 
 HITS="$(git grep -n -I -E "$PATTERN" -- . 2>/dev/null | grep -v 'abs-path-check: allow' || true)"
 
