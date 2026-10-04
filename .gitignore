@@ -38,6 +38,7 @@ tmp/
 temp/
 *.tmp
 *.bak
+.memory_migration_staging/
 
 # ---------- 编辑器与 IDE ----------
 .idea/
