@@ -163,7 +163,7 @@ OSS Engine（看懂代码）→ Canonical Adapter（统一语义与证据）→ 
 
 ## 6. ADR-012 v2 草案：CALLS 获取与归一化纪律（供 Human 审核后落账 `docs/adr/`）
 
-> 与 v1 草案（`codegraph-calls-pre-research.md` §5，"自研解析"语境）的关系：**契约部分（四态 / 调用点证据 / 统计漏斗 / schema v2）保持不变；获取方式改为外部引擎 Adapter 优先**。落账建议文件名 `ADR-012-calls-acquisition-normalization.md`（编号 012 空闲）；POC 结果与 Human 审核后落账。已决口径（2026-10-04，详见 [codegraph-adapter-contract-impact.md](codegraph-adapter-contract-impact.md)）：P1=1-A（扩类仅 Adapter 内部维度）、P7=同一个（Canonical = 域模型演进）。
+> 与 v1 草案（`codegraph-calls-pre-research.md` §5，"自研解析"语境）的关系：**契约部分（四态 / 调用点证据 / 统计漏斗 / schema v2）保持不变；获取方式改为外部引擎 Adapter 优先**。落账建议文件名 `ADR-012-calls-acquisition-normalization.md`（编号 012 空闲）；POC 结果与 Human 审核后落账。已决口径（2026-10-04，详见 [决策文档 §16](codegraph-adapter-selection-and-evolution.md)）：P1=1-A（扩类仅 Adapter 内部维度）、P7=同一个（Canonical = 域模型演进）。
 
 - 状态：Proposed（草案 v2 · 待 POC 证据与审核）
 - 日期：2026-10-04
@@ -180,7 +180,7 @@ OSS Engine（看懂代码）→ Canonical Adapter（统一语义与证据）→ 
 4. **引擎准入条件**：Apache-2.0 等宽松许可登记；版本 pin + 二进制 sha256 校验；平台资产（本机 win-x64、CI linux-x64）；离线可运行（`--graph-only`）；**引擎故障/不可用时降级**为既有 AST 能力 + 显式 unresolved 计数（不虚假成功、不静默）。
 5. **自研保底**：`PythonAstAnalyzer` 既有 DEFINES/IMPORTS 能力不回退；自研 resolver 仅用于补齐引擎无法覆盖的 gap（L4）。
 6. **落地顺序**：POC（§5）→ 通过线与缺口清单 → 集成设计（Canonical Adapter 接口 + 四态判定规则 + Golden 期望冻结）→ 评测 Baseline v2（只用新建不覆盖纪律）→ ADR 落账与架构文档同步。
-7. **相关决议（2026-10-04）**：P1=1-A（SymbolKind 扩类仅 Adapter 内部维度，对外保持 3 类）；P7=同一个（Canonical Artifact = `app/domain/codegraph` 域模型演进）；P2–P6 处置建议见 [codegraph-adapter-contract-impact.md](codegraph-adapter-contract-impact.md)。
+7. **相关决议（2026-10-04）**：P1=1-A（SymbolKind 扩类仅 Adapter 内部维度，对外保持 3 类）；P7=同一个（Canonical Artifact = `app/domain/codegraph` 域模型演进）；P2–P6 处置建议见 [决策文档 §16](codegraph-adapter-selection-and-evolution.md)。
 
 **Alternatives**
 

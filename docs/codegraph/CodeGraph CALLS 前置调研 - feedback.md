@@ -1,3 +1,7 @@
+> 状态：历史输入（2026-10-04）。本文的全部实质结论已并入以下文档，保留作原始评审记录（如无需追溯可删除）：
+> [codegraph-adapter-selection-and-evolution.md](codegraph-adapter-selection-and-evolution.md)（决策真源，含 §16 契约决策）、
+> [codegraph-oss-adoption.md](codegraph-oss-adoption.md)（选型与 POC）、[codegraph-calls-pre-research.md](codegraph-calls-pre-research.md)（调研存档）。
+
 我核对了你这份《CodeGraph CALLS 前置调研》里的主要结论，并重新查了 PyCG、JARVIS、astroid、griffe、code2flow、SCIP/scip-python、tree-sitter、pyan3、rustworkx，以及与你当前目标最直接相关的 `codegraph-ai/CodeGraph`。
 
 结论先说：
