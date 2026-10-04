@@ -1,9 +1,10 @@
 # InsightGraph Development Plan
 
-> 最后更新：2026-10-03
+> 最后更新：2026-10-04
 >
 > 当前阶段：Phase 2A，建设步骤 0~4 已完成（领域契约 + 本地采集器 + Python 分析器与首个 Golden
-> Dataset，产品能力里程碑已达成）；下一步进入步骤 5“调用关系”（含前置调研）。
+> Dataset，产品能力里程碑已达成）；步骤 5“调用关系”进行中——选型（方案 B）/ 契约 v2 / 引擎 POC 已完成，
+> 下一步：集成设计 → 实施。
 >
 > 架构真源见[系统架构](architecture.md)，设计哲学见
 > [初始化架构思想导论](Introduction%20to%20Initialization%20Architecture%20Concepts.md)。
@@ -47,7 +48,7 @@ InsightGraph 按“先确定性地理解代码，再用证据组织知识，最�
 | 2   | 领域模型              | ✅ 已完成  | 稳定 ID、ScanResult 与阶段错误契约、确定性序列化纪律已定（ADR-010/011），完成门槛由测试验证 |
 | 3   | 本地采集器             | ✅ 已完成  | `GitRepositoryCollector`：git 枚举（ignore 单一真源）+ LF 归一 SHA-256 + 局部错误通道；含最小采集 CLI |
 | 4   | Python 分析器        | ✅ 已完成  | `PythonAstAnalyzer`（Module/Class/Function + DEFINES/IMPORTS，`__qualname__` 与行号证据）；eval/codegraph 首个 Golden Dataset + evaluator（语义 100%） |
-| 5   | 调用关系              | ⬜ 未开始  | `CALLS` 仅存在于 EdgeKind，尚无符号解析实现                               |
+| 5   | 调用关系              | 🟡 进行中  | 方案 B（Engine + 自研 AST 补扫）已决；契约 v2 冻结；引擎 POC 完成（命中 ≈33%、无假阳性）；待集成设计与实施 |
 | 6   | 持久化               | ⬜ 未开始  | 只有 `CodeGraphRepository` Protocol，尚无 JSON/数据库适配器             |
 | 7   | 数据模型视图（datamodel） | ⬜ 未开始  | ADR-007/008/009 已定；复用步骤 3/4 解析设施与步骤 6 Artifact 纪律            |
 | 8   | API 与任务           | ⬜ 未开始  | 当前只有健康检查，没有扫描、进度或查询 API                                      |
@@ -224,6 +225,7 @@ ADR-012 草案待 Human 审核后落账 `docs/adr/`，通过后再进入本步�
 Adapter 职责边界与长期演进决策见 [codegraph-adapter-selection-and-evolution.md](codegraph/codegraph-adapter-selection-and-evolution.md)（Provider + Canonical Adapter + Phase 演进）；
 契约差量与决策记录（P1–P6；1-A / 同一个）见其 §16。
 方案 B 开工前 grill 收口（2026-10-04）：schema v2 范围（CALLS + 入口清单）、歧义防爆护栏（候选 ≤5 / is_truncated / oversized_ambiguous_calls）已冻结于 §16。
+引擎 POC 已完成（2026-10-04）：夹具命中未达 80%（契约口径 ≈33%，无假阳性；call-site 行号不可得）；**已决混合增强（A）**——Engine + 自研 AST 调用补扫 + Canonical Adapter（结果见 [codegraph-oss-adoption.md](codegraph/codegraph-oss-adoption.md) §5.4）。
 
 **先行件已落地（2026-10-03，不依赖调研结论）**
 
@@ -244,7 +246,7 @@ Adapter 职责边界与长期演进决策见 [codegraph-adapter-selection-and-ev
 - 解析精度、召回率和未解析比例可重复测量。
 - 基础 Module/Class/Function/IMPORTS/DEFINES 不发生回归。
 
-**状态：⬜ 未开始。**
+**状态：🟡 进行中（选型 / 契约 / POC 完成，实施未开始）。**
 
 ### 6. 持久化
 
@@ -371,12 +373,14 @@ SQLAlchemy 模型，产出第二类确定性分析产出：数据模型视图（
 
 当前不要直接接 Neo4j、LangGraph、LLM 或前端。下一阶段按下面顺序推进：
 
-### 当前任务：实现步骤 5（前置调研后开工）
+### 当前任务：步骤 5 集成设计 → 实施
 
-1. 执行步骤 5 前置调研（见上：参考开源 CodeGraph / 调用图项目，产出笔记 → ADR）。
-2. CALLS 与符号解析：本地函数 / 方法 / 导入别名 / 模块属性调用，明确区分
-   resolved / ambiguous / dynamic / unresolved。
-3. 入口识别（CLI、FastAPI、脚本）与调用关系独立 Golden Cases 与误报/漏报指标。
+前置调研、选型（方案 B）与契约 v2、引擎 POC 均已完成（见上）。按集成设计四件套推进：
+
+1. Canonical Adapter 接口设计（Provider 端口 + 映射职责，落 `infrastructure/code_intelligence/`）。
+2. 四态判定规则表（resolved / ambiguous / dynamic / unresolved 判定矩阵，含歧义护栏）。
+3. AST 调用补扫器设计（方法体 / self / 别名盲区 + call-site 行号证据，与引擎边合并策略）。
+4. schema v2 契约变更清单（字段落点 + validator 增量 + Golden/Baseline 影响面）。
 
 ### 首个产品能力里程碑：已达成（步骤 4）
 

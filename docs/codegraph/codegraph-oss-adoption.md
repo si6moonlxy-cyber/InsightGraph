@@ -205,9 +205,9 @@ OSS Engine（看懂代码）→ Canonical Adapter（统一语义与证据）→ 
 
 **待 Human 决策（本次）**
 
-1. 本选型文档（`docs/codegraph/codegraph-oss-adoption.md`）是否认可为步骤 5 落地策略；
-2. **POC 执行方式**：已决（grill Q1）——Human 手动下载（sha256 校验、存仓库外），Agent 校验并执行 POC 与记分；
-3. POC 通过后再落 ADR-012 v2（`docs/adr/`）与契约变更实施。
+1. 本选型文档（`docs/codegraph/codegraph-oss-adoption.md`）：**已认可**（2026-10-04，按方案 B 推进）；
+2. **POC 执行方式**：已决（grill Q1）——Human 手动下载（sha256 校验、存仓库外），Agent 校验并执行 POC 与记分；**POC 已执行**（§5.4：命中未达标 → 已决混合增强 A）；
+3. **ADR-012 v2 落账时机（改述）**：由“POC 通过后”改为“**集成设计冻结后**”（ADR 含方案 B 混合增强架构与契约 v2）；契约变更实施同批推进。
 
 **POC 通过后的文档同步清单（预告，非本次执行）**
 

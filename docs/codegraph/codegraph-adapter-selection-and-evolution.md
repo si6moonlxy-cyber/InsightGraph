@@ -618,6 +618,8 @@ Adapter
 
 这是预计性价比最高的阶段。
 
+> 2026-10-04 已决（POC 结论支撑）：Targeted Enricher 形态 = **自研 AST 调用补扫器**（stdlib AST；补齐方法体 / self / 别名 / 模块属性盲区 + 调用点行号证据）；Pyright / Astroid 保留为未来选项（不首批引入）。
+
 ---
 
 ### Phase 3：局部替换 Resolver

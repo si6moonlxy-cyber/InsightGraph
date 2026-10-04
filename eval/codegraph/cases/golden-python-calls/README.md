@@ -1,9 +1,9 @@
 # golden-python-calls（步骤 5 语料骨架）
 
-> 状态：**语料已就位，期望结果未冻结**。
-> CALLS 边的表示与 resolved / ambiguous / dynamic / unresolved 的判定口径，
-> 待步骤 5 前置调研（参考开源调用图项目）ADR 落账后，由 evaluator 生成期望并
-> 人工审核冻结（规矩同 `golden-python-basic`）。
+> 状态：**语料已就位；契约已冻结（决策文档 §16），期望结果未冻结**。
+> CALLS 边表示（`source_span` / `resolution` / `is_truncated`）、图级 `entries` 清单与四态判定口径已决；
+> 期望冻结随步骤 5 实施（AST 补扫器产出后由 evaluator 生成期望并人工复核；规矩同 `golden-python-basic`）。
+> POC 参考：codegraph-ai/CodeGraph 对本夹具的记分见 `eval/codegraph/.outputs/codegraph-ai-poc/scorecard.md`（本地证据，未入库）。
 
 ## 语料矩阵
 
@@ -29,5 +29,4 @@
   期望文件命名沿用 `expected_codegraph.json`。
 - 指标：resolved 精度 / 召回、未解析比例、误报与漏报清单
   （对齐 Development Plan 步骤 5 完成门槛）。
-- 入口识别的表示层（节点标记 / 新边类型 / 独立清单）同样在步骤 5 设计时定夺，
-  当前实现见 `backend/app/infrastructure/analyzers/entry_points.py`（仅识别规则）。
+- 入口表示的表示层已决（2026-10-04）：**图级清单**（与 nodes / edges 平级、不入 EdgeKind；决策文档 §16）；当前识别规则见 `backend/app/infrastructure/analyzers/entry_points.py`。

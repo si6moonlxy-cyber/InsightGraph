@@ -257,7 +257,7 @@ update something       ← 缺类型前缀
 | `cd backend && uv run python -m app.infrastructure.collectors <路径>` | 采集本地 Git 仓库为 `SourceManifest`（步骤 3 采集 CLI，`--json` 输出规范 JSON） |
 | `cd backend && uv run python -m app.infrastructure.analyzers <路径>` | 采集+分析一条链输出 `CodeGraph`（步骤 4 CLI，`--json` 输出规范 JSON） |
 | `cd backend && uv run python ../eval/codegraph/validate.py <工件.json> --repo-root <仓库根>` | CodeGraph 产物三项不变量校验（DEFINES 入边 / content_hash 重算 / imports 目标；CI 经 pytest 强制执行） |
-| `bash scripts/ci-check.sh` | **push 前全量检查**（文档死链 → 后端 lint/测试 → 前端 lint → 密钥扫描） |
+| `bash scripts/ci-check.sh` | **push 前全量检查**（文档死链 → 后端 lint/测试 → 前端 lint → 密钥扫描 → POC Guard） |
 | `bash scripts/doc-link-check.sh` | 仅检查文档死链 |
 | 开发日志（查看/编辑） | 唯一真源在 `dev-log` 分支：worktree `D:\Project_Mine\InsightGraph\.devlog`；**口述给 AI 登记 / 完成即可**（`add/done` 为内部命令，人不需要记）；网页直读见其 DEV_LOG.md 头部链接 |
 | `bash devlog.sh sync "<提交说明>"` | 在 devlog worktree 内运行：格式校验 → 提交 → pull --rebase → push（被拒自动重试；说明必填，add/done 自动派生消息） |
@@ -281,6 +281,7 @@ update something       ← 缺类型前缀
 | `backend/` | ✅ Phase 2A 骨架 | FastAPI + Settings + 错误/日志 + domain/application/infrastructure 分层 + 测试门禁 |
 | `frontend/` | ⏳ 未建立 | Phase 3：Vite + React + 视觉回归双守卫 |
 | CodeGraph / GraphRAG 领域契约 | ✅ 稳定版 | 稳定 ID、ScanResult/错误/统计契约、确定性序列化与 schema_version 已定（ADR-010/011）；Collector 与 Analyzer 已实现（步骤 3/4）；Repository 未实现 |
+| CALLS 步骤 5 前置（选型 / 契约 v2 / POC） | ✅ 决策完成（未实施） | 方案 B（Engine + 自研 AST 补扫）已决；契约 v2（CALLS + 入口清单）冻结于 [决策文档](docs/codegraph/codegraph-adapter-selection-and-evolution.md) §16；引擎 POC 完成（≈33%、无假阳性）；实现未开始（POC 隔离铁律适用） |
 | LangGraph 工作流 | ⏳ 未建立 | `workflows/` 仅声明“编排不承载业务”的边界，尚未引入 LangGraph |
 | 真实 LLM 评测 workflow | ⏳ 未建立 | Phase 3：手动触发 + gate 脚本（不进常驻 CI） |
 
@@ -293,7 +294,7 @@ update something       ← 缺类型前缀
 | `domain/codegraph/` | CodeGraph IR、稳定 ID 构造与持久化端口 | `models.py`、`ids.py`、`kinds.py`、`ports.py` |
 | `domain/evidence/` | Evidence 来源与可信状态 | `models.py` |
 | `domain/graphrag/` | 知识节点与 Evidence First Claim | `models.py` |
-| `infrastructure/` | Collector、Analyzer、Persistence、LLM 外部适配器 | `collectors/`（步骤 3）与 `analyzers/`（步骤 4）已实现；`analyzers/entry_points.py` 为步骤 5 先行件（仅识别，表示层待定）；Persistence/LLM 未建立 |
+| `infrastructure/` | Collector、Analyzer、Persistence、LLM 外部适配器 | `collectors/`（步骤 3）与 `analyzers/`（步骤 4）已实现；`analyzers/entry_points.py` 为步骤 5 先行件（仅识别；入口表示层已决 = 图级清单，决策文档 §16）；Persistence/LLM 未建立 |
 | `workflows/` | LangGraph 编排入口 | 当前仅建立边界 |
 | `foundation/` | 配置、日志与统一错误处理 | `config.py`、`logging.py`、`errors.py` |
 
