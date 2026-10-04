@@ -57,6 +57,21 @@
 [docs/InsightGraph_Engineering Infrastructure.md](docs/InsightGraph_Engineering%20Infrastructure.md)。
 查不到细颗粒度信息，再搜索整个仓库。目的：节省时间、保持宏观视角。
 
+### 1.7 开工前启动本地环境（每天首次任务必做）
+
+**每个工作日的第一件事**：运行 `start.bat`，它会依次完成
+
+1. 同步开发日志（`dev-log` 分支的 `.devlog` 工作树）
+2. 拉起 Docker 引擎与 postgres / redis 容器
+3. 三重服务检验（容器状态 / `pg_isready` 与 `redis-cli PING` / 宿主端口）
+
+只做开发日志同步、不需要容器时，可只跑 `bash .devlog/devlog.sh pull`。
+
+**非交互调用注意**：脚本内的 Docker 等待循环用了 `timeout` 命令，
+**stdin 被重定向时 `timeout` 会立即失败**，180 秒等待会在瞬间跑完并误报超时。
+因此 Agent 调用时须先用 `docker info` 轮询确认引擎就绪，再运行 `start.bat`。
+完整步骤与排障见 [docs/operations/environment-verification.md](docs/operations/environment-verification.md)。
+
 ---
 
 ## 二、架构硬约束：CodeGraph 与 GraphRAG 边界

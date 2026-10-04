@@ -10,7 +10,7 @@
 ## 1. 为什么需要本文
 
 `CLAUDE.md` §5.3 的状态地图是**逐机器**的：一台机器上验证通过，不代表另一台可用。
-换机、新克隆或重装系统后，请按 §4 的清单重新核验，并把结果回写本文。
+换机、新克隆或重装系统后，请按 §5 的清单重新核验，并把结果回写本文。
 
 本文只记录**可复现的核验事实**；建设进度以 [`Development Plan.md`](../Development%20Plan.md) 为唯一真源。
 
@@ -99,7 +99,51 @@ REDIS_URL=redis://localhost:6379/0
 
 ---
 
-## 4. 换机 / 新克隆后的核验清单
+## 4. 开工前启动本地环境
+
+`CLAUDE.md` §1.7 要求每个工作日首次任务前运行 `start.bat`。本节记录**正确的调用方式**，
+因为交互式双击与 Agent / CI 非交互调用有一个真实差异。
+
+### 4.1 交互式（人手双击）
+
+直接双击 `start.bat` 即可。脚本结尾有 `pause` 停留窗口，便于人看结果。
+
+### 4.2 ⚠️ 非交互调用（Agent / 脚本）
+
+**直接 `cmd /c "start.bat < nul"` 会失败**，且失败方式具有迷惑性：
+
+```text
+[2] Docker 环境检查...
+  [警告] Docker 引擎未运行，尝试启动 Docker Desktop...
+  - 等待 Docker 引擎就绪（最长 180 秒）...
+ERROR: Input redirection is not supported, exiting the process immediately.   ← 重复 180 次
+  [X] 等待超时。请手动打开 Docker Desktop...
+```
+
+**原因**：脚本等待引擎用的是 `timeout /t 1 /nobreak`，而 **`timeout` 命令不支持输入重定向**。
+stdin 被重定向时它立即报错退出，于是"最长 180 秒"的循环在约 1 秒内跑完并**误报超时**——
+看起来像 Docker 起不来，实际是等待机制失效。
+
+**正确做法**：先把引擎准备好，再运行脚本走快路径（此时不会进入等待循环）。
+
+```powershell
+# 1) 确保 Docker Desktop 进程在运行；未运行则启动
+# 2) 用 docker info 轮询等待引擎就绪（不要用 timeout 命令）
+# 3) 引擎就绪后再执行：
+cmd /c "start.bat < nul"
+```
+
+`< nul` 只用于吃掉结尾的 `pause`，在快路径下不影响任何逻辑。
+
+### 4.3 只要开发日志、不要容器
+
+```bash
+bash .devlog/devlog.sh pull     # 仅拉取，不提交不推送
+```
+
+---
+
+## 5. 换机 / 新克隆后的核验清单
 
 - [ ] `git config core.hooksPath .githooks`（新克隆不会携带此配置）
 - [ ] 安装 Docker Desktop（Windows 家庭版走 WSL2 后端）：
@@ -138,8 +182,8 @@ Docker Desktop 的 Windows 服务与注册表项都记录了绝对路径，**手
 
 ---
 
-## 5. 未覆盖的内容
+## 6. 未覆盖的内容
 
 - **Neo4j 未核验**：`docker-compose.yml` 中已定义，但 `start.bat` 当前只拉起 postgres 与 redis。
-  引入 GraphRAG 存储时需补充启动与检验段落，并更新 §4 清单。
+  引入 GraphRAG 存储时需补充启动与检验段落，并更新 §5 清单。
 - **真实 LLM 评测 workflow**：尚未建立（Phase 3），不在本文范围。
