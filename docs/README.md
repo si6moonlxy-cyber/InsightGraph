@@ -21,7 +21,7 @@
 |------|----------|------|
 | [adr/](adr/README.md) | 架构决策记录（模板 + 首批清单） | ✅ 已建立 |
 | `codegraph/` | CodeGraph 子系统文档（调研 / 选型 / Adapter 契约与长期演进）；系统总览由根 `architecture.md` 维护 | ✅ 已建立（2026-10-03 起） |
-| `architecture/` | 子系统设计（GraphRAG / 工作流等，按需创建）；系统总览由根 `architecture.md` 维护 | 需要时创建 |
+| [architecture/](architecture/数据模型.md) | 子系统设计（数据模型 / GraphRAG / 工作流等）；系统总览由根 `architecture.md` 维护 | ✅ 已建立（2026-10-04 起） |
 | `engineering/` | 工程流程规范（评测驱动开发、视觉回归等） | 需要时创建 |
 | `evaluation/` | 评测方法、指标口径 | 需要时创建 |
 | [operations/](operations/environment-verification.md) | 环境配置、排障、迁移 | ✅ 已建立 |
