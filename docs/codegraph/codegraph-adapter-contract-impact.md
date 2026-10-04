@@ -7,14 +7,14 @@
 
 ## 1. 契约差量分析（P1–P6）
 
-| # | 差量 | 现契约 | 文档诉求 | 影响面 | 处置 |
-| --- | --- | --- | --- | --- | --- |
-| **P1** SymbolKind 闭集 | `NodeKind = {module, class, function}`；方法 = function + `Class.method`（步骤 4 口径） | +METHOD / VARIABLE / INTERFACE / TYPE / PARAMETER / UNKNOWN | kinds.py、validator、Golden/evaluator、CLAUDE.md §二、architecture.md §5.1 | ✅ **已决 1-A**：扩类**不进入对外契约**——仅作 Adapter 内部维度；对外保持 3 类；未来如需对外扩类 → 单独立 ADR（走 schema_version 流程） |
-| **P2** SourceSpan | `file_path + line_start + line_end`；节点必填、边无 | +`start_col/end_col`；symbol span 与 callsite span 区分 | SourceSpan 模型与校验、content_hash 口径、边证据 | 建议：**callsite span 进 v2**（`CodeEdge.source_span`，calls 必填——承接既有提案）；**列号 v1 不承诺**（声明"可选、以引擎实际能力为准"；引擎响应现仅 file/line/end_line，POC 验证后定） |
-| **P3** EdgeKind 闭集 | `{defines, imports, calls}` | +CONTAINS / INHERITS / IMPLEMENTS / REFERENCES / ENTRY_POINT | kinds.py、validator、evaluator、文档 3 处同步 | 建议**分批**：v2 首批候选 = **ENTRY_POINT + CONTAINS**（前者先行件已识别、表示层随 ADR 定；后者定义树可得）；v2.x = INHERITS / IMPLEMENTS；REFERENCES 最后。每批 = 一次受控升级 |
-| **P4** 身份格式 | ADR-010 `{repository_id}:{kind}:{qualified_name}` | 示例 `symbol://python/...` 与 `python:function:...` 并存 | 全部 ID 构造与跨层引用（GraphRAG / datamodel 依赖稳定 ID） | 建议：**canonical ID 沿用 ADR-010**；文档两示例收敛为一个并标注"示意，以 ADR-010 为准"；`upstream_node_id` 只存在于 Adapter 映射，不进入 Artifact |
-| **P5** Evidence 粒度 | 边无 provenance 字段 | 逐边 `EdgeEvidence(provider/version/node_id/method)` | CodeEdge 字段、Artifact 体积、多后端融合 | 建议：**v2 = 扫描级 provenance**（图根 / ScanResult 元数据：provider、version、query 方法集合、资产哈希）；多后端 Evidence Fusion 启动时再逐边化（届时再升级） |
-| **P6** 状态枚举 | `resolution ∈ {resolved, ambiguous}`（v2 提案） | "conflict" 第五态（文档留待后议） | 枚举闭集纪律、evaluator | 建议：**v1 不引入**；写入 ADR 复审触发（多后端融合时评审） |
+| #                    | 差量                                                                             | 现契约                                                          | 文档诉求                                                                  | 影响面                                                                                                                                   | 处置  |
+| -------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------ | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | --- |
+| **P1** | SymbolKind 闭集 | `NodeKind = {module, class, function}`；方法 = function + `Class.method`（步骤 4 口径） | +METHOD / VARIABLE / INTERFACE / TYPE / PARAMETER / UNKNOWN | kinds.py、validator、Golden/evaluator、CLAUDE.md §二、architecture.md §5.1 | ✅ **已决 1-A**：扩类**不进入对外契约**——仅作 Adapter 内部维度；对外保持 3 类；未来如需对外扩类 → 单独立 ADR（走 schema_version 流程） |
+| **P2** | SourceSpan | `file_path + line_start + line_end`；节点必填、边无 | +`start_col/end_col`；symbol span 与 callsite span 区分 | SourceSpan 模型与校验、content_hash 口径、边证据 | 建议：**callsite span 进 v2**（`CodeEdge.source_span`，calls 必填——承接既有提案）；**列号 v1 不承诺**（声明"可选、以引擎实际能力为准"；引擎响应现仅 file/line/end_line，POC 验证后定） |
+| **P3** | EdgeKind 闭集 | `{defines, imports, calls}` | +CONTAINS / INHERITS / IMPLEMENTS / REFERENCES / ENTRY_POINT | kinds.py、validator、evaluator、文档 3 处同步 | 建议**分批**：v2 首批候选 = **ENTRY_POINT + CONTAINS**（前者先行件已识别、表示层随 ADR 定；后者定义树可得）；v2.x = INHERITS / IMPLEMENTS；REFERENCES 最后。每批 = 一次受控升级 |
+| **P4** | 身份格式 | ADR-010 `{repository_id}:{kind}:{qualified_name}` | 示例 `symbol://python/...` 与 `python:function:...` 并存 | 全部 ID 构造与跨层引用（GraphRAG / datamodel 依赖稳定 ID） | 建议：**canonical ID 沿用 ADR-010**；文档两示例收敛为一个并标注"示意，以 ADR-010 为准"；`upstream_node_id` 只存在于 Adapter 映射，不进入 Artifact |
+| **P5** | Evidence 粒度 | 边无 provenance 字段 | 逐边 `EdgeEvidence(provider/version/node_id/method)` | CodeEdge 字段、Artifact 体积、多后端融合 | 建议：**v2 = 扫描级 provenance**（图根 / ScanResult 元数据：provider、version、query 方法集合、资产哈希）；多后端 Evidence Fusion 启动时再逐边化（届时再升级） |
+| **P6** | 状态枚举 | `resolution ∈ {resolved, ambiguous}`（v2 提案） | "conflict" 第五态（文档留待后议） | 枚举闭集纪律、evaluator | 建议：**v1 不引入**；写入 ADR 复审触发（多后端融合时评审） |
 
 ## 2. 与升级节奏的耦合
 
