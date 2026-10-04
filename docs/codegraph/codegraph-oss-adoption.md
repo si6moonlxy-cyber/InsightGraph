@@ -23,7 +23,7 @@ FILE / MODULE / CLASS / FUNCTION / METHOD / IMPORT / CALL / CONTAINS / INHERITS 
 验收主线：
 
 ```text
-OSS Engine（看懂代码）→ Adapter / Normalizer（统一语义与证据）→ 本仓库 CodeGraph Artifact → GraphRAG / API / UI
+OSS Engine（看懂代码）→ Canonical Adapter（统一语义与证据）→ 本仓库 CodeGraph Artifact → GraphRAG / API / UI
 ```
 
 ## 2. 架构路线：Engine → Adapter → Artifact
@@ -44,7 +44,7 @@ OSS Engine（看懂代码）→ Adapter / Normalizer（统一语义与证据）�
                │ 原始解析结果（JSON）
                ▼
 ┌───────────────────────────────────────┐
-│ Resolution Normalizer（本仓库）         │
+│ Canonical Adapter（本仓库）             │
 │ 四态判定 + source_span 证据 + 漏斗计数   │
 └──────────────┬────────────────────────┘
                ▼
@@ -58,7 +58,7 @@ OSS Engine（看懂代码）→ Adapter / Normalizer（统一语义与证据）�
 边界原则（对应 ADR-001 / ADR-010/011 精神）：
 
 1. **第三方负责"看懂代码"；本仓库负责"统一语义、证据、契约、GraphRAG"。**
-2. 引擎原始输出**不直接**作为 Artifact——必须经 Normalizer（四态 + 证据 + 稳定 ID 映射 + 排序去重）。
+2. 引擎原始输出**不直接**作为 Artifact——必须经 Canonical Adapter（四态 + 证据 + 稳定 ID 映射 + 排序去重）。
 3. 引擎是**适配器细节**（infrastructure 层），完整解析契约（四态 / span / 统计）才是稳定接口——引擎可替换。
 4. 自研 `PythonAstAnalyzer`（DEFINES/IMPORTS）不回退；其能力作为 Gap 兜底与证据补扫（见 §6 ADR v2）。
 
@@ -110,7 +110,7 @@ OSS Engine（看懂代码）→ Adapter / Normalizer（统一语义与证据）�
 | 步骤 5 需求 | 引擎现状 | 缺口 | 处置 |
 | --- | --- | --- | --- |
 | 本地函数 / 方法 / 模块属性 / 导入别名调用解析 | 有跨文件 import/call resolution（tree-sitter + 启发式，**精度待 POC 实测**） | 精度未知；DI / decorator 等复杂形态预期弱 | POC 用 Golden 夹具度量；不足时 L2 增强（Pyright/astroid） |
-| resolved / ambiguous / dynamic / unresolved 四态 | **无**（工具面未暴露 resolution / confidence 字段；检索 guide 无 `call_site`/`resolved`） | 全部 | **Normalizer 自建**（本仓库差异化价值，feedback §六认同） |
+| resolved / ambiguous / dynamic / unresolved 四态 | **无**（工具面未暴露 resolution / confidence 字段；检索 guide 无 `call_site`/`resolved`） | 全部 | **Canonical Adapter 自建**（本仓库差异化价值，feedback §六认同） |
 | 调用点行号证据（call-site span） | 文档化响应只见**符号** `location{file,line,end_line}`，无调用表达式行号 | 可能缺失 | **POC 关键验证项**；若确认缺失 → Adapter 用本地 AST 定向补扫（只补证据，不重做解析） |
 | 入口识别 | `find_entry_points`（main / http_handler / cli_command / event_handler / test） | 无（是先行件规则的超集） | 与 `analyzers/entry_points.py` 规则对账；表示层设计仍待 ADR |
 | 确定性 Artifact | 引擎输出顺序 / 整数 node_id 为其内部实现 | 稳定 ID / 排序 / 双跑字节相等 | Adapter 映射稳定 ID（ADR-010）+ 排序去重 + 既有 validator |
@@ -163,7 +163,7 @@ OSS Engine（看懂代码）→ Adapter / Normalizer（统一语义与证据）�
 
 ## 6. ADR-012 v2 草案：CALLS 获取与归一化纪律（供 Human 审核后落账 `docs/adr/`）
 
-> 与 v1 草案（`codegraph-calls-pre-research.md` §5，"自研解析"语境）的关系：**契约部分（四态 / 调用点证据 / 统计漏斗 / schema v2）保持不变；获取方式改为外部引擎 Adapter 优先**。落账建议文件名 `ADR-012-calls-acquisition-normalization.md`（编号 012 空闲）；POC 结果与 Human 审核后落账。
+> 与 v1 草案（`codegraph-calls-pre-research.md` §5，"自研解析"语境）的关系：**契约部分（四态 / 调用点证据 / 统计漏斗 / schema v2）保持不变；获取方式改为外部引擎 Adapter 优先**。落账建议文件名 `ADR-012-calls-acquisition-normalization.md`（编号 012 空闲）；POC 结果与 Human 审核后落账。已决口径（2026-10-04，详见 [codegraph-adapter-contract-impact.md](codegraph-adapter-contract-impact.md)）：P1=1-A（扩类仅 Adapter 内部维度）、P7=同一个（Canonical = 域模型演进）。
 
 - 状态：Proposed（草案 v2 · 待 POC 证据与审核）
 - 日期：2026-10-04
@@ -174,12 +174,13 @@ OSS Engine（看懂代码）→ Adapter / Normalizer（统一语义与证据）�
 
 **Decision**
 
-1. **获取层（引擎 ≠ 契约）**：CALLS 解析默认经外部引擎（首选 codegraph-ai/CodeGraph，经 POC 验证后定版；备选 L2：Pyright/scip-python/astroid 增强）；引擎以 **headless 一次性模式**（`--run-tool`）接入，不引入 MCP 运行时依赖；引擎位于 infrastructure 层适配器，**引擎可替换**（归一化契约才是稳定接口）。
-2. **归一化层（本仓库职责）**：引擎原始输出必须经 Resolution Normalizer——产出四态（resolved / ambiguous / dynamic / unresolved）+ source_span + 漏斗计数 + 稳定 ID 映射（ADR-010）+ 确定性排序去重；引擎未给出调用点行号时，用本地 AST 定向补扫补齐证据（只补证据，不重做解析）。
+1. **获取层（引擎 ≠ 契约）**：CALLS 解析默认经外部引擎（首选 codegraph-ai/CodeGraph，经 POC 验证后定版；备选 L2：Pyright/scip-python/astroid 增强）；引擎以 **headless 一次性模式**（`--run-tool`）接入，不引入 MCP 运行时依赖；引擎位于 infrastructure 层适配器，**引擎可替换**（Canonical Adapter 契约才是稳定接口）。
+2. **归一化层（本仓库职责）**：引擎原始输出必须经 Canonical Adapter（含 Resolution Normalizer 职责）——产出四态（resolved / ambiguous / dynamic / unresolved）+ source_span + 漏斗计数 + 稳定 ID 映射（ADR-010）+ 确定性排序去重；引擎未给出调用点行号时，用本地 AST 定向补扫补齐证据（只补证据，不重做解析）。
 3. **契约部分（承接 v1 草案，不变）**：`CodeEdge` 增可选 `source_span`（calls 必填）与 `resolution`（calls 必填）；`ScanStats` 增调用漏斗计数；`CodeGraph.schema_version` 1→2；不新增错误码。
 4. **引擎准入条件**：Apache-2.0 等宽松许可登记；版本 pin + 二进制 sha256 校验；平台资产（本机 win-x64、CI linux-x64）；离线可运行（`--graph-only`）；**引擎故障/不可用时降级**为既有 AST 能力 + 显式 unresolved 计数（不虚假成功、不静默）。
 5. **自研保底**：`PythonAstAnalyzer` 既有 DEFINES/IMPORTS 能力不回退；自研 resolver 仅用于补齐引擎无法覆盖的 gap（L4）。
-6. **落地顺序**：POC（§5）→ 通过线与缺口清单 → 集成设计（Adapter 接口 + Normalizer 判定规则 + Golden 期望冻结）→ 评测 Baseline v2（只用新建不覆盖纪律）→ ADR 落账与架构文档同步。
+6. **落地顺序**：POC（§5）→ 通过线与缺口清单 → 集成设计（Canonical Adapter 接口 + 四态判定规则 + Golden 期望冻结）→ 评测 Baseline v2（只用新建不覆盖纪律）→ ADR 落账与架构文档同步。
+7. **相关决议（2026-10-04）**：P1=1-A（SymbolKind 扩类仅 Adapter 内部维度，对外保持 3 类）；P7=同一个（Canonical Artifact = `app/domain/codegraph` 域模型演进）；P2–P6 处置建议见 [codegraph-adapter-contract-impact.md](codegraph-adapter-contract-impact.md)。
 
 **Alternatives**
 

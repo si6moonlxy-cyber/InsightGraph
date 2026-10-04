@@ -222,6 +222,7 @@ ADR-012 草案待 Human 审核后落账 `docs/adr/`，通过后再进入本步�
 [codegraph-oss-adoption.md](codegraph/codegraph-oss-adoption.md)（Engine → Adapter → 本仓库 Artifact 路线；
 含 codegraph-ai/CodeGraph 核实、修订优先级与 POC Spike 计划）；ADR-012 草案 v2 见该文 §6，待 POC 结果与 Human 决策后落账 `docs/adr/`。
 Adapter 职责边界与长期演进决策见 [codegraph-adapter-selection-and-evolution.md](codegraph/codegraph-adapter-selection-and-evolution.md)（Provider + Canonical Adapter + Phase 演进）。
+契约差量与结构决议（P1–P6 一页版；P1=1-A、P7=同一个）见 [codegraph-adapter-contract-impact.md](codegraph/codegraph-adapter-contract-impact.md)。
 
 **先行件已落地（2026-10-03，不依赖调研结论）**
 
