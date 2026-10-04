@@ -39,3 +39,4 @@
 
 ## Kalinka1962（dev）
 
+- [2026-10-04] 评审 CodeGraph OSS 选型与 Adapter 决策文档，就 §7 决策点给出结论（POC 暂缓） @docs
