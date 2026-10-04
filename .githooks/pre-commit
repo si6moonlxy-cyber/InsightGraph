@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # ================================================================
-# pre-commit hook — 文档死链检查
+# pre-commit hook — 文档死链检查 + POC 隔离强制层
 # ================================================================
-# 只做一件事：检查 Markdown 文档的相对链接全部可达。
+# 1. 文档死链：Markdown 文档的相对链接全部可达。
+# 2. POC 隔离铁律（CLAUDE.md §二）：禁止向 main / dev 提交 poc/ 等违规内容。
 # （lint / 类型检查太慢，放在 scripts/ci-check.sh 与 CI 里）
 #
 # 安装（一次性）: git config core.hooksPath .githooks
@@ -15,3 +16,6 @@ ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 
 echo "▶ [pre-commit] 检查文档链接..."
 bash "$ROOT_DIR/scripts/doc-link-check.sh"
+
+echo "▶ [pre-commit] POC 隔离铁律检查..."
+bash "$ROOT_DIR/scripts/poc-guard.sh"

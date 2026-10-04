@@ -119,6 +119,11 @@ Evidence Relationship
 3. POC 的唯一目标是验证技术可行性，不求代码质量。
 ```
 
+强制层（由 `scripts/poc-guard.sh` 统一实现，三处执行）：main / dev 出现被跟踪的 `poc/`、
+生产代码（`backend/app`、`frontend/src`）引用 `poc`、`poc/` 缺少非空 `README.md`
+（spike 目标 / 验证结论 / 重写去向）→ 一律拒绝。
+执行点：`.githooks/pre-commit`、`scripts/ci-check.sh`、`.github/workflows/ci.yml`。
+
 ---
 
 ## 三、编码规范

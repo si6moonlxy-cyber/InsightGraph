@@ -35,6 +35,21 @@ jobs:
         run: bash scripts/doc-link-check.sh
 
   # ------------------------------------------------------------
+  # POC 隔离铁律（强制层：主分支禁入 poc/、生产禁引 poc、poc/ 需自解释）
+  # 见 CLAUDE.md §二；本地同规则由 scripts/poc-guard.sh 在 pre-commit / ci-check 执行
+  # ------------------------------------------------------------
+  guard:
+    name: Guard — POC 隔离铁律
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: POC isolation guard
+        run: bash scripts/poc-guard.sh
+
+  # ------------------------------------------------------------
   # 后端：ruff + format + mypy + pytest（mock 单测，不依赖 PG/Redis）
   # backend/ 建立后自动生效
   # ------------------------------------------------------------

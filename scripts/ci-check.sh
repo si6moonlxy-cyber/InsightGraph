@@ -12,6 +12,7 @@
 #   3. 文档死链检查始终执行
 #   4. 不在本脚本跑真实 LLM 评测（成本与波动），
 #      真实评测走手动触发的独立 workflow
+#   5. POC 隔离铁律强制层常驻执行（scripts/poc-guard.sh，见 CLAUDE.md §二）
 # ================================================================
 
 set -uo pipefail
@@ -39,7 +40,7 @@ HAS_ERROR=0
 # ================================================================
 # 1. 文档死链检查
 # ================================================================
-echo -e "${CYAN}[1/4] Docs — 死链检查${NC}"
+echo -e "${CYAN}[1/5] Docs — 死链检查${NC}"
 if bash "$ROOT/scripts/doc-link-check.sh"; then
     pass "文档链接全部可达"
 else
@@ -51,7 +52,7 @@ fi
 # 2. 后端 — Ruff + Format + Mypy + Pytest（mock 单测）
 # ================================================================
 echo ""
-echo -e "${CYAN}[2/4] Backend — Ruff + Format + Mypy + Pytest（mock 单测）${NC}"
+echo -e "${CYAN}[2/5] Backend — Ruff + Format + Mypy + Pytest（mock 单测）${NC}"
 if [ -f "$ROOT/backend/pyproject.toml" ]; then
     if ! command -v uv >/dev/null 2>&1; then
         fail "未找到 uv（安装: https://docs.astral.sh/uv/），无法运行后端检查"
@@ -94,7 +95,7 @@ fi
 # 3. 前端 — ESLint（0 警告 hard gate）+ tsc 类型检查
 # ================================================================
 echo ""
-echo -e "${CYAN}[3/4] Frontend — ESLint + tsc${NC}"
+echo -e "${CYAN}[3/5] Frontend — ESLint + tsc${NC}"
 if [ -f "$ROOT/frontend/package.json" ]; then
     echo "  ▶ ESLint"
     if (cd "$ROOT/frontend" && pnpm lint); then
@@ -118,7 +119,7 @@ fi
 # 4. 安全门禁 — 疑似硬编码密钥扫描
 # ================================================================
 echo ""
-echo -e "${CYAN}[4/4] Security — 疑似硬编码密钥扫描${NC}"
+echo -e "${CYAN}[4/5] Security — 疑似硬编码密钥扫描${NC}"
 SUSPECTS=""
 for scan_dir in backend/app frontend/src; do
     [ -d "$scan_dir" ] || continue
@@ -135,6 +136,18 @@ if [ -z "$SUSPECTS" ]; then
 else
     fail "发现疑似硬编码密钥（应改为环境变量读取）："
     echo "$SUSPECTS" | head -10
+    HAS_ERROR=1
+fi
+
+# ================================================================
+# 5. POC 隔离强制层（铁律：CLAUDE.md §二）
+# ================================================================
+echo ""
+echo -e "${CYAN}[5/5] POC Guard — 隔离铁律强制检查${NC}"
+if bash "$ROOT/scripts/poc-guard.sh"; then
+    pass "POC 隔离铁律"
+else
+    fail "POC 隔离违规，修复后重新运行"
     HAS_ERROR=1
 fi
 
