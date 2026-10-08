@@ -214,14 +214,9 @@ InsightGraph 按“先确定性地理解代码，再用证据组织知识，最�
 产出「参考笔记 + 借鉴/否决清单」（含许可证与维护状态核实），以 ADR 形式落账后再进入本步骤设计；
 Parser Wrapper 抽象与图遍历性能优化在出现明确触发条件前不引入。
 
-调研已完成（2026-10-03）：产出见
-[codegraph-calls-pre-research.md](codegraph/codegraph-calls-pre-research.md)（参考笔记 + 借鉴/否决清单 + ADR 草案建议，附证据链接）；
-ADR-012 草案待 Human 审核后落账 `docs/adr/`，通过后再进入本步骤设计。
-
-修订（2026-10-04）：依据 Human feedback（主要矛盾 =「借鉴并使用开源项目，快速开展 CodeGraph 代码解析功能」，
-反馈原文见 `docs/codegraph/CodeGraph CALLS 前置调研 - feedback.md`），选型与落地策略已拆分为独立文档
+调研与 Human feedback 已合并为唯一真源
 [codegraph-oss-adoption.md](codegraph/codegraph-oss-adoption.md)（Engine → Adapter → 本仓库 Artifact 路线；
-含 codegraph-ai/CodeGraph 核实、修订优先级与 POC Spike 计划）；ADR-012 草案 v2 见该文 §6，待 POC 结果与 Human 决策后落账 `docs/adr/`。
+含候选证据、借鉴/否决边界、CodeGraphAI POC、冲突处置与 ADR-012 决策基线）；原始调研稿与反馈稿已于 2026-10-08 提炼后移除，可从 Git 历史追溯。
 Adapter 职责边界与长期演进决策见 [codegraph-adapter-selection-and-evolution.md](codegraph/codegraph-adapter-selection-and-evolution.md)（Provider + Canonical Adapter + Phase 演进）；
 契约差量与决策记录（P1–P6；1-A / 同一个）见其 §16。
 方案 B 开工前 grill 收口（2026-10-04）：schema v2 范围（CALLS + 入口清单）、歧义防爆护栏（候选 ≤5 / is_truncated / oversized_ambiguous_calls）已冻结于 §16。

@@ -1,9 +1,9 @@
 # CodeGraph OSS 快速落地选型：Adapter + 开源引擎路线
 
-> 状态：步骤 5 选型与落地策略文档（供 Human 审核；引擎引入与契约变更须经 POC 证据 + 决策后实施）
-> 日期：2026-10-04 ｜ 依据：Human feedback（`docs/codegraph/CodeGraph CALLS 前置调研 - feedback.md`）
-> 关联：研究资料 [codegraph-calls-pre-research.md](codegraph-calls-pre-research.md)（§2 项目笔记 / §3 机制对比仍然有效；**其选型结论以本文为准**）、
-> 系统架构 [architecture.md](../architecture.md)、契约 [ADR-010](../adr/ADR-010-codegraph-contract-discipline.md) / [ADR-011](../adr/ADR-011-scan-result-contract.md)
+> 状态：步骤 5 选型、前置调研与 POC 的唯一真源；M1 已完成，M2 按本文路线继续。
+> 日期：2026-10-04 ｜ 合并整理：2026-10-08
+> 依据：2026-10-03 前置调研、2026-10-04 Human feedback 与同日 CodeGraphAI POC；原始反馈稿和前置调研稿已提炼并入本文，可从 Git 历史追溯。
+> 关联：系统架构 [architecture.md](../architecture.md)、实施冻结件 [codegraph-integration-design.md](codegraph-integration-design.md)、决策文档 [codegraph-adapter-selection-and-evolution.md](codegraph-adapter-selection-and-evolution.md)、契约 [ADR-010](../adr/ADR-010-codegraph-contract-discipline.md) / [ADR-011](../adr/ADR-011-scan-result-contract.md)
 > 快照：本文所有许可证 / 维护 / 平台事实为 2026-10-04 实测（GitHub API + LICENSE 文件 + README/文档）。
 
 ## 1. 主要矛盾（重述）与验收定义
@@ -83,7 +83,7 @@ OSS Engine（看懂代码）→ Canonical Adapter（统一语义与证据）→ 
 勘误与说明：
 
 - **codegraph-ai/CodeGraph 实现语言为 Rust**（README 自述"A single Rust binary"，构建命令 `cargo build`）；GitHub 语言统计标记为 C（仓库含 vendored C 组件），引用时以 README/构建方式为准。
-- Prigh（Pyright）许可证：与 scip-python 相同的"MIT 文本 + 微软自定义头"文件（`LICENSE.txt`，本日实测 1150 字节）——**这是 MIT**，不是专有许可。
+- Pyright 许可证：与 scip-python 相同的"MIT 文本 + 微软自定义头"文件（`LICENSE.txt`，本日实测 1150 字节）——**这是 MIT**，不是专有许可。
 - Joern "暂不上"的理由（采纳 feedback）：CPG/data-flow 属重型栈，与本阶段"快速获得调用关系"的目标不成比例；出现安全/污点分析需求时再评审。
 
 ## 4. 首选引擎核实：codegraph-ai/CodeGraph（2026-10-04 实测）
@@ -167,11 +167,11 @@ OSS Engine（看懂代码）→ Canonical Adapter（统一语义与证据）→ 
 - 已确认：无调用点行号证据 → 调用点补扫为刚需（ADR-012 v2 决策 2 预案成立）。
 - 下一步分支（**已决 2026-10-04：A 混合增强**）：Engine 负责跨文件图 / 入口 / 高精度直呼边；**自研 AST 调用补扫器**补齐方法体 / self / 别名盲区 + call-site 行号证据（stdlib AST，零新依赖，复用既有解析设施）；B（Pyright/astroid 第二分析器）与 C（纯 Engine）否决或备选，代价见 scorecard。
 
-## 6. ADR-012 v2 草案：CALLS 获取与归一化纪律（供 Human 审核后落账 `docs/adr/`）
+## 6. ADR-012 v2 决策基线：CALLS 获取与归一化纪律
 
-> 与 v1 草案（`codegraph-calls-pre-research.md` §5，"自研解析"语境）的关系：**契约部分（四态 / 调用点证据 / 统计漏斗 / schema v2）保持不变；获取方式改为外部引擎 Adapter 优先**。落账建议文件名 `ADR-012-calls-acquisition-normalization.md`（编号 012 空闲）；POC 结果与 Human 审核后落账。已决口径（2026-10-04，详见 [决策文档 §16](codegraph-adapter-selection-and-evolution.md)）：P1=1-A（扩类仅 Adapter 内部维度）、P7=同一个（Canonical = 域模型演进）。
+> 本节吸收早期“自研解析”草案中仍有效的契约纪律，并按 Human feedback 改为外部引擎 Adapter 优先。已决口径详见 [决策文档 §16](codegraph-adapter-selection-and-evolution.md)：P1=1-A（扩类仅 Adapter 内部维度）、P7=同一个（Canonical = 域模型演进）。正式 ADR-012 仍在 M3 落账，本节在此之前作为决策基线。
 
-- 状态：Proposed（草案 v2 · 待 POC 证据与审核）
+- 状态：Accepted baseline（POC、集成设计评审与 M1 实现已验证；待 M3 转录为正式 ADR-012）
 - 日期：2026-10-04
 
 **Context**
@@ -185,7 +185,7 @@ OSS Engine（看懂代码）→ Canonical Adapter（统一语义与证据）→ 
 3. **契约部分（v2 范围，grill 2026-10-04 冻结）**：`CodeEdge` 增可选 `source_span`（calls 必填）与 `resolution`（calls 必填）；**ambiguous 物化 + 防爆护栏**（候选上限 5 / `is_truncated` 标记 / `ScanStats.oversized_ambiguous_calls`）；**CodeGraph 增图级 `entries` 清单**（与 nodes/edges 平级，不入 EdgeKind）；`ScanStats` 增调用漏斗计数；`CodeGraph.schema_version` 1→2；不新增错误码。
 4. **引擎准入条件**：Apache-2.0 等宽松许可登记；版本 pin + 二进制 sha256 校验；平台资产（本机 win-x64、CI linux-x64）；离线可运行（`--graph-only`）；**引擎故障/不可用时降级**为既有 AST 能力 + 显式 unresolved 计数（不虚假成功、不静默）。
 5. **自研保底**：`PythonAstAnalyzer` 既有 DEFINES/IMPORTS 能力不回退；自研 resolver 仅用于补齐引擎无法覆盖的 gap（L4）。
-6. **落地顺序**：POC（§5）→ 通过线与缺口清单 → 集成设计（Canonical Adapter 接口 + 四态判定规则 + Golden 期望冻结）→ 评测 Baseline v2（只用新建不覆盖纪律）→ ADR 落账与架构文档同步。
+6. **落地顺序**：POC（§5，已完成）→ 集成设计（已冻结）→ M1 schema v2 + AST CALLS + Golden / Baseline v2（已完成）→ M2 外部 Provider + Canonical Adapter（下一步）→ M3 ADR 落账与架构文档同步。
 7. **相关决议（2026-10-04）**：P1=1-A（SymbolKind 扩类仅 Adapter 内部维度，对外保持 3 类）；P7=同一个（Canonical Artifact = `app/domain/codegraph` 域模型演进）；P2–P6 处置建议见 [决策文档 §16](codegraph-adapter-selection-and-evolution.md)。
 
 **Alternatives**
@@ -201,17 +201,80 @@ OSS Engine（看懂代码）→ Canonical Adapter（统一语义与证据）→ 
 - 负向：引入外部 native 依赖与供应链风险（solo/0.x，已列缓解）；解析精度受引擎启发式上限约束，需持续用自有 Golden 度量；调用点证据可能需补扫（额外一次 AST 遍历）；`~/.codegraph` 运行期状态需在运维文档登记。
 - 复审触发：引擎不再活跃或行为回归、Golden 命中率跌破通过线、许可证变化、需要多语言解析（复用引擎 38 语言能力时另行评审）、或引入第二解析器改变能力上限。
 
-## 7. 决策点与后续同步
+## 7. 当前决策与后续同步
 
-**待 Human 决策（本次）**
+**已完成决策**
 
 1. 本选型文档（`docs/codegraph/codegraph-oss-adoption.md`）：**已认可**（2026-10-04，按方案 B 推进）；
 2. **POC 执行方式**：已决（grill Q1）——Human 手动下载（sha256 校验、存仓库外），Agent 校验并执行 POC 与记分；**POC 已执行**（§5.4：命中未达标 → 已决混合增强 A）；
-3. **ADR-012 v2 落账时机（改述）**：由“POC 通过后”改为“**集成设计冻结后**”（ADR 含方案 B 混合增强架构与契约 v2）；契约变更实施同批推进。
+3. **ADR-012 v2 落账时机（改述）**：M1/M2 的实现证据齐备后在 M3 落账，避免 ADR 早于真实集成结果。
 
-**POC 通过后的文档同步清单（预告，非本次执行）**
+**当前里程碑**
 
-- `architecture.md`：状态表 + 演进顺序（Phase 2D"CALLS"改为"外部引擎 Adapter 接入"叙事）；
-- `CLAUDE.md`：§五状态地图 + 模块速查（新增引擎适配器模块后）；
-- `eval/codegraph`：`golden-python-calls` 期望冻结 + Baseline v2；
-- dev-log 与本地记忆按惯例登记。
+- **M1 已完成**：schema v2、AST CALLS、入口清单、四态与统计漏斗、双 Golden、Baseline v2 已落地。
+- **M2 下一步**：接入 CodeGraphAI Provider、Raw DTO、Canonical Adapter、合并与 provenance、配置及失败降级，并在真实引擎上狗粮与测时。
+- **M3 收口**：正式落账 ADR-012；同步架构、开发计划与运行文档。若 M2 自扫描超过 15 分钟，再评审常驻服务模式。
+
+## 8. 合并后的研究证据与采用边界
+
+### 8.1 Human feedback 的纠偏结论
+
+早期调研的事实基本可靠，但默认倾向“研究开源项目后自研 resolver”，与“借鉴并使用开源，快速获得可信代码关系”的主要矛盾不一致。最终采用四级路线：
+
+1. **L1 默认引擎**：先验证并接入 codegraph-ai/CodeGraph；它是默认结构引擎，不是 CALLS 绝对真源。
+2. **L2 精度增强**：只有 M2 实测证明需要类型推断时，才评审 Pyright / scip-python / astroid。
+3. **L3 机制参考**：PyCG、JARVIS、griffe、code2flow 只提供算法、失败语义和测试设计参考。
+4. **L4 定向自研**：仅补 OSS 已证实的缺口；当前 AST 补扫用于 call-site 证据、方法体、`self` 与别名盲区，不重造完整调用图引擎。
+
+无论底层引擎如何替换，`resolved / ambiguous / dynamic / unresolved`、source span、稳定 ID、确定性排序、provenance 与漏斗统计始终由本仓库契约掌控。
+
+### 8.2 候选证据与采用结论
+
+| 项目 | 许可证 / 快照状态 | 可借能力 | 当前结论 / 复审触发 |
+| --- | --- | --- | --- |
+| codegraph-ai/CodeGraph | Apache-2.0；0.x、活跃、solo maintainer | 多语言结构、跨文件关系、入口与遍历 | M2 默认 Provider；pin 版本与 sha256，输出必须归一化 |
+| tree-sitter | MIT；活跃 | 增量、容错、多语言 CST | 经默认引擎间接使用；直接接入仅在第二解析器需求出现时 |
+| Pyright / scip-python | MIT；活跃 | 类型、definition、继承与跨库解析 | 不作为默认依赖；Golden 缺口确认需要类型推断时复审 |
+| astroid | LGPL-2.1；活跃 | 多值 inference、`Uninferable`、MRO | 接口语义参考；未解析比例超阈值且需推断时复审 |
+| griffe | ISC；活跃 | Alias 链、环检测、类型化失败 | 借机制；出现 API 表面或文档断链需求时复审 |
+| PyCG | Apache-2.0；已归档 | 作用域/赋值图、微基准、precision-first | 仅算法与 benchmark 来源，不作运行内核 |
+| JARVIS / HeaderGen | 无许可证；研究原型 | FTG、流敏感、强更新与评测思路 | 仅论文参考，代码不可复用 |
+| code2flow | MIT；低频维护 | “说不清就跳过并告警”的保守策略 | 借歧义处理纪律，不作内核 |
+| SCIP | Apache-2.0；活跃 | 字符串 ID、传输格式与存储分离 | 借设计原则；不引 Protobuf 中间真源 |
+| LSIF / Sourcetrail | 已废弃 / GPL-3.0 且归档 | 历史协议 / UI 理念 | 不采用 |
+| pyan3 | GPL-2.0 | 基础静态调用图 | 许可证与精度均不合适，不采用 |
+| rustworkx | Apache-2.0；活跃 | SCC、拓扑、中心度等大图算法 | 当前标准库足够；出现实测规模或高级算法需求时复审 |
+| Joern | Apache-2.0；活跃 | CPG、data-flow、安全分析 | 当前过重；出现污点或安全分析需求时复审 |
+
+### 8.3 研究期冲突的最终处置
+
+| 冲突 | 最终处置 |
+| --- | --- |
+| C1 CALLS 无调用点证据 | schema v2 的 CALLS 边强制 `source_span`；M1 AST 补扫已实现 |
+| C2 无解析状态 | CALLS 边使用闭枚举 resolution；dynamic / unresolved 不伪造边 |
+| C3 无调用漏斗 | `ScanStats` 增调用总数与四态、截断计数；M1 已实现守恒校验 |
+| C4 破坏性契约演进 | `CodeGraph.schema_version` 升至 2；Baseline v1 保留，新增 v2 |
+| C5 错误码闭集 | 不可解析是分析事实，不新增错误码 |
+| C6 集合序不确定 | 出边前排序、去重；Golden 双跑保证字节稳定 |
+| C7 重名与稳定身份 | 继续使用稳定节点 ID 与 `#n` 规则；解析落到具体节点 ID |
+| C8 分析范围膨胀 | 只物化仓库内目标；第三方 / stdlib 进入 unresolved 统计 |
+
+### 8.4 可复用的方法沉淀
+
+- **失败是一等值**：不以 `None`、异常或静默缺边混合表达解析结果。
+- **引擎不等于契约**：Raw DTO 只存在于 infrastructure；领域层只接收 Canonical 模型。
+- **precision 优先但 recall 可观测**：宁可不建边，也要把 ambiguous / dynamic / unresolved 显式计数。
+- **证据优先**：每条物化 CALLS 必须能回到调用点；引擎缺 span 时由 AST 补证据。
+- **测试先于增强器**：先用自有 Golden 定位缺口，再决定引入第二引擎或定向 resolver。
+
+### 8.5 外部证据索引（快照 2026-10-03/04）
+
+- [codegraph-ai/CodeGraph](https://github.com/codegraph-ai/CodeGraph)（README、工具指南、Release 资产与 Apache-2.0）
+- [PyCG](https://github.com/vitsalis/PyCG) 与 [论文](https://arxiv.org/abs/2103.00587)
+- [JARVIS 论文](https://arxiv.org/abs/2305.05949) 与 [项目页](https://pythonjarvis.github.io/)
+- [HeaderGen](https://github.com/secure-software-engineering/HeaderGen)
+- [astroid](https://github.com/pylint-dev/astroid) 与 [官方文档](https://pylint.readthedocs.io/projects/astroid/en/latest/)
+- [griffe](https://github.com/mkdocstrings/griffe) 与 [官方文档](https://mkdocstrings.github.io/griffe/)
+- [SCIP](https://github.com/scip-code/scip) 与 [scip-python](https://github.com/sourcegraph/scip-python)
+- [code2flow](https://github.com/scottrogowski/code2flow)、[tree-sitter](https://github.com/tree-sitter/tree-sitter)、[rustworkx](https://github.com/Qiskit/rustworkx)
+- [Sourcetrail](https://github.com/CoatiSoftware/Sourcetrail) 与 [pyan3](https://github.com/Technologicat/pyan)
