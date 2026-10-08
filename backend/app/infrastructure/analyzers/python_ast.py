@@ -35,10 +35,12 @@ from app.application.scans.models import (
     SourceManifest,
 )
 from app.domain.codegraph.ids import build_edge_id, build_node_id
-from app.domain.codegraph.kinds import CallResolution, EdgeKind, NodeKind
+from app.domain.codegraph.kinds import EdgeKind, NodeKind
 from app.domain.codegraph.models import CodeEdge, CodeGraph, CodeNode, EntryPoint, SourceSpan
 from app.infrastructure.analyzers.entry_points import find_entry_points
-from app.infrastructure.analyzers.python_calls import CallFact, DefinitionSymbol, scan_python_calls
+from app.infrastructure.analyzers.python_calls import DefinitionSymbol, scan_python_calls
+from app.infrastructure.code_intelligence.pipeline import CallEnrichment
+from app.infrastructure.code_intelligence.providers.engine_port import CallGraphProvider
 
 PARSER_VERSION = "python-ast/0.2"
 
@@ -73,6 +75,14 @@ class PythonAstAnalyzer:
     本分析器直接以该路径为 base 拼接 manifest 内相对路径，不做子目录推导。
     """
 
+    def __init__(
+        self,
+        call_graph_provider: CallGraphProvider | None = None,
+        *,
+        call_graph_total_budget_seconds: int = 900,
+    ) -> None:
+        self._call_enrichment = CallEnrichment(call_graph_provider, call_graph_total_budget_seconds)
+
     async def analyze(self, request: ScanRequest, manifest: SourceManifest) -> AnalyzeOutcome:
         """异步外壳；解析与文件 IO 在线程中执行，不阻塞事件循环。"""
         return await asyncio.to_thread(self._analyze_sync, request, manifest)
@@ -106,7 +116,8 @@ class PythonAstAnalyzer:
             symbols.extend(file_symbols)
 
         call_facts, call_funnel = scan_python_calls(parsed_files, symbols, module_ids)
-        edges.extend(_merge_call_facts(call_facts))
+        enrichment = self._call_enrichment.enrich(root, tuple(nodes), symbols, call_facts)
+        edges.extend(enrichment.edges)
         entries = _build_entries(parsed_files, symbols, module_ids)
 
         # 统一排序，保证字节级确定性输出
@@ -120,6 +131,7 @@ class PythonAstAnalyzer:
             nodes=tuple(nodes),
             edges=tuple(edges),
             entries=tuple(entries),
+            provenance=enrichment.provenance,
         )
         return AnalyzeOutcome(graph=graph, errors=tuple(errors), call_funnel=call_funnel)
 
@@ -406,36 +418,6 @@ def _add_edge(
             target_id=target_id,
         )
     )
-
-
-def _merge_call_facts(facts: list[CallFact]) -> list[CodeEdge]:
-    """按冻结身份合并调用事实，并选择最早的代表 span。"""
-    grouped: dict[tuple[str, str], list[CallFact]] = {}
-    for fact in facts:
-        grouped.setdefault((fact.source_id, fact.target_id), []).append(fact)
-    edges: list[CodeEdge] = []
-    for (source_id, target_id), group in grouped.items():
-        resolution = (
-            CallResolution.RESOLVED
-            if any(item.resolution is CallResolution.RESOLVED for item in group)
-            else CallResolution.AMBIGUOUS
-        )
-        representative = min(
-            (item.call_span for item in group),
-            key=lambda span: (span.line_start, span.line_end),
-        )
-        edges.append(
-            CodeEdge(
-                id=build_edge_id(EdgeKind.CALLS, source_id, target_id),
-                kind=EdgeKind.CALLS,
-                source_id=source_id,
-                target_id=target_id,
-                source_span=representative,
-                resolution=resolution,
-                is_truncated=resolution is CallResolution.AMBIGUOUS and any(item.is_truncated for item in group),
-            )
-        )
-    return edges
 
 
 def _build_entries(

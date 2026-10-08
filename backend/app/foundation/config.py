@@ -23,11 +23,17 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:3000"
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO"
     debug: bool = False
+    codegraph_engine_enabled: bool = False
+    codegraph_engine_path: str = ""
+    codegraph_engine_timeout_seconds: int = Field(default=30, ge=1)
+    codegraph_engine_total_budget_seconds: int = Field(default=900, ge=1)
 
     @model_validator(mode="after")
     def reject_production_debug(self) -> "Settings":
         if self.app_env == "production" and self.debug:
             raise ValueError("production 环境禁止开启 DEBUG")
+        if self.codegraph_engine_enabled and not self.codegraph_engine_path.strip():
+            raise ValueError("启用 CodeGraph 引擎时必须配置 CODEGRAPH_ENGINE_PATH")
         return self
 
     @property

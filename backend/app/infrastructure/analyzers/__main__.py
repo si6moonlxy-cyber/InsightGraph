@@ -15,7 +15,9 @@ from pathlib import Path
 
 from app.application.scans.models import ScanError, ScanRequest, SourceManifest
 from app.domain.codegraph.models import CodeGraph
+from app.foundation.config import get_settings
 from app.infrastructure.analyzers.python_ast import PythonAstAnalyzer
+from app.infrastructure.code_intelligence.providers import create_call_graph_provider
 from app.infrastructure.collectors import GitRepositoryCollector, resolve_repository_root
 
 _LOGGER = logging.getLogger("insightgraph.codegraph")
@@ -36,11 +38,27 @@ async def _run(request: ScanRequest) -> tuple[tuple[ScanError, ...], SourceManif
     collect_outcome = await GitRepositoryCollector().collect(request)
     if collect_outcome.manifest is None:
         return collect_outcome.errors, None, None
-    analyze_outcome = await PythonAstAnalyzer().analyze(request, collect_outcome.manifest)
+    settings = get_settings()
+    provider = (
+        create_call_graph_provider(
+            "codegraph-ai",
+            Path(settings.codegraph_engine_path),
+            settings.codegraph_engine_timeout_seconds,
+        )
+        if settings.codegraph_engine_enabled
+        else None
+    )
+    analyze_outcome = await PythonAstAnalyzer(
+        provider,
+        call_graph_total_budget_seconds=settings.codegraph_engine_total_budget_seconds,
+    ).analyze(request, collect_outcome.manifest)
     return collect_outcome.errors + analyze_outcome.errors, collect_outcome.manifest, analyze_outcome.graph
 
 
 def main(argv: list[str] | None = None) -> int:
+    reconfigure_stdout = getattr(sys.stdout, "reconfigure", None)
+    if callable(reconfigure_stdout):
+        reconfigure_stdout(encoding="utf-8")
     logging.basicConfig(level=logging.INFO, format="%(message)s", stream=sys.stdout)
     args = build_parser().parse_args(argv)
     path = resolve_repository_root(args.path) or args.path
