@@ -39,24 +39,24 @@ SourceManifest（步骤 3） ──► PythonAstAnalyzer（步骤 4 基础图：
 
 ### 0.2 新增/变更组件清单
 
-| 路径                                                                                                                                                | 类型  | 职责                                                                                                           | 里程碑   |
-| ------------------------------------------------------------------------------------------------------------------------------------------------- | --- | ------------------------------------------------------------------------------------------------------------ | ----- |
-| `backend/app/infrastructure/code_intelligence/pipeline.py`                                                                                        | 新增  | `CallEnrichment` 编排：scanner → engine（可选）→ adapter → merge 产出增强结果与漏斗                                          | M1/M2 |
-| `backend/app/infrastructure/code_intelligence/scanner/call_scanner.py`                                                                            | 新增  | stdlib AST 调用点采集与四态分类（§2/§3）                                                                                 | M1    |
-| `backend/app/infrastructure/code_intelligence/scanner/binding.py`                                                                                 | 新增  | 模块/类/函数作用域绑定模型（import 形态、self、局部浅推断，§3.2）                                                                    | M1    |
-| `backend/app/infrastructure/code_intelligence/providers/engine_port.py`                                                                           | 新增  | `CallGraphProvider` 内部 Protocol（§1.2）                                                                        | M2    |
-| `backend/app/infrastructure/code_intelligence/providers/codegraph_ai.py`                                                                          | 新增  | codegraph-ai/CodeGraph subprocess 实现（§1.3）                                                                   | M2    |
-| `backend/app/infrastructure/code_intelligence/raw_models/symbol.py` / `relation.py`                                                               | 新增  | 引擎响应 DTO（`extra="ignore"`，§1.4）                                                                              | M2    |
-| `backend/app/infrastructure/code_intelligence/adapter/{identity,symbol_mapper,relation_mapper,span_mapper,resolution,provenance,canonicalize}.py` | 新增  | Canonical Adapter 七组件（§1.5）                                                                                  | M2    |
-| `backend/app/domain/codegraph/kinds.py`                                                                                                           | 变更  | +`CallResolution`、+`EntryKind`；CALLS 注释更新（§4.1）                                                              | M1    |
-| `backend/app/domain/codegraph/models.py`                                                                                                          | 变更  | CodeEdge +3 字段与校验；+`EntryPoint`/`ProviderRecord`；CodeGraph +`entries`/`provenance`；schema_version 语义=2（§4.2） | M1    |
-| `backend/app/application/scans/models.py`                                                                                                         | 变更  | +`CallFunnel`；AnalyzeOutcome +`call_funnel`；ScanStats +3 计数（§4.3）                                            | M1    |
-| `backend/app/application/scans/service.py`                                                                                                        | 变更  | `_build_stats` 合并漏斗计数（§4.3）                                                                                  | M1    |
-| `backend/app/infrastructure/analyzers/python_ast.py`                                                                                              | 变更  | 产出符号表并调用 CallEnrichment；`PARSER_VERSION` → `python-ast/0.2`（§3.1）                                            | M1    |
-| `backend/app/infrastructure/analyzers/entry_points.py`                                                                                            | 变更  | 枚举与 `EntryKind` 统一（domain）；捕获语句级 span（行为不变，§4.2）                                                             | M1    |
-| `backend/app/foundation/config.py`                                                                                                                | 变更  | +`codegraph_engine_*` 三配置（§1.9）                                                                              | M2    |
-| `eval/codegraph/validate.py`                                                                                                                      | 变更  | +calls 证据不变量、+entries 引用不变量（§4.4）                                                                            | M1    |
-| `eval/codegraph/evaluator.py`                                                                                                                     | 变更  | 语义比对纳入 CALLS（含 resolution）与 entries；指标扩展（§4.6）                                                               | M1    |
+| 路径                                                                                                                                                      | 类型  | 职责                                                                                                           | 里程碑   |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------- | --- | ------------------------------------------------------------------------------------------------------------ | ----- |
+| `backend/app/infrastructure/code_intelligence/pipeline.py`                                                                                              | 新增  | `CallEnrichment` 编排：scanner → engine（可选）→ adapter → merge 产出增强结果与漏斗                                          | M1/M2 |
+| `backend/app/infrastructure/code_intelligence/scanner/call_scanner.py`                                                                                  | 新增  | stdlib AST 调用点采集与四态分类（§2/§3）                                                                                 | M1    |
+| `backend/app/infrastructure/code_intelligence/scanner/binding.py`                                                                                       | 新增  | 模块/类/函数作用域绑定模型（import 形态、self、局部浅推断，§3.2）                                                                    | M1    |
+| `backend/app/infrastructure/code_intelligence/providers/engine_port.py`                                                                                 | 新增  | `CallGraphProvider` 内部 Protocol（§1.2）                                                                        | M2    |
+| `backend/app/infrastructure/code_intelligence/providers/codegraph_ai.py`                                                                                | 新增  | codegraph-ai/CodeGraph subprocess 实现（§1.3）                                                                   | M2    |
+| `backend/app/infrastructure/code_intelligence/raw_models/symbol.py` / `relation.py`                                                                     | 新增  | 引擎响应 DTO（`extra="ignore"`，§1.4）                                                                              | M2    |
+| `backend/app/infrastructure/code_intelligence/adapter/{identity,symbol_mapper,`<br>`relation_mapper,span_mapper,resolution,provenance,canonicalize}.py` | 新增  | Canonical Adapter 七组件（§1.5）                                                                                  | M2    |
+| `backend/app/domain/codegraph/kinds.py`                                                                                                                 | 变更  | +`CallResolution`、+`EntryKind`；CALLS 注释更新（§4.1）                                                              | M1    |
+| `backend/app/domain/codegraph/models.py`                                                                                                                | 变更  | CodeEdge +3 字段与校验；+`EntryPoint`/`ProviderRecord`；CodeGraph +`entries`/`provenance`；schema_version 语义=2（§4.2） | M1    |
+| `backend/app/application/scans/models.py`                                                                                                               | 变更  | +`CallFunnel`；AnalyzeOutcome +`call_funnel`；ScanStats +3 计数（§4.3）                                            | M1    |
+| `backend/app/application/scans/service.py`                                                                                                              | 变更  | `_build_stats` 合并漏斗计数（§4.3）                                                                                  | M1    |
+| `backend/app/infrastructure/analyzers/python_ast.py`                                                                                                    | 变更  | 产出符号表并调用 CallEnrichment；`PARSER_VERSION` → `python-ast/0.2`（§3.1）                                            | M1    |
+| `backend/app/infrastructure/analyzers/entry_points.py`                                                                                                  | 变更  | 枚举与 `EntryKind` 统一（domain）；捕获语句级 span（行为不变，§4.2）                                                             | M1    |
+| `backend/app/foundation/config.py`                                                                                                                      | 变更  | +`codegraph_engine_*` 三配置（§1.9）                                                                              | M2    |
+| `eval/codegraph/validate.py`                                                                                                                            | 变更  | +calls 证据不变量、+entries 引用不变量（§4.4）                                                                            | M1    |
+| `eval/codegraph/evaluator.py`                                                                                                                           | 变更  | 语义比对纳入 CALLS（含 resolution）与 entries；指标扩展（§4.6）                                                               | M1    |
 
 ---
 
@@ -73,11 +73,9 @@ SourceManifest（步骤 3） ──► PythonAstAnalyzer（步骤 4 基础图：
 ```python
 class CallGraphProvider(Protocol):
     name: str                 # 例如 "codegraph-ai/CodeGraph"
-    version: str              # 引擎版本（--info 探测，M2 实测确认格式）
-    asset_hash: str | None    # 引擎二进制 sha256（可核验时）
 
     def probe(self, root: Path) -> ProviderStatus: ...
-    def calls_for_symbol(self, root: Path, file_rel: str, line_1based: int) -> list[RawCallEdge]: ...
+    def calls_for_symbol(self, root: Path, file_rel: str, line_1based: int) -> ProviderCallResult: ...
 ```
 
 - `probe`：启动前探测（二进制存在/可执行/`--info` 成功）→ `available / unavailable(reason)`；不可用只影响降级，不产生错误码（§1.8）。
@@ -96,7 +94,7 @@ class CallGraphProvider(Protocol):
 ### 1.4 raw DTO 与解析纪律
 
 - `raw_models/symbol.py`：`RawLocation{file,line,end_line,column,end_column}`、`RawSymbol{id,name,kind,signature,path,line_start,line_end}`。
-- `raw_models/relation.py`：`RawCallEdge{from_id,to_id,type}`、`RawCallGraph{nodes,edges,root}`、`RawEntryPoint{entry_type,node_id,symbol,...}`（当前不使用，保留解析能力供 M3 对比诊断）。
+- `raw_models/relation.py`：`RawCallEdge{from_id,to_id,type}`、`RawCallGraph{nodes,edges,root,root_node}`；`ProviderCallResult` 显式区分 graph / error。
 - 解析纪律：**`extra="ignore"`**（外部 schema 演进不致命）；缺字段/类型不符 → 跳过该条 + 诊断计数；不猜测不补造。
 
 ### 1.5 Adapter 映射职责（七组件）
@@ -106,7 +104,7 @@ class CallGraphProvider(Protocol):
 | `identity.py` | 引擎节点（path/line/kind/name）→ canonical node id | §1.6 匹配规则；匹配失败 → 丢弃该边 + 诊断计数 |
 | `symbol_mapper.py` | 引擎 kind → canonical `NodeKind` | `Function`→function（方法亦是）、`Class`→class；其余丢弃（1-A：扩类不进入对外契约） |
 | `relation_mapper.py` | 引擎边 type → `EdgeKind` | 白名单：`calls`→CALLS；`contains`→**丢弃**（与 DEFINES 同义，本仓 DEFINES 为准）；`imports`→丢弃（步骤 4 已有）；白名单外丢弃 |
-| `span_mapper.py` | 引擎行号 → `SourceSpan` | 调用点证据不来自引擎（实测不可得，见 POC §专项）；仅节点定位用。输出行号按 **POC 实测口径（1-based，与编辑器一致）** 解释并做「±1 窗口 + 名称」双重匹配容错；输入 `line` 参数按官方文档 0-indexed 传 `span.line_start - 1` |
+| `span_mapper.py` | 引擎行号 → `SourceSpan` | 调用点证据不来自引擎（实测不可得，见 POC §专项）；仅节点定位用。M2 复验 v0.20.1 的输入/输出均为 **1-based**，查询传 AST 定义节点 `lineno`（不能传含装饰器的 span 首行），匹配保留「±1 窗口 + 名称」容错 |
 | `resolution.py` | 边来源与形态 → `CallResolution` | 引擎边 → `resolved`（POC 实测 0 假阳性）；scanner 四态判定见 §2；合并优先级见 §1.7 |
 | `provenance.py` | probe 结果 → `ProviderRecord` | `{name, version, asset_hash, tools_used}`；未启用/不可用 → 空 provenance |
 | `canonicalize.py` | CallFact 集合 → `CodeEdge` / `EntryPoint` 元组 | 分组、去重、代表 span、排序（§1.7/§3.5/§4.5） |
@@ -130,6 +128,8 @@ group by (source_id, target_id):
     resolution   = 优先级最高者：resolved > ambiguous        # dynamic/unresolved 不产生 fact
     source_span  = 全部贡献 fact 中 (line_start, line_end) 最小者（确定性代表 span，§3.5）
     is_truncated = 任一 fact 截断 且 合并后 resolution == ambiguous；合并为 resolved 时为 False
+同一调用点存在多个 ambiguous 候选时，engine 不得单方面把其中一个升级为 resolved
+engine-only 边因缺少 call-site span 不物化，只进入诊断计数
 只保留 endpoints 均在 canonical 节点集内的边；自环跳过（沿用既有纪律）
 edges 按 id 排序输出
 诊断（仅日志，不进契约）：engine_only 边数、scanner_only 边数、两端丢弃数、
@@ -148,8 +148,9 @@ edges 按 id 排序输出
 | `codegraph_engine_enabled` | `False` | 显式开启（默认关闭 → 测试/CI 确定性不受引擎影响） |
 | `codegraph_engine_path` | `""` | 引擎二进制路径（如 `D:\.codegraph\bin\codegraph-server-win32-x64.exe`） |
 | `codegraph_engine_timeout_seconds` | `30` | 单次工具调用超时 |
+| `codegraph_engine_total_budget_seconds` | `900` | 整批查询总预算；超时熔断并返回 scanner-only 完整结果 |
 
-`.env.example` 增补三个可选键与注释（机器相关路径不入库）。
+`.env.example` 增补四个可选键与注释（机器相关路径不入库）。
 
 ---
 
@@ -386,20 +387,20 @@ _build_stats(...):  # 增参 call_funnel；funnel 缺失时三计数保持 0
 | 里程碑 | 内容 | 验收（可执行） |
 | --- | --- | --- |
 | **M1**（scanner 自足闭环） | 契约 v2（§4）+ scanner（§2/§3）+ entries + funnel；golden-python-calls 期望冻结；basic expected 复核更新；Baseline v2 | 夹具契约口径 100%（resolved/ambiguous/dynamic/unresolved 全对）；basic 六项不变量通过 + DEFINES/IMPORTS 零回归；evaluator 100%；自扫描 dogfood 零错误；ruff/mypy/pytest 全绿 |
-| **M2**（引擎接入） | provider + adapter + merge（§1）；降级路径；Settings | 夹具上「引擎并入 ≡ scanner-only 结果」（幂等合并证明）；provenance 正确写入；关引擎/坏路径降级测试通过；自扫描耗时记录（性能预算） |
+| **M2**（引擎接入）✅ | provider + adapter + merge（§1）；降级路径；Settings | 已完成：真实 Golden 幂等、provenance、关闭/坏路径/查询失败降级均通过；自扫描 220.817 秒（470 节点 / 951 边 / 0 错误），不触发 `--serve` |
 | **M3**（落账） | ADR-012 v2（并入本设计主体）落 `docs/adr/`；架构/CLAUDE/Plan 同步；CI linux 引擎明确豁免；若 M2 自扫描超过 15 分钟则引入 `--serve` 常驻方案 | 文档同步矩阵全部勾选；死链/CI 全绿；Human 评审记录；性能超预算时 `--serve` 验证通过 |
 
 ---
 
 ## 6. 评审冻结结论
 
-1. **引擎行号口径**：M2 在更多样本复验后固化 `span_mapper`；当前保留 ±1 窗口兜底。
+1. **引擎行号口径**：M2 已复验并固化为 1-based；查询使用 AST 定义 `lineno`，节点映射保留 ±1 窗口兜底。
 2. **CI 与引擎**：CI 只运行 scanner + mock provider；真实引擎验证留在本地 dogfood，不引入 CI 外部资产依赖。
-3. **性能预算**：M2 先实测自扫描是否超过 15 分钟；若超时，M3 引入 `--serve` 常驻方案并验证。
+3. **性能预算**：M2 自扫描 220.817 秒，未超过 15 分钟；M3 不引入 `--serve`。
 4. **v2.x 边界**：装饰器调用、`super()`、MRO/继承链、逐调用点证据不阻塞本批次，随 INHERITS/IMPLEMENTS 批次评审。
 5. **ambiguous 探针**：使用同模块重名（`#n`）形态，期望结果由 Human 人工复核后冻结。
 
 ---
 
-> 起草：2026-10-07（Agent）｜评审冻结：2026-10-08（sixmoon）｜后续：契约变更实施（M1）+ ADR-012 v2 落账（M3）。
+> 起草：2026-10-07（Agent）｜评审冻结：2026-10-08（sixmoon）｜M1/M2 实施完成：2026-10-08｜后续：ADR-012 v2 落账（M3）。
 > 关联：[决策文档 §16](codegraph-adapter-selection-and-evolution.md)（契约决策记录）、[选型文档 §6](codegraph-oss-adoption.md)（ADR 草案）、[金夹具说明](../../eval/codegraph/cases/golden-python-calls/README.md)。

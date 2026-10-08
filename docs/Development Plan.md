@@ -250,7 +250,14 @@ Adapter 职责边界与长期演进决策见 [codegraph-adapter-selection-and-ev
   Baseline v2 独立提交并锚定实现提交 `b389760`。
 - InsightGraph 自扫描：393 节点 / 795 边 / 0 局部错误；完整 CI 全绿。
 
-**状态：🟡 进行中（M1 scanner 自足闭环完成；M2 引擎接入待实施）。**
+**M2 验证（2026-10-08）**
+
+- `CodeGraphAIProvider` + 宽容 Raw DTO + Canonical Adapter 七组件 + Provider registry 已落地；默认关闭，固定二进制路径、单次超时可配置。
+- 关引擎、坏路径、查询失败或超过默认 900 秒总预算均无错降级为 scanner-only；整批成功才写 provenance，engine-only 无 call-site 证据不物化。
+- mock 单测证明幂等合并；真实 v0.20.1 Golden 集成证明 engine ∪ scanner 与 scanner-only 的 nodes/edges/entries 完全一致。
+- 真实 InsightGraph 自扫描：470 节点 / 951 边 / 0 局部错误，耗时 220.817 秒；低于 15 分钟预算，不触发 `--serve`。
+
+**状态：🟡 进行中（M1/M2 完成；下一步 M3 ADR-012 与文档收口）。**
 
 ### 6. 持久化
 
@@ -377,14 +384,14 @@ SQLAlchemy 模型，产出第二类确定性分析产出：数据模型视图（
 
 当前不要直接接 Neo4j、LangGraph、LLM 或前端。下一阶段按下面顺序推进：
 
-### 当前任务：步骤 5 M2 引擎接入
+### 当前任务：步骤 5 M3 落账收口
 
-M1 已完成。下一批按冻结设计 §1 实施 M2：
+M1/M2 已完成。下一批按冻结设计 §5 实施 M3：
 
-1. CodeGraphAI Provider 端口与 raw DTO。
-2. Canonical Adapter 节点匹配、CALLS fact 映射与 provenance。
-3. engine ∪ scanner 合并、坏路径/关闭引擎的无错降级。
-4. 夹具幂等证明与 InsightGraph 自扫描性能记录；若超过 15 分钟，M3 引入 `--serve`。
+1. 将集成设计主体正式落账 ADR-012 v2。
+2. 完成架构 / CLAUDE / Development Plan / 运行说明同步与 Human 评审记录。
+3. 明确 CI Linux 不下载真实引擎，只跑 scanner + mock provider；真实二进制验证保留为手动 integration。
+4. M2 自扫描仅 220.817 秒，不引入 `--serve`。
 
 ### 首个产品能力里程碑：已达成（步骤 4）
 

@@ -1,6 +1,6 @@
 # CodeGraph OSS 快速落地选型：Adapter + 开源引擎路线
 
-> 状态：步骤 5 选型、前置调研与 POC 的唯一真源；M1 已完成，M2 按本文路线继续。
+> 状态：步骤 5 选型、前置调研与 POC 的唯一真源；M1/M2 已完成，下一步 M3 落账收口。
 > 日期：2026-10-04 ｜ 合并整理：2026-10-08
 > 依据：2026-10-03 前置调研、2026-10-04 Human feedback 与同日 CodeGraphAI POC；原始反馈稿和前置调研稿已提炼并入本文，可从 Git 历史追溯。
 > 关联：系统架构 [architecture.md](../architecture.md)、实施冻结件 [codegraph-integration-design.md](codegraph-integration-design.md)、决策文档 [codegraph-adapter-selection-and-evolution.md](codegraph-adapter-selection-and-evolution.md)、契约 [ADR-010](../adr/ADR-010-codegraph-contract-discipline.md) / [ADR-011](../adr/ADR-011-scan-result-contract.md)
@@ -147,7 +147,7 @@ OSS Engine（看懂代码）→ Canonical Adapter（统一语义与证据）→ 
 1. **获取引擎**：下载 Releases `codegraph-server-win32-x64.exe` + `.sha256`（v0.20.1），校验哈希后放入仓库外目录（建议 `~/.codegraph/bin/`，与官方生态同规；**不入仓**）。
 2. **核验 CLI**：`codegraph-server.exe --help`，确认 `--workspace / --graph-only / --run-tool / --tool-args` 实际形态（文档与二进制以二进制为准）。
 3. **索引**（graph-only，无 MCP）：`--workspace <夹具 repo> --graph-only --run-tool codegraph_find_entry_points --tool-args '{"entryType":"all","limit":50}'`。
-4. **逐工具采样**：`codegraph_symbol_search` / `codegraph_get_callees` / `codegraph_get_callers` / `codegraph_get_call_graph`（`uri` + **0-indexed line**，或 `nodeId` 字符串）/ `codegraph_traverse_graph`（`edgeTypes:[Calls]`）；对夹具每个调用形态取 1–2 个样本。
+4. **逐工具采样**：`codegraph_symbol_search` / `codegraph_get_callees` / `codegraph_get_callers` / `codegraph_get_call_graph`（`uri` + `line`，或 `nodeId` 字符串）/ `codegraph_traverse_graph`（`edgeTypes:[Calls]`）；对夹具每个调用形态取 1–2 个样本。M2 实测 v0.20.1 的 `line` 为 1-based，最终以集成设计 §1.5 为准。
 5. **对照与判定**：按夹具归属表逐项打分（命中 / 偏差 / 缺失），专项检查 **call-site 行号是否出现**。
 6. **产出**：`eval/codegraph/.outputs/codegraph-ai-poc/{raw_responses, scorecard.md}`（原始响应 + 记分卡）；结论摘要回填本文 §5.4。
 
@@ -212,8 +212,8 @@ OSS Engine（看懂代码）→ Canonical Adapter（统一语义与证据）→ 
 **当前里程碑**
 
 - **M1 已完成**：schema v2、AST CALLS、入口清单、四态与统计漏斗、双 Golden、Baseline v2 已落地。
-- **M2 下一步**：接入 CodeGraphAI Provider、Raw DTO、Canonical Adapter、合并与 provenance、配置及失败降级，并在真实引擎上狗粮与测时。
-- **M3 收口**：正式落账 ADR-012；同步架构、开发计划与运行文档。若 M2 自扫描超过 15 分钟，再评审常驻服务模式。
+- **M2 已完成**：CodeGraphAI Provider、Raw DTO、Canonical Adapter、幂等合并与 provenance、配置及失败降级均已落地；真实 Golden 通过，InsightGraph 自扫描 220.817 秒。
+- **M3 下一步**：正式落账 ADR-012；完成架构、开发计划与运行文档收口。M2 未超过 15 分钟，不引入常驻服务模式。
 
 ## 8. 合并后的研究证据与采用边界
 
