@@ -1,6 +1,6 @@
 # CodeGraph OSS 快速落地选型：Adapter + 开源引擎路线
 
-> 状态：步骤 5 选型、前置调研与 POC 的唯一真源；M1/M2 已完成，下一步 M3 落账收口。
+> 状态：步骤 5 选型、前置调研与 POC 的唯一真源；M1/M2/M3 已完成，正式决策见 [ADR-012](../adr/ADR-012-calls-acquisition-normalization.md)。
 > 日期：2026-10-04 ｜ 合并整理：2026-10-08
 > 依据：2026-10-03 前置调研、2026-10-04 Human feedback 与同日 CodeGraphAI POC；原始反馈稿和前置调研稿已提炼并入本文，可从 Git 历史追溯。
 > 关联：系统架构 [architecture.md](../architecture.md)、实施冻结件 [codegraph-integration-design.md](codegraph-integration-design.md)、决策文档 [codegraph-adapter-selection-and-evolution.md](codegraph-adapter-selection-and-evolution.md)、契约 [ADR-010](../adr/ADR-010-codegraph-contract-discipline.md) / [ADR-011](../adr/ADR-011-scan-result-contract.md)
@@ -213,7 +213,7 @@ OSS Engine（看懂代码）→ Canonical Adapter（统一语义与证据）→ 
 
 - **M1 已完成**：schema v2、AST CALLS、入口清单、四态与统计漏斗、双 Golden、Baseline v2 已落地。
 - **M2 已完成**：CodeGraphAI Provider、Raw DTO、Canonical Adapter、幂等合并与 provenance、配置及失败降级均已落地；真实 Golden 通过，InsightGraph 自扫描 220.817 秒。
-- **M3 下一步**：正式落账 ADR-012；完成架构、开发计划与运行文档收口。M2 未超过 15 分钟，不引入常驻服务模式。
+- **M3 已完成**：ADR-012 Accepted；架构、开发计划与运行边界已收口。当前不引入常驻服务模式；大型仓库由 900 秒预算熔断保护，首次触发后再评审 `--serve`/批量/分区。
 
 ## 8. 合并后的研究证据与采用边界
 

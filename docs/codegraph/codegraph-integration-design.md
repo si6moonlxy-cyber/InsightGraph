@@ -388,7 +388,7 @@ _build_stats(...):  # 增参 call_funnel；funnel 缺失时三计数保持 0
 | --- | --- | --- |
 | **M1**（scanner 自足闭环） | 契约 v2（§4）+ scanner（§2/§3）+ entries + funnel；golden-python-calls 期望冻结；basic expected 复核更新；Baseline v2 | 夹具契约口径 100%（resolved/ambiguous/dynamic/unresolved 全对）；basic 六项不变量通过 + DEFINES/IMPORTS 零回归；evaluator 100%；自扫描 dogfood 零错误；ruff/mypy/pytest 全绿 |
 | **M2**（引擎接入）✅ | provider + adapter + merge（§1）；降级路径；Settings | 已完成：真实 Golden 幂等、provenance、关闭/坏路径/查询失败降级均通过；自扫描 220.817 秒（470 节点 / 951 边 / 0 错误），不触发 `--serve` |
-| **M3**（落账） | ADR-012 v2（并入本设计主体）落 `docs/adr/`；架构/CLAUDE/Plan 同步；CI linux 引擎明确豁免；若 M2 自扫描超过 15 分钟则引入 `--serve` 常驻方案 | 文档同步矩阵全部勾选；死链/CI 全绿；Human 评审记录；性能超预算时 `--serve` 验证通过 |
+| **M3**（落账）✅ | [ADR-012](../adr/ADR-012-calls-acquisition-normalization.md) Accepted；架构/CLAUDE/Plan 同步；CI 只跑 mock；大型仓库 900 秒预算熔断 | 文档同步完成；Human 要求的大仓有界降级已进入配置、代码、测试与 ADR；当前不引入 `--serve` |
 
 ---
 
@@ -402,5 +402,5 @@ _build_stats(...):  # 增参 call_funnel；funnel 缺失时三计数保持 0
 
 ---
 
-> 起草：2026-10-07（Agent）｜评审冻结：2026-10-08（sixmoon）｜M1/M2 实施完成：2026-10-08｜后续：ADR-012 v2 落账（M3）。
+> 起草：2026-10-07（Agent）｜评审冻结：2026-10-08（sixmoon）｜M1/M2/M3 完成：2026-10-08｜正式决策：[ADR-012](../adr/ADR-012-calls-acquisition-normalization.md)。
 > 关联：[决策文档 §16](codegraph-adapter-selection-and-evolution.md)（契约决策记录）、[选型文档 §6](codegraph-oss-adoption.md)（ADR 草案）、[金夹具说明](../../eval/codegraph/cases/golden-python-calls/README.md)。
