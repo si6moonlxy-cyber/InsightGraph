@@ -29,6 +29,10 @@ class Settings(BaseSettings):
     # 内容与 sidecar 哈希均由 JsonCodeGraphRepository 管理，见 ADR-006。
     artifact_root: Path = Path(".artifacts")
 
+    # PostgreSQL 元数据库（ADR-002）。为 None 时未启用关系型持久化；
+    # 构造引擎与执行迁移时 fail-fast，不做静默降级。
+    database_url: str | None = None
+
     @model_validator(mode="after")
     def reject_production_debug(self) -> "Settings":
         if self.app_env == "production" and self.debug:
