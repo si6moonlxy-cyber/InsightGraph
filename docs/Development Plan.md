@@ -257,7 +257,13 @@ Adapter 职责边界与长期演进决策见 [codegraph-adapter-selection-and-ev
 - mock 单测证明幂等合并；真实 v0.20.1 Golden 集成证明 engine ∪ scanner 与 scanner-only 的 nodes/edges/entries 完全一致。
 - 真实 InsightGraph 自扫描：470 节点 / 951 边 / 0 局部错误，耗时 220.817 秒；低于 15 分钟预算，不触发 `--serve`。
 
-**状态：🟡 进行中（M1/M2 完成；下一步 M3 ADR-012 与文档收口）。**
+**M3 收口（2026-10-08）**
+
+- [ADR-012](adr/ADR-012-calls-acquisition-normalization.md) 已 Accepted：正式冻结混合增强、Evidence First 合并、CI/真实引擎边界与大型仓库有界降级。
+- CI 继续只跑 scanner + mock provider；真实引擎测试使用 `integration` marker 和显式 `CODEGRAPH_ENGINE_PATH`。
+- 900 秒总预算是正确性兜底；首次真实大仓触发预算时再以配对测量评审 `--serve`、批量、分区或只查询未解析符号。
+
+**状态：✅ 已完成（M1 scanner、M2 引擎接入、M3 ADR/文档收口全部完成）。**
 
 ### 6. 持久化
 
@@ -384,14 +390,13 @@ SQLAlchemy 模型，产出第二类确定性分析产出：数据模型视图（
 
 当前不要直接接 Neo4j、LangGraph、LLM 或前端。下一阶段按下面顺序推进：
 
-### 当前任务：步骤 5 M3 落账收口
+### 当前任务：步骤 6 持久化
 
-M1/M2 已完成。下一批按冻结设计 §5 实施 M3：
+步骤 5 已完成。下一批先冻结步骤 6 的访问模式与 Artifact Repository 契约，再实施：
 
-1. 将集成设计主体正式落账 ADR-012 v2。
-2. 完成架构 / CLAUDE / Development Plan / 运行说明同步与 Human 评审记录。
-3. 明确 CI Linux 不下载真实引擎，只跑 scanner + mock provider；真实二进制验证保留为手动 integration。
-4. M2 自扫描仅 220.817 秒，不引入 `--serve`。
+1. 规范化 JSON Artifact Repository、原子写入、内容哈希与保存后重载一致性。
+2. PostgreSQL Repository / Scan / Job 元数据与 Alembic，逐表对应真实查询。
+3. 用实际图规模与查询样本复审 ADR-002 / ADR-006；不提前引入 Neo4j。
 
 ### 首个产品能力里程碑：已达成（步骤 4）
 

@@ -216,7 +216,7 @@ Baseline First → Change → Same Eval → Delta
 1. **Phase 2A（当前）**：后端骨架、领域契约、依赖守卫、文档与 ADR。
 2. **Phase 2B**：本地 Collector、Python AST Analyzer、确定性 JSON Artifact、Golden Dataset。
 3. **Phase 2C**：扫描 API、PostgreSQL 元数据、后台 Job 与 Redis 状态。
-4. **Phase 2D（进行中）**：CALLS scanner 与 CodeGraphAI Provider/Canonical Adapter 已完成；继续 ADR-012 落账、增量扫描和 CodeGraph 查询。
+4. **Phase 2D（进行中）**：CALLS scanner 与 CodeGraphAI Provider/Canonical Adapter 已完成并由 ADR-012 冻结；下一步进入 Artifact 持久化、增量扫描和 CodeGraph 查询。
 5. **Phase 2E**：GraphRAG Evidence/Claim、Neo4j、pgvector 与统一 LLM Gateway。
 6. **Phase 2F**：LangGraph 编排和 Evidence First Reporter。
 7. **Phase 3**：React 图谱浏览器、视觉回归和真实 LLM 手动评测工作流。

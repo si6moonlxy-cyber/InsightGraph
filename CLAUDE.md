@@ -4,7 +4,7 @@
 > **核心法则：Evidence First（证据优先）。文档过时 = 生产 Bug，优先级等同。**
 >
 > 当前阶段：Phase 2A —— 工程基础设施、`backend/` 架构骨架、领域契约（ADR-010/011）、本地 Collector 与
-> Python Analyzer（步骤 3/4）与 CALLS scanner + CodeGraphAI Provider/Canonical Adapter（步骤 5 M1/M2）已就位，
+> Python Analyzer（步骤 3/4）与 CALLS scanner + CodeGraphAI Provider/Canonical Adapter（步骤 5，ADR-012）已完成，
 > 持久化适配器、GraphRAG 引擎与 `frontend/` 尚未建立
 > （见 §五 5.3 当前代码-文档现实）。
 
@@ -282,7 +282,7 @@ update something       ← 缺类型前缀
 | `backend/` | ✅ Phase 2A 骨架 | FastAPI + Settings + 错误/日志 + domain/application/infrastructure 分层 + 测试门禁 |
 | `frontend/` | ⏳ 未建立 | Phase 3：Vite + React + 视觉回归双守卫 |
 | CodeGraph / GraphRAG 领域契约 | ✅ 稳定版 | 稳定 ID、ScanResult/错误/统计契约、确定性序列化与 schema_version 已定（ADR-010/011）；Collector 与 Analyzer 已实现（步骤 3/4）；Repository 未实现 |
-| CALLS 步骤 5 | 🟡 M1/M2 完成，M3 待落账 | schema v2、AST 调用补扫、entries/funnel、双 Golden、CodeGraphAI Provider + Canonical Adapter + 幂等 merge/降级与 900 秒总预算熔断已落地；下一步 ADR-012 与文档收口 |
+| CALLS 步骤 5 | ✅ 已完成 | schema v2、AST 调用补扫、entries/funnel、双 Golden、CodeGraphAI Provider + Canonical Adapter + 幂等 merge/降级与 900 秒总预算熔断已落地；ADR-012 Accepted |
 | LangGraph 工作流 | ⏳ 未建立 | `workflows/` 仅声明“编排不承载业务”的边界，尚未引入 LangGraph |
 | 真实 LLM 评测 workflow | ⏳ 未建立 | Phase 3：手动触发 + gate 脚本（不进常驻 CI） |
 
