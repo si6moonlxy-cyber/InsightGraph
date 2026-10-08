@@ -260,6 +260,9 @@ update something       ← 缺类型前缀
 | `cd backend && uv run python -m app.infrastructure.collectors <路径>` | 采集本地 Git 仓库为 `SourceManifest`（步骤 3 采集 CLI，`--json` 输出规范 JSON） |
 | `cd backend && uv run python -m app.infrastructure.analyzers <路径>` | 采集+分析一条链输出 `CodeGraph`（步骤 4 CLI，`--json` 输出规范 JSON） |
 | `cd backend && uv run python ../eval/codegraph/validate.py <工件.json> --repo-root <仓库根>` | CodeGraph 产物三项不变量校验（DEFINES 入边 / content_hash 重算 / imports 目标；CI 经 pytest 强制执行） |
+| `cd backend && uv run alembic upgrade head` | 应用 PostgreSQL 迁移（连接串从 Settings 读，需 `.env` 的 `DATABASE_URL`；未配置则 fail-fast） |
+| `cd backend && uv run alembic revision --autogenerate -m "<中文说明>"` | 由 ORM 模型生成迁移（revision id 必须 ≤ 32 字符，见 `docker/postgres/init.sql` 留档） |
+| `cd backend && uv run pytest -m integration` | 运行需要真实 PostgreSQL / 外部基础设施的集成测试（含迁移结构校验） |
 | `bash scripts/ci-check.sh` | **push 前全量检查**（文档死链 → 后端 lint/测试 → 前端 lint → 密钥扫描） |
 | `bash scripts/doc-link-check.sh` | 仅检查文档死链 |
 | `bash scripts/abs-path-check.sh` | 仅检查机器特定绝对路径（本机盘符 / 家目录） |
@@ -284,7 +287,7 @@ update something       ← 缺类型前缀
 | 开发日志（`dev-log` 分支） | ✅ 就绪 | 独立 orphan 分支为唯一真源；工作树 .devlog 自带钩子（校验 / 强制 dlog / 提交后自动推送）；devlog.sh sync / pull；CI 只读校验 + 7 天陈旧提醒；Setup 与启动自动 pull 已并入 start.bat |
 | `backend/` | ✅ Phase 2A 骨架 | FastAPI + Settings + 错误/日志 + domain/application/infrastructure 分层 + 测试门禁 |
 | `frontend/` | ⏳ 未建立 | Phase 3：Vite + React + 视觉回归双守卫 |
-| CodeGraph / GraphRAG 领域契约 | ✅ 稳定版 | 稳定 ID、ScanResult/错误/统计契约、确定性序列化与 schema_version 已定（ADR-010/011）；Collector 与 Analyzer 已实现（步骤 3/4）；**JSON Artifact Repository 已实现**（步骤 6 首件）；PostgreSQL 元数据表与 Alembic 未建立 |
+| CodeGraph / GraphRAG 领域契约 | ✅ 稳定版 | 稳定 ID、ScanResult/错误/统计契约、确定性序列化与 schema_version 已定（ADR-010/011）；Collector 与 Analyzer 已实现（步骤 3/4）；**JSON Artifact Repository 已实现**；**PostgreSQL `scan` / `scan_error` 已建表**（迁移 `817b75001d2d`）；ScanRecord 持久化适配器未实现 |
 | LangGraph 工作流 | ⏳ 未建立 | `workflows/` 仅声明“编排不承载业务”的边界，尚未引入 LangGraph |
 | 真实 LLM 评测 workflow | ⏳ 未建立 | Phase 3：手动触发 + gate 脚本（不进常驻 CI） |
 
@@ -297,7 +300,7 @@ update something       ← 缺类型前缀
 | `domain/codegraph/` | CodeGraph IR、稳定 ID 构造与持久化端口 | `models.py`、`ids.py`、`kinds.py`、`ports.py` |
 | `domain/evidence/` | Evidence 来源与可信状态 | `models.py` |
 | `domain/graphrag/` | 知识节点与 Evidence First Claim | `models.py` |
-| `infrastructure/` | Collector、Analyzer、Persistence、LLM 外部适配器 | `collectors/`（步骤 3）与 `analyzers/`（步骤 4）已实现；`analyzers/entry_points.py` 为步骤 5 先行件（仅识别，表示层待定）；`persistence/codegraph_artifact.py`（步骤 6 首件）已实现 JSON Artifact Repository；PostgreSQL / Neo4j / LLM 适配器未建立 |
+| `infrastructure/` | Collector、Analyzer、Persistence、LLM 外部适配器 | `collectors/`（步骤 3）与 `analyzers/`（步骤 4）已实现；`analyzers/entry_points.py` 为步骤 5 先行件（仅识别，表示层待定）；`persistence/` 含 JSON Artifact 适配器、ORM 模型与 Alembic 迁移；Neo4j / LLM 适配器未建立 |
 | `workflows/` | LangGraph 编排入口 | 当前仅建立边界 |
 | `foundation/` | 配置、日志与统一错误处理 | `config.py`、`logging.py`、`errors.py` |
 
