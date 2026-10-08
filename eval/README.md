@@ -2,8 +2,8 @@
 
 > 规则来源：[工程基础设施借鉴方案](../docs/InsightGraph_Engineering%20Infrastructure.md) §8–§12。
 >
-> 当前状态：**骨架已建立**。第一个 evaluator 随第一个分析能力（CodeGraph parser）落地；
-> 在此之前不建立空目录占位。
+> 当前状态：CodeGraph evaluator 已进入 eval-v2，包含 `golden-python-basic` 与
+> `golden-python-calls` 两个经人工复核的 Golden Dataset；检索与报告评测仍按能力落地时再建立。
 
 ---
 
@@ -45,6 +45,10 @@ eval/
 
 5. 数据集确需调整时：升版本，并用新版本重新计算旧实现的 Baseline。
 ```
+
+CodeGraph eval-v2 固定比对节点、结构边、CALLS 的 resolution/span/truncation 与图级 entries；
+`calls_dynamic`、`calls_unresolved` 和 `oversized_ambiguous_calls` 通过 AnalyzeOutcome 漏斗记录。
+Baseline v2 使用 `golden-python-calls`，锚定 `python-ast/0.2` 实现提交 `b389760`；历史 v1 基线保留。
 
 ## 最小基线记录（JSON 字段）
 

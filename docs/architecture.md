@@ -108,6 +108,10 @@ Repository 是图的作用域（由图的 `repository_id` + `revision` 界定）
 [ADR-010](adr/ADR-010-codegraph-contract-discipline.md)；扫描结果与错误契约见
 [ADR-011](adr/ADR-011-scan-result-contract.md)。相同仓库、Commit 与配置应产生相同结果。
 
+当前 schema v2 已实现 CALLS：边携带调用点 `source_span`、`resolved/ambiguous` 解析状态与
+歧义截断标记；dynamic/unresolved 不建边而进入扫描漏斗。代码入口以图级 `entries` 清单表达，
+不混入 EdgeKind。scanner-only 产物的 `provenance` 为空；M2 接入外部引擎后才记录 Provider。
+
 ### 5.2 GraphRAG
 
 GraphRAG 是研究证据图：
@@ -139,8 +143,9 @@ ScanRequest
   → Query API
 ```
 
-第一阶段只实现本地 Python 仓库以及 Module、Class、Function、IMPORTS、DEFINES。`CALLS`、
-跨模块符号解析和远程 GitHub 仓库放在后续迭代。
+当前本地 Python 链路已实现 Module、Class、Function、IMPORTS、DEFINES、CALLS 与入口清单；
+CALLS 采用确定性浅绑定并保守区分 resolved、ambiguous、dynamic、unresolved。
+CodeGraphAI Provider/Adapter、多语言与远程 GitHub 仓库仍在后续迭代。
 
 完成标准：
 
@@ -209,7 +214,7 @@ Baseline First → Change → Same Eval → Delta
 1. **Phase 2A（当前）**：后端骨架、领域契约、依赖守卫、文档与 ADR。
 2. **Phase 2B**：本地 Collector、Python AST Analyzer、确定性 JSON Artifact、Golden Dataset。
 3. **Phase 2C**：扫描 API、PostgreSQL 元数据、后台 Job 与 Redis 状态。
-4. **Phase 2D**：CALLS、跨模块解析、增量扫描和 CodeGraph 查询。
+4. **Phase 2D（进行中）**：CALLS scanner 已完成；继续接入外部引擎、增量扫描和 CodeGraph 查询。
 5. **Phase 2E**：GraphRAG Evidence/Claim、Neo4j、pgvector 与统一 LLM Gateway。
 6. **Phase 2F**：LangGraph 编排和 Evidence First Reporter。
 7. **Phase 3**：React 图谱浏览器、视觉回归和真实 LLM 手动评测工作流。

@@ -1,6 +1,6 @@
 # CodeGraph 集成设计（步骤 5 · 实施冻结件）
 
-> 状态：**待评审冻结**（Draft for Review，2026-10-07）。
+> 状态：**已评审冻结**（sixmoon，2026-10-08；初稿 2026-10-07）。
 > 输入与依据：[决策文档](codegraph-adapter-selection-and-evolution.md)（§3–§5 契约与四态、§7 目录、§8 方案 B、§10 Phase 演进、§16 全部已决项）、
 > [选型文档](codegraph-oss-adoption.md)（§5 POC、§5.4 结果、§6 ADR-012 v2 草案）、POC 记分卡（`eval/codegraph/.outputs/codegraph-ai-poc/scorecard.md`，本地证据）、
 > [前置调研](codegraph-calls-pre-research.md)。
@@ -162,23 +162,23 @@ edges 按 id 排序输出
 3. **不建边**：`dynamic` / `unresolved` 只进漏斗计数；`ambiguous` 物化候选边 + 防爆护栏（§2.4）。
 4. **对称性**：同一调用点在 callers/callees 双向查询中必须得到一致状态（由单一 CallFact 数据结构保证）。
 
-### 2.2 规则表（v1 冻结候选）
+### 2.2 规则表（v1 已冻结）
 
-| # | AST 构造（callee 形态） | 判定 | 候选枚举来源 | 说明 |
-| --- | --- | --- | --- | --- |
-| R1 | `Name(...)` 直呼 | resolved / ambiguous / unresolved | 模块绑定表：`def` 本模块 + `from M import f` | 命中 1 个 → resolved；同名多定义（`#n`）→ ambiguous；仓库内无候选 → unresolved |
-| R2 | `Attr(Name=模块绑定)(...)`（`helpers.shout(...)`） | 同上 | `import a.b` / `import a.b as m` / `from . import m` 的模块绑定 | 模块节点内查同文件函数；`m.attr` 中 attr 是模块内函数 → 1 候选 |
-| R3 | `Attr(Name=导入别名)(...)`（`g(...)`，`from M import f as g`） | 同上 | 别名绑定 → 目标函数 | POC 盲区，scanner 主责 |
-| R4 | `Attr(Name=self)(...)`（`self._format(...)`） | resolved / unresolved | 本类方法表（同一 ClassDef）；找不到 → unresolved | v1 不做 MRO（基类方法留 v2.x，随 INHERITS 批次） |
-| R5 | `Name(局部变量)(...)` 且局部变量为**单一直接赋值** `x = Cls(...)`；`Attr(x)(...)` | resolved / unresolved | 浅层类型推断：函数体内该名字唯一一次赋值给 `Cls(...)` → 在 `Cls` 类方法表找 attr | 多处赋值/条件赋值/链式 → unresolved（v1 不做多来源推断） |
-| R6 | `Cls(...)` 类实例化 | resolved | 目标类节点；若类定义了 `__init__` → **重定向到 `__init__` 函数节点**，否则指向 Class 节点 | 修正引擎的 Class 目标口径 |
-| R7 | `Name(形参)(...)` / `Attr(形参)(...)`（`callback(...)`） | **dynamic** | —（不枚举） | **修正夹具初步意向**（原标 ambiguous）：运行时决定，v1 不做栈间数据流；见 §2.5 |
-| R8 | `getattr(...)(...)`、映射取值后调用（`d[k]` 形式）、`Call(...)(...)`（调用返回值） | dynamic | — | 动态构造 |
-| R9 | stdlib / 第三方（`os.path.join(...)`） | unresolved | —（仓库内无候选） | 不建边，进漏斗 |
-| R10 | 模块级调用（main guard 内 `main()`、模块顶层语句中的调用） | resolved / ... | 同 R1–R3；**source = module 节点** | 模块节点作为调用源（引擎不覆盖） |
-| R11 | `super().m(...)` | unresolved | — | v1 不解析 MRO；v2.x 评估 |
-| R12 | 装饰器使用（`@decorator`） | **v1 不采集** | — | 记入已知限制（§6 开放问题）；只采集 `ast.Call` 表达式 |
-| R13 | 嵌套函数（`<locals>`）内调用 | 同 R1–R10 | 绑定 = 模块绑定 + 外层遮蔽（nearer 优先） | source = 嵌套 function 节点 |
+| #   | AST 构造（callee 形态）                                                | 判定                                | 候选枚举来源                                                          | 说明                                                           |
+| --- | ---------------------------------------------------------------- | --------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------ |
+| R1  | `Name(...)` 直呼                                                   | resolved / ambiguous / unresolved | 模块绑定表：`def` 本模块 + `from M import f`                             | 命中 1 个 → resolved；同名多定义（`#n`）→ ambiguous；仓库内无候选 → unresolved |
+| R2  | `Attr(Name=模块绑定)(...)`（`helpers.shout(...)`）                     | 同上                                | `import a.b` / `import a.b as m` / `from . import m` 的模块绑定      | 模块节点内查同文件函数；`m.attr` 中 attr 是模块内函数 → 1 候选                    |
+| R3  | `Attr(Name=导入别名)(...)`（`g(...)`，`from M import f as g`）          | 同上                                | 别名绑定 → 目标函数                                                     | POC 盲区，scanner 主责                                            |
+| R4  | `Attr(Name=self)(...)`（`self._format(...)`）                      | resolved / unresolved             | 本类方法表（同一 ClassDef）；找不到 → unresolved                             | v1 不做 MRO（基类方法留 v2.x，随 INHERITS 批次）                          |
+| R5  | `Name(局部变量)(...)` 且局部变量为**单一直接赋值** `x = Cls(...)`；`Attr(x)(...)` | resolved / unresolved             | 浅层类型推断：函数体内该名字唯一一次赋值给 `Cls(...)` → 在 `Cls` 类方法表找 attr           | 多处赋值/条件赋值/链式 → unresolved（v1 不做多来源推断）                        |
+| R6  | `Cls(...)` 类实例化                                                  | resolved                          | 目标类节点；若类定义了 `__init__` → **重定向到 `__init__` 函数节点**，否则指向 Class 节点 | 修正引擎的 Class 目标口径                                             |
+| R7  | `Name(形参)(...)` / `Attr(形参)(...)`（`callback(...)`）               | **dynamic**                       | —（不枚举）                                                          | **修正夹具初步意向**（原标 ambiguous）：运行时决定，v1 不做栈间数据流；见 §2.5           |
+| R8  | `getattr(...)(...)`、映射取值后调用（`d[k]` 形式）、`Call(...)(...)`（调用返回值）   | dynamic                           | —                                                               | 动态构造                                                         |
+| R9  | stdlib / 第三方（`os.path.join(...)`）                                | unresolved                        | —（仓库内无候选）                                                       | 不建边，进漏斗                                                      |
+| R10 | 模块级调用（main guard 内 `main()`、模块顶层语句中的调用）                          | resolved / ...                    | 同 R1–R3；**source = module 节点**                                  | 模块节点作为调用源（引擎不覆盖）                                             |
+| R11 | `super().m(...)`                                                 | unresolved                        | —                                                               | v1 不解析 MRO；v2.x 评估                                           |
+| R12 | 装饰器使用（`@decorator`）                                              | **v1 不采集**                        | —                                                               | 记入已知限制（§6 开放问题）；只采集 `ast.Call` 表达式                           |
+| R13 | 嵌套函数（`<locals>`）内调用                                              | 同 R1–R10                          | 绑定 = 模块绑定 + 外层遮蔽（nearer 优先）                                     | source = 嵌套 function 节点                                      |
 
 ### 2.3 候选枚举细则
 
@@ -387,19 +387,19 @@ _build_stats(...):  # 增参 call_funnel；funnel 缺失时三计数保持 0
 | --- | --- | --- |
 | **M1**（scanner 自足闭环） | 契约 v2（§4）+ scanner（§2/§3）+ entries + funnel；golden-python-calls 期望冻结；basic expected 复核更新；Baseline v2 | 夹具契约口径 100%（resolved/ambiguous/dynamic/unresolved 全对）；basic 六项不变量通过 + DEFINES/IMPORTS 零回归；evaluator 100%；自扫描 dogfood 零错误；ruff/mypy/pytest 全绿 |
 | **M2**（引擎接入） | provider + adapter + merge（§1）；降级路径；Settings | 夹具上「引擎并入 ≡ scanner-only 结果」（幂等合并证明）；provenance 正确写入；关引擎/坏路径降级测试通过；自扫描耗时记录（性能预算） |
-| **M3**（落账） | ADR-012 v2（并入本设计主体）落 `docs/adr/`；架构/CLAUDE/Plan 同步；CI linux 引擎验证（或明确豁免） | 文档同步矩阵全部勾选；死链/CI 全绿；Human 评审记录 |
+| **M3**（落账） | ADR-012 v2（并入本设计主体）落 `docs/adr/`；架构/CLAUDE/Plan 同步；CI linux 引擎明确豁免；若 M2 自扫描超过 15 分钟则引入 `--serve` 常驻方案 | 文档同步矩阵全部勾选；死链/CI 全绿；Human 评审记录；性能超预算时 `--serve` 验证通过 |
 
 ---
 
-## 6. 开放问题（评审项，需 Human 拍板）
+## 6. 评审冻结结论
 
-1. **引擎行号口径复验**：输入（官方称 0-indexed）与输出（POC 实测 1-based）存在文档/实测张力；M2 在 CI/linux 与更多样本复验后固化 `span_mapper` 容差策略（当前设计已含 ±1 窗口兜底）。
-2. **CI 与引擎**：M2 的 CI 是否安装 linux-x64 引擎（多一次外部资产依赖），还是 CI 仅跑 scanner + mock provider（引擎验证留本地/dogfood）？建议后者（确定性优先）。
-3. **性能预算确认**：自扫描 ≤15 分钟是否接受；超出时是否提前引入 `--serve` 常驻方案。
-4. **v2.x 边界**：装饰器调用（R12）、`super()`（R11）、MRO/继承链、逐调用点证据——排期随 INHERITS/IMPLEMENTS 批次，确认无阻塞。
-5. **补充探针形态**：ambiguous 覆盖探针选「同模块重名（`#n`）」还是「后缀歧义导入」（§2.5），冻结时期望一并人工复核。
+1. **引擎行号口径**：M2 在更多样本复验后固化 `span_mapper`；当前保留 ±1 窗口兜底。
+2. **CI 与引擎**：CI 只运行 scanner + mock provider；真实引擎验证留在本地 dogfood，不引入 CI 外部资产依赖。
+3. **性能预算**：M2 先实测自扫描是否超过 15 分钟；若超时，M3 引入 `--serve` 常驻方案并验证。
+4. **v2.x 边界**：装饰器调用、`super()`、MRO/继承链、逐调用点证据不阻塞本批次，随 INHERITS/IMPLEMENTS 批次评审。
+5. **ambiguous 探针**：使用同模块重名（`#n`）形态，期望结果由 Human 人工复核后冻结。
 
 ---
 
-> 起草：2026-10-07（Agent）｜评审通过后：契约变更实施（M1）+ ADR-012 v2 落账（M3）。
+> 起草：2026-10-07（Agent）｜评审冻结：2026-10-08（sixmoon）｜后续：契约变更实施（M1）+ ADR-012 v2 落账（M3）。
 > 关联：[决策文档 §16](codegraph-adapter-selection-and-evolution.md)（契约决策记录）、[选型文档 §6](codegraph-oss-adoption.md)（ADR 草案）、[金夹具说明](../../eval/codegraph/cases/golden-python-calls/README.md)。

@@ -1,10 +1,10 @@
 # InsightGraph Development Plan
 
-> 最后更新：2026-10-04
+> 最后更新：2026-10-08
 >
 > 当前阶段：Phase 2A，建设步骤 0~4 已完成（领域契约 + 本地采集器 + Python 分析器与首个 Golden
-> Dataset，产品能力里程碑已达成）；步骤 5“调用关系”进行中——选型（方案 B）/ 契约 v2 / 引擎 POC 已完成，
-> 下一步：集成设计 → 实施。
+> Dataset，产品能力里程碑已达成）；步骤 5“调用关系”进行中——集成设计已冻结，M1 scanner 自足闭环、
+> 双 Golden 与 Baseline v2 已完成；下一步进入 M2 CodeGraphAI Provider + Canonical Adapter + merge/降级路径。
 >
 > 架构真源见[系统架构](architecture.md)，设计哲学见
 > [初始化架构思想导论](Introduction%20to%20Initialization%20Architecture%20Concepts.md)。
@@ -41,19 +41,19 @@ InsightGraph 按“先确定性地理解代码，再用证据组织知识，最�
 
 ## 3. 当前进度总览
 
-| 步骤  | 建设内容              | 状态     | 当前事实                                                         |
-| --- | ----------------- | ------ | ------------------------------------------------------------ |
-| 0   | 校准真源              | ✅ 已完成  | 架构真源、思想导论、ADR 体系与文档索引已经建立                                    |
-| 1   | 后端工程骨架            | ✅ 已完成  | FastAPI、Settings、日志、错误、分层目录、依赖锁和质量门禁已通过                      |
-| 2   | 领域模型              | ✅ 已完成  | 稳定 ID、ScanResult 与阶段错误契约、确定性序列化纪律已定（ADR-010/011），完成门槛由测试验证 |
-| 3   | 本地采集器             | ✅ 已完成  | `GitRepositoryCollector`：git 枚举（ignore 单一真源）+ LF 归一 SHA-256 + 局部错误通道；含最小采集 CLI |
+| 步骤  | 建设内容              | 状态     | 当前事实                                                                                                                                    |
+| --- | ----------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------- |
+| 0   | 校准真源              | ✅ 已完成  | 架构真源、思想导论、ADR 体系与文档索引已经建立                                                                                                               |
+| 1   | 后端工程骨架            | ✅ 已完成  | FastAPI、Settings、日志、错误、分层目录、依赖锁和质量门禁已通过                                                                                                 |
+| 2   | 领域模型              | ✅ 已完成  | 稳定 ID、ScanResult 与阶段错误契约、确定性序列化纪律已定（ADR-010/011），完成门槛由测试验证                                                                              |
+| 3   | 本地采集器             | ✅ 已完成  | `GitRepositoryCollector`：git 枚举（ignore 单一真源）+ LF 归一 SHA-256 + 局部错误通道；含最小采集 CLI                                                          |
 | 4   | Python 分析器        | ✅ 已完成  | `PythonAstAnalyzer`（Module/Class/Function + DEFINES/IMPORTS，`__qualname__` 与行号证据）；eval/codegraph 首个 Golden Dataset + evaluator（语义 100%） |
-| 5   | 调用关系              | 🟡 进行中  | 方案 B（Engine + 自研 AST 补扫）已决；契约 v2 冻结；引擎 POC 完成（命中 ≈33%、无假阳性）；待集成设计与实施 |
-| 6   | 持久化               | ⬜ 未开始  | 只有 `CodeGraphRepository` Protocol，尚无 JSON/数据库适配器             |
-| 7   | 数据模型视图（datamodel） | ⬜ 未开始  | ADR-007/008/009 已定；复用步骤 3/4 解析设施与步骤 6 Artifact 纪律            |
-| 8   | API 与任务           | ⬜ 未开始  | 当前只有健康检查，没有扫描、进度或查询 API                                      |
-| 9   | GraphRAG          | ⬜ 未开始  | 只有知识节点与 Claim 不变量，没有证据抽取、检索或图构建                              |
-| 10  | 编排与产品层            | ⬜ 未开始  | LangGraph、Reporter 和 React 图谱浏览器均未实现                         |
+| 5   | 调用关系              | 🟡 进行中 | 方案 B（Engine + 自研 AST 补扫）已决；契约 v2 冻结；引擎 POC 完成（命中 ≈33%、无假阳性）；待集成设计与实施                                                                    |
+| 6   | 持久化               | ⬜ 未开始  | 只有 `CodeGraphRepository` Protocol，尚无 JSON/数据库适配器                                                                                        |
+| 7   | 数据模型视图（datamodel） | ⬜ 未开始  | ADR-007/008/009 已定；复用步骤 3/4 解析设施与步骤 6 Artifact 纪律                                                                                       |
+| 8   | API 与任务           | ⬜ 未开始  | 当前只有健康检查，没有扫描、进度或查询 API                                                                                                                 |
+| 9   | GraphRAG          | ⬜ 未开始  | 只有知识节点与 Claim 不变量，没有证据抽取、检索或图构建                                                                                                         |
+| 10  | 编排与产品层            | ⬜ 未开始  | LangGraph、Reporter 和 React 图谱浏览器均未实现                                                                                                    |
 
 ## 4. 分步建设计划
 
@@ -230,7 +230,7 @@ Adapter 职责边界与长期演进决策见 [codegraph-adapter-selection-and-ev
 **先行件已落地（2026-10-03，不依赖调研结论）**
 
 - 入口识别规则：`analyzers/entry_points.py`（main guard / FastAPI web_app，仅识别、不含产物表示）。
-- CALLS 语料夹具：`eval/codegraph/cases/golden-python-calls/`（调用形态矩阵，期望结果未冻结）。
+- CALLS Golden：`eval/codegraph/cases/golden-python-calls/`（Human 于 2026-10-08 复核冻结）。
 - 两者均不触碰冻结契约（ADR-010/011）；表示层与判定口径待调研 ADR 后并入本步骤设计。
 
 **应实现**
@@ -246,7 +246,16 @@ Adapter 职责边界与长期演进决策见 [codegraph-adapter-selection-and-ev
 - 解析精度、召回率和未解析比例可重复测量。
 - 基础 Module/Class/Function/IMPORTS/DEFINES 不发生回归。
 
-**状态：🟡 进行中（选型 / 契约 / POC 完成，实施未开始）。**
+**M1 验证（2026-10-08）**
+
+- schema v2：CALLS 三字段不变量、图级 entries/provenance、CallFunnel 与 parser `python-ast/0.2`。
+- AST 补扫覆盖直呼、导入别名、模块属性、self、局部实例浅推断、类实例化与同模块重名 ambiguous；
+  候选上限 5、代表 span 与确定性排序均有反向测试。
+- `golden-python-basic` 与 `golden-python-calls` 均升级为 eval-v2，节点/边/CALLS/entries 全部 100%；
+  Baseline v2 独立提交并锚定实现提交 `b389760`。
+- InsightGraph 自扫描：393 节点 / 795 边 / 0 局部错误；完整 CI 全绿。
+
+**状态：🟡 进行中（M1 scanner 自足闭环完成；M2 引擎接入待实施）。**
 
 ### 6. 持久化
 
@@ -373,14 +382,14 @@ SQLAlchemy 模型，产出第二类确定性分析产出：数据模型视图（
 
 当前不要直接接 Neo4j、LangGraph、LLM 或前端。下一阶段按下面顺序推进：
 
-### 当前任务：步骤 5 集成设计 → 实施
+### 当前任务：步骤 5 M2 引擎接入
 
-前置调研、选型（方案 B）与契约 v2、引擎 POC 均已完成（见上）。按集成设计四件套推进：
+M1 已完成。下一批按冻结设计 §1 实施 M2：
 
-1. Canonical Adapter 接口设计（Provider 端口 + 映射职责，落 `infrastructure/code_intelligence/`）。
-2. 四态判定规则表（resolved / ambiguous / dynamic / unresolved 判定矩阵，含歧义护栏）。
-3. AST 调用补扫器设计（方法体 / self / 别名盲区 + call-site 行号证据，与引擎边合并策略）。
-4. schema v2 契约变更清单（字段落点 + validator 增量 + Golden/Baseline 影响面）。
+1. CodeGraphAI Provider 端口与 raw DTO。
+2. Canonical Adapter 节点匹配、CALLS fact 映射与 provenance。
+3. engine ∪ scanner 合并、坏路径/关闭引擎的无错降级。
+4. 夹具幂等证明与 InsightGraph 自扫描性能记录；若超过 15 分钟，M3 引入 `--serve`。
 
 ### 首个产品能力里程碑：已达成（步骤 4）
 

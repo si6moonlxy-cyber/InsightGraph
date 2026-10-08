@@ -4,7 +4,8 @@
 > **核心法则：Evidence First（证据优先）。文档过时 = 生产 Bug，优先级等同。**
 >
 > 当前阶段：Phase 2A —— 工程基础设施、`backend/` 架构骨架、领域契约（ADR-010/011）、本地 Collector 与
-> Python Analyzer（步骤 3/4，含首个 Golden Dataset）已就位，持久化适配器、GraphRAG 引擎与 `frontend/` 尚未建立
+> Python Analyzer（步骤 3/4）与 CALLS scanner 自足闭环（步骤 5 M1，schema v2 + 双 Golden）已就位，
+> CodeGraphAI Provider/Adapter、持久化适配器、GraphRAG 引擎与 `frontend/` 尚未建立
 > （见 §五 5.3 当前代码-文档现实）。
 
 ---
@@ -276,12 +277,12 @@ update something       ← 缺类型前缀
 | `docker-compose.yml` + `docker/postgres/init.sql` | ✅ 就绪 | postgres/redis 已在本机启动并 healthy（2026-10-02）；neo4j 未启动；api、web 服务待代码建立后加入 |
 | `.github/workflows/ci.yml` | ✅ 就绪 | docs 立即可用；backend / frontend 用存在性守卫，建立后自动生效 |
 | `scripts/` + `.githooks/`（pre-commit / pre-push / commit-msg） | ✅ 就绪 | 需一次性安装：`git config core.hooksPath .githooks` |
-| `eval/` | ✅ 首个 evaluator 已落地 | `eval/codegraph/`：Golden Dataset（golden-python-basic）+ evaluator（语义 100%）+ Baseline v1 |
+| `eval/` | ✅ CodeGraph eval-v2 已落地 | 两个 Human 冻结 Golden（basic + calls）；节点/边/CALLS/entries 语义 100%；Baseline v1 保留，Baseline v2 锚定实现提交 `b389760` |
 | 开发日志（`dev-log` 分支） | ✅ 就绪 | 独立 orphan 分支为唯一真源；工作树 .devlog 自带钩子（校验 / 强制 dlog / 提交后自动推送）；devlog.sh sync / pull；CI 只读校验 + 7 天陈旧提醒；Setup 与启动自动 pull 已并入 start.bat |
 | `backend/` | ✅ Phase 2A 骨架 | FastAPI + Settings + 错误/日志 + domain/application/infrastructure 分层 + 测试门禁 |
 | `frontend/` | ⏳ 未建立 | Phase 3：Vite + React + 视觉回归双守卫 |
 | CodeGraph / GraphRAG 领域契约 | ✅ 稳定版 | 稳定 ID、ScanResult/错误/统计契约、确定性序列化与 schema_version 已定（ADR-010/011）；Collector 与 Analyzer 已实现（步骤 3/4）；Repository 未实现 |
-| CALLS 步骤 5 前置（选型 / 契约 v2 / POC） | ✅ 决策完成（未实施） | 方案 B（Engine + 自研 AST 补扫）已决；契约 v2（CALLS + 入口清单）冻结于 [决策文档](docs/codegraph/codegraph-adapter-selection-and-evolution.md) §16；引擎 POC 完成（≈33%、无假阳性）；实现未开始（POC 隔离铁律适用） |
+| CALLS 步骤 5 | 🟡 M1 完成，M2 待实施 | schema v2、AST 调用补扫、entries/funnel、双 Golden 已落地；下一步接入 CodeGraphAI Provider + Canonical Adapter + merge/降级路径 |
 | LangGraph 工作流 | ⏳ 未建立 | `workflows/` 仅声明“编排不承载业务”的边界，尚未引入 LangGraph |
 | 真实 LLM 评测 workflow | ⏳ 未建立 | Phase 3：手动触发 + gate 脚本（不进常驻 CI） |
 
@@ -294,7 +295,7 @@ update something       ← 缺类型前缀
 | `domain/codegraph/` | CodeGraph IR、稳定 ID 构造与持久化端口 | `models.py`、`ids.py`、`kinds.py`、`ports.py` |
 | `domain/evidence/` | Evidence 来源与可信状态 | `models.py` |
 | `domain/graphrag/` | 知识节点与 Evidence First Claim | `models.py` |
-| `infrastructure/` | Collector、Analyzer、Persistence、LLM 外部适配器 | `collectors/`（步骤 3）与 `analyzers/`（步骤 4）已实现；`analyzers/entry_points.py` 为步骤 5 先行件（仅识别；入口表示层已决 = 图级清单，决策文档 §16）；Persistence/LLM 未建立 |
+| `infrastructure/` | Collector、Analyzer、Persistence、LLM 外部适配器 | `collectors/`、Python AST analyzer、`python_calls.py` 与图级入口识别已实现；CodeGraphAI Provider/Adapter、Persistence/LLM 未建立 |
 | `workflows/` | LangGraph 编排入口 | 当前仅建立边界 |
 | `foundation/` | 配置、日志与统一错误处理 | `config.py`、`logging.py`、`errors.py` |
 

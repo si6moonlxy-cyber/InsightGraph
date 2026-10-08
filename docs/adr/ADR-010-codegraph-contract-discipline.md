@@ -37,6 +37,14 @@ Python Analyzer 即将动工，为避免每个下游模块各自发明一套规�
 8. **稳定性测试三件套**：同一对象两次序列化字节相等、反序列化往返相等、golden fixture
    字节级回归（任何序列化变化必须是有意更新 fixture）。
 
+### 2026-10-08 受控契约升级记录
+
+步骤 5 M1 按本 ADR 的 schema 升级纪律将新产物从 v1 升为 **schema v2**：新增 CALLS 的
+`source_span` / `resolution` / `is_truncated`、图级 `entries` 与扫描级 `provenance`；
+parser 独立升级为 `python-ast/0.2`。历史 v1 Artifact 仍可读取，但不得被静默解释为 v2。
+完整字段、不变量与 Human 冻结记录见
+[CodeGraph 集成设计 §4](../codegraph/codegraph-integration-design.md#4-schema-v2-契约变更清单)。
+
 ## Alternatives
 
 - **ID 含 revision**（如 `repo@abc:module:app.main`）：快照内精确，但每次 commit 后
