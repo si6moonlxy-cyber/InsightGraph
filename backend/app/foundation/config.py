@@ -1,6 +1,7 @@
 """应用配置的唯一读取入口。"""
 
 from functools import lru_cache
+from pathlib import Path
 from typing import Literal
 
 from pydantic import Field, model_validator
@@ -23,6 +24,10 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:3000"
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO"
     debug: bool = False
+
+    # CodeGraph JSON Artifact 的落盘根目录（相对后端工作目录）；
+    # 内容与 sidecar 哈希均由 JsonCodeGraphRepository 管理，见 ADR-006。
+    artifact_root: Path = Path(".artifacts")
 
     @model_validator(mode="after")
     def reject_production_debug(self) -> "Settings":

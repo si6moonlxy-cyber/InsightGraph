@@ -63,5 +63,8 @@ data/raw/
 # ---------- 评测产物（eval 输出；长期保留的只有基线摘要与 Dataset） ----------
 eval/codegraph/.outputs/
 
+# ---------- CodeGraph JSON Artifact（运行期产物，见 ADR-006） ----------
+.artifacts/
+
 # ---------- 开发日志工作树（dev-log 分支，见 CLAUDE.md） ----------
 .devlog/
