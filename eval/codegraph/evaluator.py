@@ -330,6 +330,12 @@ def write_baseline(result: dict) -> Path:
 
 
 def main(argv: list[str] | None = None) -> int:
+    reconfigure_stdout = getattr(sys.stdout, "reconfigure", None)
+    reconfigure_stderr = getattr(sys.stderr, "reconfigure", None)
+    if callable(reconfigure_stdout):
+        reconfigure_stdout(encoding="utf-8")
+    if callable(reconfigure_stderr):
+        reconfigure_stderr(encoding="utf-8")
     logging.basicConfig(level=logging.INFO, format="%(message)s", stream=sys.stdout)
     parser = argparse.ArgumentParser(description="CodeGraph 解析评测（语义集合 100% 口径）")
     parser.add_argument("--case", default=DEFAULT_CASE, help="case 名称（cases/ 下的目录名）")
