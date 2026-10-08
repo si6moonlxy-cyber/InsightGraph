@@ -70,21 +70,21 @@ if [ -f "$ROOT/backend/pyproject.toml" ]; then
         HAS_ERROR=1
     else
         echo "  ▶ Ruff"
-        if (cd "$ROOT/backend" && uv run ruff check app/ tests/); then
+        if (cd "$ROOT/backend" && uv run ruff check app/ tests/ alembic/); then
             pass "Ruff"
         else
             fail "Ruff — 存在 lint 错误，修复后重新运行"
             HAS_ERROR=1
         fi
         echo "  ▶ Ruff Format"
-        if (cd "$ROOT/backend" && uv run ruff format --check app/ tests/); then
+        if (cd "$ROOT/backend" && uv run ruff format --check app/ tests/ alembic/); then
             pass "Ruff Format"
         else
             fail "Ruff Format — 存在未格式化文件"
             HAS_ERROR=1
         fi
         echo "  ▶ Mypy"
-        if (cd "$ROOT/backend" && uv run mypy app/ tests/); then
+        if (cd "$ROOT/backend" && uv run mypy app/ tests/ alembic/); then
             pass "Mypy"
         else
             fail "Mypy — 存在类型错误"

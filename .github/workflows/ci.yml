@@ -82,19 +82,19 @@ jobs:
         if: steps.detect.outputs.exists == 'true'
         run: |
           cd backend
-          uv run ruff check app/ tests/
+          uv run ruff check app/ tests/ alembic/
 
       - name: Format — Ruff
         if: steps.detect.outputs.exists == 'true'
         run: |
           cd backend
-          uv run ruff format --check app/ tests/
+          uv run ruff format --check app/ tests/ alembic/
 
       - name: Typecheck — Mypy
         if: steps.detect.outputs.exists == 'true'
         run: |
           cd backend
-          uv run mypy app/ tests/
+          uv run mypy app/ tests/ alembic/
 
       - name: Test — pytest（mock 单测）
         if: steps.detect.outputs.exists == 'true'
