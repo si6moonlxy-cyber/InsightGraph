@@ -1,0 +1,22 @@
+{
+  "feature": "codegraph-parser",
+  "case": "golden-python-calls",
+  "dataset_version": "eval-v2",
+  "git_sha": "b389760c360fdecf27441a8ce0d489b9ba5809c5",
+  "timestamp": "2026-10-08T09:59:18.821301+00:00",
+  "runner": "eval/codegraph/evaluator.py",
+  "model_or_algorithm": "python-ast/0.2",
+  "metrics": {
+    "primary": 1.0,
+    "node_recall": 1.0,
+    "node_precision": 1.0,
+    "edge_recall": 1.0,
+    "edge_precision": 1.0,
+    "calls_recall": 1.0,
+    "calls_precision": 1.0,
+    "entry_recall": 1.0,
+    "entry_precision": 1.0,
+    "unresolved_ratio": 0.3157894736842105
+  },
+  "raw_outputs": "eval/codegraph/.outputs/golden-python-calls.candidate.json"
+}
