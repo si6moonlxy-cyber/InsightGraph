@@ -83,8 +83,12 @@ class ScanRepository:
 def _build_stats(manifest: SourceManifest, analyze_outcome: AnalyzeOutcome) -> ScanStats:
     """按漏斗口径统计：analyzed = collected - 有局部错误的去重文件数。"""
     failed_files = {error.file_path for error in analyze_outcome.errors if error.file_path is not None}
+    call_funnel = analyze_outcome.call_funnel
     return ScanStats(
         files_collected=len(manifest.files),
         files_failed=len(failed_files),
         files_analyzed=len(manifest.files) - len(failed_files),
+        calls_dynamic=call_funnel.calls_dynamic if call_funnel is not None else 0,
+        calls_unresolved=call_funnel.calls_unresolved if call_funnel is not None else 0,
+        oversized_ambiguous_calls=call_funnel.oversized_ambiguous_calls if call_funnel is not None else 0,
     )

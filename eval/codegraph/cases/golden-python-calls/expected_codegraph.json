@@ -1,0 +1,660 @@
+{
+  "schema_version": 2,
+  "repository_id": "golden-python-calls",
+  "revision": "fixture-v1",
+  "parser_version": "python-ast/0.2",
+  "nodes": [
+    {
+      "id": "golden-python-calls:class:app.workers.Worker",
+      "kind": "class",
+      "qualified_name": "app.workers.Worker",
+      "language": "python",
+      "source": {
+        "file_path": "app/workers.py",
+        "line_start": 7,
+        "line_end": 15
+      },
+      "content_hash": "sha256:2eb12b48a7fa39bffbd81cfd4193010e7d4625800aa5be91c40e00860208839f"
+    },
+    {
+      "id": "golden-python-calls:function:app.aliases.use_alias",
+      "kind": "function",
+      "qualified_name": "app.aliases.use_alias",
+      "language": "python",
+      "source": {
+        "file_path": "app/aliases.py",
+        "line_start": 7,
+        "line_end": 8
+      },
+      "content_hash": "sha256:659956a2fa4b4f96ab1a972a8053591482133d555d3691336869f62b4cef626f"
+    },
+    {
+      "id": "golden-python-calls:function:app.ambiguous.choose",
+      "kind": "function",
+      "qualified_name": "app.ambiguous.choose",
+      "language": "python",
+      "source": {
+        "file_path": "app/ambiguous.py",
+        "line_start": 5,
+        "line_end": 6
+      },
+      "content_hash": "sha256:637a5975366789bcae62b8a898be8a9cc14908de029803a3e597234e5f3b41e0"
+    },
+    {
+      "id": "golden-python-calls:function:app.ambiguous.choose#2",
+      "kind": "function",
+      "qualified_name": "app.ambiguous.choose",
+      "language": "python",
+      "source": {
+        "file_path": "app/ambiguous.py",
+        "line_start": 9,
+        "line_end": 10
+      },
+      "content_hash": "sha256:7463d3050481a36a393ea93b2f4258e429249d1ec7bd81649adfc17ebb5a460c"
+    },
+    {
+      "id": "golden-python-calls:function:app.ambiguous.use_ambiguous",
+      "kind": "function",
+      "qualified_name": "app.ambiguous.use_ambiguous",
+      "language": "python",
+      "source": {
+        "file_path": "app/ambiguous.py",
+        "line_start": 13,
+        "line_end": 14
+      },
+      "content_hash": "sha256:da4c27b689865a270ee8cd716fb677a3651a03f8b34928a1ef857fcd7ac354d3"
+    },
+    {
+      "id": "golden-python-calls:function:app.dynamic.assign_callback",
+      "kind": "function",
+      "qualified_name": "app.dynamic.assign_callback",
+      "language": "python",
+      "source": {
+        "file_path": "app/dynamic.py",
+        "line_start": 14,
+        "line_end": 16
+      },
+      "content_hash": "sha256:adbafad10b2763170457a12799696e21212dce3bdf5ac5ae3629dc9ea87ec797"
+    },
+    {
+      "id": "golden-python-calls:function:app.dynamic.call_dynamic",
+      "kind": "function",
+      "qualified_name": "app.dynamic.call_dynamic",
+      "language": "python",
+      "source": {
+        "file_path": "app/dynamic.py",
+        "line_start": 10,
+        "line_end": 11
+      },
+      "content_hash": "sha256:7a32c5a379f20a57f8681068fa1725a3bd5bea01ccb5ef3c5e4f51fde447d1a3"
+    },
+    {
+      "id": "golden-python-calls:function:app.dynamic.call_via_variable",
+      "kind": "function",
+      "qualified_name": "app.dynamic.call_via_variable",
+      "language": "python",
+      "source": {
+        "file_path": "app/dynamic.py",
+        "line_start": 6,
+        "line_end": 7
+      },
+      "content_hash": "sha256:8d02de0d7a18262685e339f911072a51f381251240162f6f9daf6d2bb23a53f4"
+    },
+    {
+      "id": "golden-python-calls:function:app.helpers.greet",
+      "kind": "function",
+      "qualified_name": "app.helpers.greet",
+      "language": "python",
+      "source": {
+        "file_path": "app/helpers.py",
+        "line_start": 4,
+        "line_end": 5
+      },
+      "content_hash": "sha256:098c7ba97bf56dfac31ac8960b77a852c8dc65e6e8ef16b5f9fde673521e7d68"
+    },
+    {
+      "id": "golden-python-calls:function:app.helpers.shout",
+      "kind": "function",
+      "qualified_name": "app.helpers.shout",
+      "language": "python",
+      "source": {
+        "file_path": "app/helpers.py",
+        "line_start": 8,
+        "line_end": 9
+      },
+      "content_hash": "sha256:18be72c11d8a8c335b79110a3b11f88349fe92eb71ff8aabe9e43e8ec53fbc6d"
+    },
+    {
+      "id": "golden-python-calls:function:app.main.main",
+      "kind": "function",
+      "qualified_name": "app.main.main",
+      "language": "python",
+      "source": {
+        "file_path": "app/main.py",
+        "line_start": 8,
+        "line_end": 10
+      },
+      "content_hash": "sha256:53b790a7b91df58813b7f88599fdd405667a81d689b9cf158e15133648f0fbc8"
+    },
+    {
+      "id": "golden-python-calls:function:app.workers.Worker.__init__",
+      "kind": "function",
+      "qualified_name": "app.workers.Worker.__init__",
+      "language": "python",
+      "source": {
+        "file_path": "app/workers.py",
+        "line_start": 8,
+        "line_end": 9
+      },
+      "content_hash": "sha256:aef11efffc94c3485e2a487ab7214f054372ca14afac9c53e5a9ddd15c4b98d3"
+    },
+    {
+      "id": "golden-python-calls:function:app.workers.Worker._format",
+      "kind": "function",
+      "qualified_name": "app.workers.Worker._format",
+      "language": "python",
+      "source": {
+        "file_path": "app/workers.py",
+        "line_start": 14,
+        "line_end": 15
+      },
+      "content_hash": "sha256:20648f16f26bc4558abfc42ce22a1278fd2e3ef0947859c83ecd656a505a2d27"
+    },
+    {
+      "id": "golden-python-calls:function:app.workers.Worker.run",
+      "kind": "function",
+      "qualified_name": "app.workers.Worker.run",
+      "language": "python",
+      "source": {
+        "file_path": "app/workers.py",
+        "line_start": 11,
+        "line_end": 12
+      },
+      "content_hash": "sha256:42f3fc380826804d3565dd745021a6cec92a8c89f16d6f9416f074bd30817e97"
+    },
+    {
+      "id": "golden-python-calls:function:app.workers.pipeline",
+      "kind": "function",
+      "qualified_name": "app.workers.pipeline",
+      "language": "python",
+      "source": {
+        "file_path": "app/workers.py",
+        "line_start": 18,
+        "line_end": 22
+      },
+      "content_hash": "sha256:2c72298c15a90f708b048326318c48b798e4e24c7a4cc87eaff4006c496a5121"
+    },
+    {
+      "id": "golden-python-calls:module:app",
+      "kind": "module",
+      "qualified_name": "app",
+      "language": "python",
+      "source": {
+        "file_path": "app/__init__.py",
+        "line_start": 1,
+        "line_end": 1
+      },
+      "content_hash": "sha256:e79a15c1c23d29f8cdd1b29df26fe26745c1f017865a9d5393e5f336e9e2c89b"
+    },
+    {
+      "id": "golden-python-calls:module:app.aliases",
+      "kind": "module",
+      "qualified_name": "app.aliases",
+      "language": "python",
+      "source": {
+        "file_path": "app/aliases.py",
+        "line_start": 1,
+        "line_end": 8
+      },
+      "content_hash": "sha256:4f3296abdd21df01402e6bcabaf11cc9128c2b0c2c422b985c9554730593aeac"
+    },
+    {
+      "id": "golden-python-calls:module:app.ambiguous",
+      "kind": "module",
+      "qualified_name": "app.ambiguous",
+      "language": "python",
+      "source": {
+        "file_path": "app/ambiguous.py",
+        "line_start": 1,
+        "line_end": 14
+      },
+      "content_hash": "sha256:154f4f96ff5912ab37de60d63203216494c23f9270174d750a7fb22d913cfdb7"
+    },
+    {
+      "id": "golden-python-calls:module:app.api",
+      "kind": "module",
+      "qualified_name": "app.api",
+      "language": "python",
+      "source": {
+        "file_path": "app/api.py",
+        "line_start": 1,
+        "line_end": 5
+      },
+      "content_hash": "sha256:9a273598ad5b920a51d591a1691195a0330857e9a3922c3146140086aa34d49e"
+    },
+    {
+      "id": "golden-python-calls:module:app.dynamic",
+      "kind": "module",
+      "qualified_name": "app.dynamic",
+      "language": "python",
+      "source": {
+        "file_path": "app/dynamic.py",
+        "line_start": 1,
+        "line_end": 16
+      },
+      "content_hash": "sha256:6d762b815a8cdc8b07d6476f68ab18f88c9f584bbb639c0c668413cb71e249ba"
+    },
+    {
+      "id": "golden-python-calls:module:app.helpers",
+      "kind": "module",
+      "qualified_name": "app.helpers",
+      "language": "python",
+      "source": {
+        "file_path": "app/helpers.py",
+        "line_start": 1,
+        "line_end": 9
+      },
+      "content_hash": "sha256:5cf5ac2e3de86edf6e614f7fd10b0dfc7541d692f2a179801d5d452a64008a69"
+    },
+    {
+      "id": "golden-python-calls:module:app.main",
+      "kind": "module",
+      "qualified_name": "app.main",
+      "language": "python",
+      "source": {
+        "file_path": "app/main.py",
+        "line_start": 1,
+        "line_end": 14
+      },
+      "content_hash": "sha256:65a89ef6d7b9881fa30c340441016d3c1ad27b38864d375a54b337a7bdeac040"
+    },
+    {
+      "id": "golden-python-calls:module:app.workers",
+      "kind": "module",
+      "qualified_name": "app.workers",
+      "language": "python",
+      "source": {
+        "file_path": "app/workers.py",
+        "line_start": 1,
+        "line_end": 22
+      },
+      "content_hash": "sha256:58507ff1dcf79b7e04796dae80a5d18b3805379ef5204af70a729dca29b609b1"
+    }
+  ],
+  "edges": [
+    {
+      "id": "calls:golden-python-calls:function:app.aliases.use_alias->golden-python-calls:function:app.helpers.greet",
+      "kind": "calls",
+      "source_id": "golden-python-calls:function:app.aliases.use_alias",
+      "target_id": "golden-python-calls:function:app.helpers.greet",
+      "source_span": {
+        "file_path": "app/aliases.py",
+        "line_start": 8,
+        "line_end": 8
+      },
+      "resolution": "resolved",
+      "is_truncated": false
+    },
+    {
+      "id": "calls:golden-python-calls:function:app.aliases.use_alias->golden-python-calls:function:app.helpers.shout",
+      "kind": "calls",
+      "source_id": "golden-python-calls:function:app.aliases.use_alias",
+      "target_id": "golden-python-calls:function:app.helpers.shout",
+      "source_span": {
+        "file_path": "app/aliases.py",
+        "line_start": 8,
+        "line_end": 8
+      },
+      "resolution": "resolved",
+      "is_truncated": false
+    },
+    {
+      "id": "calls:golden-python-calls:function:app.ambiguous.use_ambiguous->golden-python-calls:function:app.ambiguous.choose",
+      "kind": "calls",
+      "source_id": "golden-python-calls:function:app.ambiguous.use_ambiguous",
+      "target_id": "golden-python-calls:function:app.ambiguous.choose",
+      "source_span": {
+        "file_path": "app/ambiguous.py",
+        "line_start": 14,
+        "line_end": 14
+      },
+      "resolution": "ambiguous",
+      "is_truncated": false
+    },
+    {
+      "id": "calls:golden-python-calls:function:app.ambiguous.use_ambiguous->golden-python-calls:function:app.ambiguous.choose#2",
+      "kind": "calls",
+      "source_id": "golden-python-calls:function:app.ambiguous.use_ambiguous",
+      "target_id": "golden-python-calls:function:app.ambiguous.choose#2",
+      "source_span": {
+        "file_path": "app/ambiguous.py",
+        "line_start": 14,
+        "line_end": 14
+      },
+      "resolution": "ambiguous",
+      "is_truncated": false
+    },
+    {
+      "id": "calls:golden-python-calls:function:app.dynamic.assign_callback->golden-python-calls:function:app.dynamic.call_via_variable",
+      "kind": "calls",
+      "source_id": "golden-python-calls:function:app.dynamic.assign_callback",
+      "target_id": "golden-python-calls:function:app.dynamic.call_via_variable",
+      "source_span": {
+        "file_path": "app/dynamic.py",
+        "line_start": 16,
+        "line_end": 16
+      },
+      "resolution": "resolved",
+      "is_truncated": false
+    },
+    {
+      "id": "calls:golden-python-calls:function:app.main.main->golden-python-calls:function:app.workers.pipeline",
+      "kind": "calls",
+      "source_id": "golden-python-calls:function:app.main.main",
+      "target_id": "golden-python-calls:function:app.workers.pipeline",
+      "source_span": {
+        "file_path": "app/main.py",
+        "line_start": 10,
+        "line_end": 10
+      },
+      "resolution": "resolved",
+      "is_truncated": false
+    },
+    {
+      "id": "calls:golden-python-calls:function:app.workers.Worker.run->golden-python-calls:function:app.helpers.greet",
+      "kind": "calls",
+      "source_id": "golden-python-calls:function:app.workers.Worker.run",
+      "target_id": "golden-python-calls:function:app.helpers.greet",
+      "source_span": {
+        "file_path": "app/workers.py",
+        "line_start": 12,
+        "line_end": 12
+      },
+      "resolution": "resolved",
+      "is_truncated": false
+    },
+    {
+      "id": "calls:golden-python-calls:function:app.workers.Worker.run->golden-python-calls:function:app.workers.Worker._format",
+      "kind": "calls",
+      "source_id": "golden-python-calls:function:app.workers.Worker.run",
+      "target_id": "golden-python-calls:function:app.workers.Worker._format",
+      "source_span": {
+        "file_path": "app/workers.py",
+        "line_start": 12,
+        "line_end": 12
+      },
+      "resolution": "resolved",
+      "is_truncated": false
+    },
+    {
+      "id": "calls:golden-python-calls:function:app.workers.pipeline->golden-python-calls:function:app.helpers.greet",
+      "kind": "calls",
+      "source_id": "golden-python-calls:function:app.workers.pipeline",
+      "target_id": "golden-python-calls:function:app.helpers.greet",
+      "source_span": {
+        "file_path": "app/workers.py",
+        "line_start": 20,
+        "line_end": 20
+      },
+      "resolution": "resolved",
+      "is_truncated": false
+    },
+    {
+      "id": "calls:golden-python-calls:function:app.workers.pipeline->golden-python-calls:function:app.helpers.shout",
+      "kind": "calls",
+      "source_id": "golden-python-calls:function:app.workers.pipeline",
+      "target_id": "golden-python-calls:function:app.helpers.shout",
+      "source_span": {
+        "file_path": "app/workers.py",
+        "line_start": 21,
+        "line_end": 21
+      },
+      "resolution": "resolved",
+      "is_truncated": false
+    },
+    {
+      "id": "calls:golden-python-calls:function:app.workers.pipeline->golden-python-calls:function:app.workers.Worker.__init__",
+      "kind": "calls",
+      "source_id": "golden-python-calls:function:app.workers.pipeline",
+      "target_id": "golden-python-calls:function:app.workers.Worker.__init__",
+      "source_span": {
+        "file_path": "app/workers.py",
+        "line_start": 19,
+        "line_end": 19
+      },
+      "resolution": "resolved",
+      "is_truncated": false
+    },
+    {
+      "id": "calls:golden-python-calls:function:app.workers.pipeline->golden-python-calls:function:app.workers.Worker.run",
+      "kind": "calls",
+      "source_id": "golden-python-calls:function:app.workers.pipeline",
+      "target_id": "golden-python-calls:function:app.workers.Worker.run",
+      "source_span": {
+        "file_path": "app/workers.py",
+        "line_start": 22,
+        "line_end": 22
+      },
+      "resolution": "resolved",
+      "is_truncated": false
+    },
+    {
+      "id": "calls:golden-python-calls:module:app.main->golden-python-calls:function:app.main.main",
+      "kind": "calls",
+      "source_id": "golden-python-calls:module:app.main",
+      "target_id": "golden-python-calls:function:app.main.main",
+      "source_span": {
+        "file_path": "app/main.py",
+        "line_start": 14,
+        "line_end": 14
+      },
+      "resolution": "resolved",
+      "is_truncated": false
+    },
+    {
+      "id": "defines:golden-python-calls:class:app.workers.Worker->golden-python-calls:function:app.workers.Worker.__init__",
+      "kind": "defines",
+      "source_id": "golden-python-calls:class:app.workers.Worker",
+      "target_id": "golden-python-calls:function:app.workers.Worker.__init__",
+      "source_span": null,
+      "resolution": null,
+      "is_truncated": false
+    },
+    {
+      "id": "defines:golden-python-calls:class:app.workers.Worker->golden-python-calls:function:app.workers.Worker._format",
+      "kind": "defines",
+      "source_id": "golden-python-calls:class:app.workers.Worker",
+      "target_id": "golden-python-calls:function:app.workers.Worker._format",
+      "source_span": null,
+      "resolution": null,
+      "is_truncated": false
+    },
+    {
+      "id": "defines:golden-python-calls:class:app.workers.Worker->golden-python-calls:function:app.workers.Worker.run",
+      "kind": "defines",
+      "source_id": "golden-python-calls:class:app.workers.Worker",
+      "target_id": "golden-python-calls:function:app.workers.Worker.run",
+      "source_span": null,
+      "resolution": null,
+      "is_truncated": false
+    },
+    {
+      "id": "defines:golden-python-calls:module:app.aliases->golden-python-calls:function:app.aliases.use_alias",
+      "kind": "defines",
+      "source_id": "golden-python-calls:module:app.aliases",
+      "target_id": "golden-python-calls:function:app.aliases.use_alias",
+      "source_span": null,
+      "resolution": null,
+      "is_truncated": false
+    },
+    {
+      "id": "defines:golden-python-calls:module:app.ambiguous->golden-python-calls:function:app.ambiguous.choose",
+      "kind": "defines",
+      "source_id": "golden-python-calls:module:app.ambiguous",
+      "target_id": "golden-python-calls:function:app.ambiguous.choose",
+      "source_span": null,
+      "resolution": null,
+      "is_truncated": false
+    },
+    {
+      "id": "defines:golden-python-calls:module:app.ambiguous->golden-python-calls:function:app.ambiguous.choose#2",
+      "kind": "defines",
+      "source_id": "golden-python-calls:module:app.ambiguous",
+      "target_id": "golden-python-calls:function:app.ambiguous.choose#2",
+      "source_span": null,
+      "resolution": null,
+      "is_truncated": false
+    },
+    {
+      "id": "defines:golden-python-calls:module:app.ambiguous->golden-python-calls:function:app.ambiguous.use_ambiguous",
+      "kind": "defines",
+      "source_id": "golden-python-calls:module:app.ambiguous",
+      "target_id": "golden-python-calls:function:app.ambiguous.use_ambiguous",
+      "source_span": null,
+      "resolution": null,
+      "is_truncated": false
+    },
+    {
+      "id": "defines:golden-python-calls:module:app.dynamic->golden-python-calls:function:app.dynamic.assign_callback",
+      "kind": "defines",
+      "source_id": "golden-python-calls:module:app.dynamic",
+      "target_id": "golden-python-calls:function:app.dynamic.assign_callback",
+      "source_span": null,
+      "resolution": null,
+      "is_truncated": false
+    },
+    {
+      "id": "defines:golden-python-calls:module:app.dynamic->golden-python-calls:function:app.dynamic.call_dynamic",
+      "kind": "defines",
+      "source_id": "golden-python-calls:module:app.dynamic",
+      "target_id": "golden-python-calls:function:app.dynamic.call_dynamic",
+      "source_span": null,
+      "resolution": null,
+      "is_truncated": false
+    },
+    {
+      "id": "defines:golden-python-calls:module:app.dynamic->golden-python-calls:function:app.dynamic.call_via_variable",
+      "kind": "defines",
+      "source_id": "golden-python-calls:module:app.dynamic",
+      "target_id": "golden-python-calls:function:app.dynamic.call_via_variable",
+      "source_span": null,
+      "resolution": null,
+      "is_truncated": false
+    },
+    {
+      "id": "defines:golden-python-calls:module:app.helpers->golden-python-calls:function:app.helpers.greet",
+      "kind": "defines",
+      "source_id": "golden-python-calls:module:app.helpers",
+      "target_id": "golden-python-calls:function:app.helpers.greet",
+      "source_span": null,
+      "resolution": null,
+      "is_truncated": false
+    },
+    {
+      "id": "defines:golden-python-calls:module:app.helpers->golden-python-calls:function:app.helpers.shout",
+      "kind": "defines",
+      "source_id": "golden-python-calls:module:app.helpers",
+      "target_id": "golden-python-calls:function:app.helpers.shout",
+      "source_span": null,
+      "resolution": null,
+      "is_truncated": false
+    },
+    {
+      "id": "defines:golden-python-calls:module:app.main->golden-python-calls:function:app.main.main",
+      "kind": "defines",
+      "source_id": "golden-python-calls:module:app.main",
+      "target_id": "golden-python-calls:function:app.main.main",
+      "source_span": null,
+      "resolution": null,
+      "is_truncated": false
+    },
+    {
+      "id": "defines:golden-python-calls:module:app.workers->golden-python-calls:class:app.workers.Worker",
+      "kind": "defines",
+      "source_id": "golden-python-calls:module:app.workers",
+      "target_id": "golden-python-calls:class:app.workers.Worker",
+      "source_span": null,
+      "resolution": null,
+      "is_truncated": false
+    },
+    {
+      "id": "defines:golden-python-calls:module:app.workers->golden-python-calls:function:app.workers.pipeline",
+      "kind": "defines",
+      "source_id": "golden-python-calls:module:app.workers",
+      "target_id": "golden-python-calls:function:app.workers.pipeline",
+      "source_span": null,
+      "resolution": null,
+      "is_truncated": false
+    },
+    {
+      "id": "imports:golden-python-calls:module:app.aliases->golden-python-calls:module:app.helpers",
+      "kind": "imports",
+      "source_id": "golden-python-calls:module:app.aliases",
+      "target_id": "golden-python-calls:module:app.helpers",
+      "source_span": null,
+      "resolution": null,
+      "is_truncated": false
+    },
+    {
+      "id": "imports:golden-python-calls:module:app.dynamic->golden-python-calls:module:app.helpers",
+      "kind": "imports",
+      "source_id": "golden-python-calls:module:app.dynamic",
+      "target_id": "golden-python-calls:module:app.helpers",
+      "source_span": null,
+      "resolution": null,
+      "is_truncated": false
+    },
+    {
+      "id": "imports:golden-python-calls:module:app.main->golden-python-calls:module:app.workers",
+      "kind": "imports",
+      "source_id": "golden-python-calls:module:app.main",
+      "target_id": "golden-python-calls:module:app.workers",
+      "source_span": null,
+      "resolution": null,
+      "is_truncated": false
+    },
+    {
+      "id": "imports:golden-python-calls:module:app.workers->golden-python-calls:module:app",
+      "kind": "imports",
+      "source_id": "golden-python-calls:module:app.workers",
+      "target_id": "golden-python-calls:module:app",
+      "source_span": null,
+      "resolution": null,
+      "is_truncated": false
+    },
+    {
+      "id": "imports:golden-python-calls:module:app.workers->golden-python-calls:module:app.helpers",
+      "kind": "imports",
+      "source_id": "golden-python-calls:module:app.workers",
+      "target_id": "golden-python-calls:module:app.helpers",
+      "source_span": null,
+      "resolution": null,
+      "is_truncated": false
+    }
+  ],
+  "entries": [
+    {
+      "kind": "web_app",
+      "module_id": "golden-python-calls:module:app.api",
+      "span": {
+        "file_path": "app/api.py",
+        "line_start": 5,
+        "line_end": 5
+      },
+      "symbol": "app",
+      "target_node_id": null
+    },
+    {
+      "kind": "main_guard",
+      "module_id": "golden-python-calls:module:app.main",
+      "span": {
+        "file_path": "app/main.py",
+        "line_start": 13,
+        "line_end": 14
+      },
+      "symbol": "main",
+      "target_node_id": "golden-python-calls:function:app.main.main"
+    }
+  ],
+  "provenance": []
+}

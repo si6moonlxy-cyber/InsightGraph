@@ -6,6 +6,7 @@ import pytest
 
 from app.application.scans.models import (
     AnalyzeOutcome,
+    CallFunnel,
     CollectOutcome,
     ScanError,
     ScanErrorCode,
@@ -177,6 +178,30 @@ async def test_local_analyze_error_yields_partial() -> None:
     assert result.errors == (_local_syntax_error(),)
     assert result.stats == ScanStats(files_collected=2, files_analyzed=1, files_failed=1)
     assert repository.save_calls == 1
+
+
+@pytest.mark.asyncio
+async def test_call_funnel_is_copied_to_scan_stats() -> None:
+    service = ScanRepository(
+        FakeCollector(CollectOutcome(manifest=_manifest())),
+        FakeAnalyzer(
+            AnalyzeOutcome(
+                graph=_graph(),
+                call_funnel=CallFunnel(
+                    calls_dynamic=2,
+                    calls_unresolved=3,
+                    oversized_ambiguous_calls=1,
+                ),
+            )
+        ),
+        InMemoryCodeGraphRepository(),
+    )
+
+    result = await service.execute(_request())
+
+    assert result.stats.calls_dynamic == 2
+    assert result.stats.calls_unresolved == 3
+    assert result.stats.oversized_ambiguous_calls == 1
 
 
 @pytest.mark.asyncio

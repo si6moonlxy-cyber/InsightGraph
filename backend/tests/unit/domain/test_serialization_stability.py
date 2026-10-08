@@ -21,7 +21,9 @@ _FIXTURE = Path(__file__).parent / "fixtures" / "codegraph_v1.json"
 
 def _canonical(graph: CodeGraph) -> str:
     """规范 JSON：indent=2、字段声明序、Unicode 不转义，文件尾一个换行。"""
-    return graph.model_dump_json(indent=2) + "\n"
+    # 历史 v1 fixture 不补写 v2 默认字段；新产物固定输出完整 v2 形状。
+    exclude_defaults = graph.schema_version == 1
+    return graph.model_dump_json(indent=2, exclude_defaults=exclude_defaults) + "\n"
 
 
 def _build_graph() -> CodeGraph:
@@ -93,6 +95,7 @@ def _build_graph() -> CodeGraph:
         ),
     )
     return CodeGraph(
+        schema_version=1,
         repository_id=repository_id,
         revision="e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         parser_version="python-ast/0.1",

@@ -35,10 +35,12 @@ from app.application.scans.models import (
     SourceManifest,
 )
 from app.domain.codegraph.ids import build_edge_id, build_node_id
-from app.domain.codegraph.kinds import EdgeKind, NodeKind
-from app.domain.codegraph.models import CodeEdge, CodeGraph, CodeNode, SourceSpan
+from app.domain.codegraph.kinds import CallResolution, EdgeKind, NodeKind
+from app.domain.codegraph.models import CodeEdge, CodeGraph, CodeNode, EntryPoint, SourceSpan
+from app.infrastructure.analyzers.entry_points import find_entry_points
+from app.infrastructure.analyzers.python_calls import CallFact, DefinitionSymbol, scan_python_calls
 
-PARSER_VERSION = "python-ast/0.1"
+PARSER_VERSION = "python-ast/0.2"
 
 
 @dataclass
@@ -61,6 +63,7 @@ class _Definition:
     line_start: int
     line_end: int
     parent_index: int | None
+    node: ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef
 
 
 class PythonAstAnalyzer:
@@ -89,12 +92,22 @@ class PythonAstAnalyzer:
                 parsed_files.append(parsed)
 
         module_names = {parsed.module_name for parsed in parsed_files}
+        module_ids = {
+            parsed.module_name: build_node_id(manifest.repository_id, NodeKind.MODULE, parsed.module_name)
+            for parsed in parsed_files
+        }
         nodes: list[CodeNode] = []
         edges: list[CodeEdge] = []
+        symbols: list[DefinitionSymbol] = []
         for parsed in parsed_files:
-            file_nodes, file_edges = _build_file_graph(manifest.repository_id, parsed, module_names)
+            file_nodes, file_edges, file_symbols = _build_file_graph(manifest.repository_id, parsed, module_names)
             nodes.extend(file_nodes)
             edges.extend(file_edges)
+            symbols.extend(file_symbols)
+
+        call_facts, call_funnel = scan_python_calls(parsed_files, symbols, module_ids)
+        edges.extend(_merge_call_facts(call_facts))
+        entries = _build_entries(parsed_files, symbols, module_ids)
 
         # 统一排序，保证字节级确定性输出
         nodes.sort(key=lambda node: node.id)
@@ -106,8 +119,9 @@ class PythonAstAnalyzer:
             parser_version=PARSER_VERSION,
             nodes=tuple(nodes),
             edges=tuple(edges),
+            entries=tuple(entries),
         )
-        return AnalyzeOutcome(graph=graph, errors=tuple(errors))
+        return AnalyzeOutcome(graph=graph, errors=tuple(errors), call_funnel=call_funnel)
 
 
 def _parse_file(root: Path, path_text: str, errors: list[ScanError]) -> _ParsedFile | None:
@@ -159,7 +173,7 @@ def _build_file_graph(
     repository_id: str,
     parsed: _ParsedFile,
     module_names: set[str],
-) -> tuple[list[CodeNode], list[CodeEdge]]:
+) -> tuple[list[CodeNode], list[CodeEdge], list[DefinitionSymbol]]:
     """单文件 → 节点与边；重名序号按收集顺序（文档序 / 行号序）分配。"""
     lines = parsed.lines
     total_lines = max(1, len(lines))
@@ -180,6 +194,7 @@ def _build_file_graph(
         _walk_statements(statement, parent_qual=parsed.module_name, parent_kind=None, parent_index=None, defs=defs)
 
     def_ids: list[str] = []
+    symbols: list[DefinitionSymbol] = []
     ordinals: dict[tuple[NodeKind, str], int] = {}
     for definition in defs:
         key = (definition.kind, definition.qualified_name)
@@ -192,6 +207,15 @@ def _build_file_graph(
             duplicate_index=None if occurrence == 1 else occurrence,
         )
         def_ids.append(node_id)
+        symbols.append(
+            DefinitionSymbol(
+                node=definition.node,
+                node_id=node_id,
+                kind=definition.kind,
+                qualified_name=definition.qualified_name,
+                module_name=parsed.module_name,
+            )
+        )
         nodes.append(
             CodeNode(
                 id=node_id,
@@ -216,7 +240,7 @@ def _build_file_graph(
         _add_edge(
             edges, edge_keys, EdgeKind.IMPORTS, module_id, build_node_id(repository_id, NodeKind.MODULE, target_module)
         )
-    return nodes, edges
+    return nodes, edges, symbols
 
 
 def _walk_statements(
@@ -241,6 +265,7 @@ def _walk_statements(
                 line_start=_definition_start_line(statement),
                 line_end=statement.end_lineno if statement.end_lineno is not None else statement.lineno,
                 parent_index=parent_index,
+                node=statement,
             )
         )
         for block in _nested_blocks(statement):
@@ -381,6 +406,70 @@ def _add_edge(
             target_id=target_id,
         )
     )
+
+
+def _merge_call_facts(facts: list[CallFact]) -> list[CodeEdge]:
+    """按冻结身份合并调用事实，并选择最早的代表 span。"""
+    grouped: dict[tuple[str, str], list[CallFact]] = {}
+    for fact in facts:
+        grouped.setdefault((fact.source_id, fact.target_id), []).append(fact)
+    edges: list[CodeEdge] = []
+    for (source_id, target_id), group in grouped.items():
+        resolution = (
+            CallResolution.RESOLVED
+            if any(item.resolution is CallResolution.RESOLVED for item in group)
+            else CallResolution.AMBIGUOUS
+        )
+        representative = min(
+            (item.call_span for item in group),
+            key=lambda span: (span.line_start, span.line_end),
+        )
+        edges.append(
+            CodeEdge(
+                id=build_edge_id(EdgeKind.CALLS, source_id, target_id),
+                kind=EdgeKind.CALLS,
+                source_id=source_id,
+                target_id=target_id,
+                source_span=representative,
+                resolution=resolution,
+                is_truncated=resolution is CallResolution.AMBIGUOUS and any(item.is_truncated for item in group),
+            )
+        )
+    return edges
+
+
+def _build_entries(
+    parsed_files: list[_ParsedFile],
+    symbols: list[DefinitionSymbol],
+    module_ids: dict[str, str],
+) -> list[EntryPoint]:
+    """把入口检测结果映射为 schema v2 图级清单。"""
+    entries: list[EntryPoint] = []
+    for parsed in parsed_files:
+        for finding in find_entry_points(parsed.module_name, parsed.tree):
+            targets = [
+                symbol.node_id
+                for symbol in symbols
+                if symbol.module_name == parsed.module_name
+                and symbol.kind is NodeKind.FUNCTION
+                and symbol.node.name == finding.symbol
+                and symbol.qualified_name == f"{parsed.module_name}.{finding.symbol}"
+            ]
+            entries.append(
+                EntryPoint(
+                    kind=finding.kind,
+                    module_id=module_ids[parsed.module_name],
+                    span=SourceSpan(
+                        file_path=parsed.path_text,
+                        line_start=finding.line_start,
+                        line_end=finding.line_end or finding.line_start,
+                    ),
+                    symbol=finding.symbol,
+                    target_node_id=targets[0] if len(targets) == 1 else None,
+                )
+            )
+    entries.sort(key=lambda item: (item.module_id, item.span.line_start, item.span.line_end, item.kind.value))
+    return entries
 
 
 def _local_error(code: ScanErrorCode, message: str, file_path: str) -> ScanError:

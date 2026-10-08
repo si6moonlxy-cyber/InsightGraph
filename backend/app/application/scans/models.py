@@ -97,6 +97,9 @@ class ScanStats(BaseModel):
     files_collected: int = Field(default=0, ge=0)
     files_analyzed: int = Field(default=0, ge=0)
     files_failed: int = Field(default=0, ge=0)
+    calls_dynamic: int = Field(default=0, ge=0)
+    calls_unresolved: int = Field(default=0, ge=0)
+    oversized_ambiguous_calls: int = Field(default=0, ge=0)
 
     @model_validator(mode="after")
     def validate_funnel(self) -> "ScanStats":
@@ -129,6 +132,7 @@ class AnalyzeOutcome(BaseModel):
 
     graph: CodeGraph | None = None
     errors: tuple[ScanError, ...] = ()
+    call_funnel: "CallFunnel | None" = None
 
     @model_validator(mode="after")
     def validate_stage_and_output(self) -> "AnalyzeOutcome":
@@ -137,6 +141,16 @@ class AnalyzeOutcome(BaseModel):
         if self.graph is None and not _contains_fatal(self.errors):
             raise ValueError("分析无 fatal 错误时必须产出 CodeGraph")
         return self
+
+
+class CallFunnel(BaseModel):
+    """无法从图中反推的调用扫描漏斗。"""
+
+    model_config = _FROZEN
+
+    calls_dynamic: int = Field(default=0, ge=0)
+    calls_unresolved: int = Field(default=0, ge=0)
+    oversized_ambiguous_calls: int = Field(default=0, ge=0)
 
 
 class ScanStatus(StrEnum):

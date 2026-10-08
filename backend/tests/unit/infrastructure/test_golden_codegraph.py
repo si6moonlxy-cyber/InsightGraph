@@ -18,27 +18,43 @@ def _load_evaluator() -> types.ModuleType:
     return module
 
 
-def test_golden_case_matches_expected_graph_semantically() -> None:
+@pytest.mark.parametrize("case_name", ["golden-python-basic", "golden-python-calls"])
+def test_golden_cases_match_expected_graph_semantically(case_name: str) -> None:
     evaluator = _load_evaluator()
 
-    result = evaluator.run_case("golden-python-basic")
+    result = evaluator.run_case(case_name)
     metrics = result["metrics"]
 
     assert metrics["node_recall"] == 1.0, metrics["missing_nodes"][:5]
     assert metrics["node_precision"] == 1.0, metrics["extra_nodes"][:5]
     assert metrics["edge_recall"] == 1.0, metrics["missing_edges"][:5]
     assert metrics["edge_precision"] == 1.0, metrics["extra_edges"][:5]
+    assert metrics["calls_recall"] == 1.0
+    assert metrics["calls_precision"] == 1.0
+    assert metrics["entry_recall"] == 1.0
+    assert metrics["entry_precision"] == 1.0
     assert metrics["primary"] == 1.0
 
 
-def test_baseline_matches_current_metrics() -> None:
+def test_historical_v1_baseline_is_preserved() -> None:
     evaluator = _load_evaluator()
 
     baseline_path = evaluator.BASELINES_DIR / "codegraph-parser-v1.json"
-    if not baseline_path.exists():
-        pytest.skip("baseline 尚未创建（首次运行 evaluator --write-baseline 后生效）")
     baseline = json.loads(baseline_path.read_text(encoding="utf-8"))
 
-    result = evaluator.run_case("golden-python-basic")
+    assert baseline["dataset_version"] == "eval-v1"
+    assert baseline["model_or_algorithm"] == "python-ast/0.1"
+    assert baseline["metrics"]["primary"] == 1.0
+
+
+def test_v2_baseline_matches_calls_metrics_when_created() -> None:
+    evaluator = _load_evaluator()
+    baseline_path = evaluator.BASELINES_DIR / "codegraph-parser-v2.json"
+    if not baseline_path.exists():
+        pytest.skip("Baseline v2 必须在实现提交后独立生成")
+    baseline = json.loads(baseline_path.read_text(encoding="utf-8"))
+    result = evaluator.run_case("golden-python-calls")
 
     assert result["metrics"]["primary"] == baseline["metrics"]["primary"] == 1.0
+    assert result["metrics"]["calls_recall"] == baseline["metrics"]["calls_recall"] == 1.0
+    assert result["metrics"]["calls_precision"] == baseline["metrics"]["calls_precision"] == 1.0

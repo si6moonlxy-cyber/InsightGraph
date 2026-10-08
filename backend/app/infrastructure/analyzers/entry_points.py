@@ -14,14 +14,10 @@
 
 import ast
 from dataclasses import dataclass
-from enum import StrEnum
 
+from app.domain.codegraph.kinds import EntryKind
 
-class EntryPointKind(StrEnum):
-    """入口类型（与后续产物表示解耦）。"""
-
-    MAIN_GUARD = "main_guard"
-    WEB_APP = "web_app"
+EntryPointKind = EntryKind
 
 
 @dataclass(frozen=True)
@@ -32,6 +28,7 @@ class EntryPoint:
     module_name: str
     line_start: int
     symbol: str | None = None
+    line_end: int | None = None
 
 
 def find_entry_points(module_name: str, tree: ast.Module) -> list[EntryPoint]:
@@ -46,6 +43,7 @@ def find_entry_points(module_name: str, tree: ast.Module) -> list[EntryPoint]:
                     module_name=module_name,
                     line_start=statement.lineno,
                     symbol=_first_local_call(statement.body, top_level_defs),
+                    line_end=statement.end_lineno,
                 )
             )
         elif isinstance(statement, (ast.Assign, ast.AnnAssign)) and _is_fastapi_call(statement.value):
@@ -60,6 +58,7 @@ def find_entry_points(module_name: str, tree: ast.Module) -> list[EntryPoint]:
                     module_name=module_name,
                     line_start=statement.lineno,
                     symbol=symbol,
+                    line_end=statement.end_lineno,
                 )
             )
     return findings

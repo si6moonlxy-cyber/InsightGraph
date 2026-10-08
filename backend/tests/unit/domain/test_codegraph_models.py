@@ -3,7 +3,18 @@
 import pytest
 from pydantic import ValidationError
 
-from app.domain.codegraph import CodeEdge, CodeGraph, CodeNode, EdgeKind, NodeKind, SourceSpan
+from app.domain.codegraph import (
+    CallResolution,
+    CodeEdge,
+    CodeGraph,
+    CodeNode,
+    EdgeKind,
+    EntryKind,
+    EntryPoint,
+    NodeKind,
+    SourceSpan,
+    build_edge_id,
+)
 
 _SHA = "sha256:" + "0" * 64
 
@@ -22,6 +33,7 @@ def _node(node_id: str, kind: NodeKind, qualified_name: str) -> CodeNode:
 def _graph(
     nodes: tuple[CodeNode, ...] = (),
     edges: tuple[CodeEdge, ...] = (),
+    entries: tuple[EntryPoint, ...] = (),
 ) -> CodeGraph:
     return CodeGraph(
         repository_id="repo",
@@ -29,6 +41,7 @@ def _graph(
         parser_version="python-ast/0.1",
         nodes=nodes,
         edges=edges,
+        entries=entries,
     )
 
 
@@ -46,7 +59,7 @@ def test_codegraph_keeps_source_evidence_and_defaults() -> None:
 
     assert graph.nodes[0].source.file_path == "app/main.py"
     assert graph.edges[0].kind is EdgeKind.DEFINES
-    assert graph.schema_version == 1
+    assert graph.schema_version == 2
 
 
 def test_source_span_rejects_reversed_lines() -> None:
@@ -132,3 +145,41 @@ def test_edge_must_reference_existing_nodes() -> None:
 def test_repository_id_rejects_separator() -> None:
     with pytest.raises(ValidationError, match=":"):
         CodeGraph(repository_id="bad:repo", revision="abc", parser_version="python-ast/0.1")
+
+
+def test_calls_edge_requires_resolution_and_source_span() -> None:
+    module = _node("repo:module:app.main", NodeKind.MODULE, "app.main")
+    function = _node("repo:function:app.main.run", NodeKind.FUNCTION, "app.main.run")
+
+    with pytest.raises(ValidationError, match="CALLS"):
+        CodeEdge(
+            id=build_edge_id(EdgeKind.CALLS, module.id, function.id),
+            kind=EdgeKind.CALLS,
+            source_id=module.id,
+            target_id=function.id,
+        )
+    edge = CodeEdge(
+        id=build_edge_id(EdgeKind.CALLS, module.id, function.id),
+        kind=EdgeKind.CALLS,
+        source_id=module.id,
+        target_id=function.id,
+        source_span=SourceSpan(file_path="app/main.py", line_start=10, line_end=10),
+        resolution=CallResolution.RESOLVED,
+    )
+    assert edge.resolution is CallResolution.RESOLVED
+
+
+def test_entries_require_same_file_references() -> None:
+    module = _node("repo:module:app.main", NodeKind.MODULE, "app.main")
+    function = _node("repo:function:app.main.run", NodeKind.FUNCTION, "app.main.run")
+    entry = EntryPoint(
+        kind=EntryKind.MAIN_GUARD,
+        module_id=module.id,
+        span=SourceSpan(file_path="app/main.py", line_start=10, line_end=11),
+        symbol="run",
+        target_node_id=function.id,
+    )
+
+    graph = _graph(nodes=(module, function), entries=(entry,))
+
+    assert graph.entries == (entry,)

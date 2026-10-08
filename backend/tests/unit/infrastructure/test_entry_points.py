@@ -27,7 +27,15 @@ def test_main_guard_with_direct_local_call() -> None:
 
     findings = _find(source)
 
-    assert findings == [EntryPoint(kind=EntryPointKind.MAIN_GUARD, module_name="app.m", line_start=5, symbol="main")]
+    assert findings == [
+        EntryPoint(
+            kind=EntryPointKind.MAIN_GUARD,
+            module_name="app.m",
+            line_start=5,
+            symbol="main",
+            line_end=6,
+        )
+    ]
 
 
 def test_main_guard_with_reversed_comparison_order() -> None:
@@ -50,7 +58,15 @@ def test_guard_without_local_call_has_no_symbol() -> None:
 
     findings = _find(source)
 
-    assert findings == [EntryPoint(kind=EntryPointKind.MAIN_GUARD, module_name="app.m", line_start=4, symbol=None)]
+    assert findings == [
+        EntryPoint(
+            kind=EntryPointKind.MAIN_GUARD,
+            module_name="app.m",
+            line_start=4,
+            symbol=None,
+            line_end=5,
+        )
+    ]
 
 
 def test_guard_inside_function_is_not_top_level() -> None:
@@ -64,7 +80,15 @@ def test_fastapi_direct_assignment() -> None:
 
     findings = _find(source)
 
-    assert findings == [EntryPoint(kind=EntryPointKind.WEB_APP, module_name="app.m", line_start=3, symbol="app")]
+    assert findings == [
+        EntryPoint(
+            kind=EntryPointKind.WEB_APP,
+            module_name="app.m",
+            line_start=3,
+            symbol="app",
+            line_end=3,
+        )
+    ]
 
 
 def test_fastapi_attribute_form_and_annotated_form() -> None:

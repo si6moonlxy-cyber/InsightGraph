@@ -79,3 +79,33 @@ def test_imports_target_must_be_module_node() -> None:
     violations = validator.validate_artifact(artifact, _CASE_DIR / "repo")
 
     assert any(v.startswith("[imports]") and imports_edge["id"] in v for v in violations)
+
+
+def test_calls_edge_requires_resolution_and_span() -> None:
+    validator = _load_module(_VALIDATE_PATH, "codegraph_validate")
+    evaluator = _load_module(_EVALUATOR_PATH, "codegraph_evaluator")
+    artifact = json.loads(evaluator.run_case("golden-python-basic")["graph"].model_dump_json())
+    calls_edge = next(edge for edge in artifact["edges"] if edge["kind"] == "calls")
+    calls_edge["source_span"] = None
+
+    violations = validator.validate_artifact(artifact, _CASE_DIR / "repo")
+
+    assert any(v.startswith("[calls]") and calls_edge["id"] in v for v in violations)
+
+
+def test_entry_module_reference_is_validated() -> None:
+    validator = _load_module(_VALIDATE_PATH, "codegraph_validate")
+    artifact = _golden_artifact()
+    artifact["entries"] = [
+        {
+            "kind": "main_guard",
+            "module_id": "missing:module",
+            "span": {"file_path": "app/main.py", "line_start": 1, "line_end": 1},
+            "symbol": None,
+            "target_node_id": None,
+        }
+    ]
+
+    violations = validator.validate_artifact(artifact, _CASE_DIR / "repo")
+
+    assert any(v.startswith("[entries]") for v in violations)

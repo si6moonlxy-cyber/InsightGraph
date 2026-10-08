@@ -14,7 +14,7 @@ from app.application.scans.models import (
     SourceFile,
     SourceManifest,
 )
-from app.domain.codegraph.kinds import NodeKind
+from app.domain.codegraph.kinds import CallResolution, EdgeKind, EntryKind, NodeKind
 from app.domain.codegraph.models import CodeNode
 from app.infrastructure.analyzers import PythonAstAnalyzer
 
@@ -313,6 +313,68 @@ async def test_double_run_is_byte_identical_and_sorted(tmp_path: Path) -> None:
     edge_ids = [edge.id for edge in first.graph.edges]
     assert node_ids == sorted(node_ids)
     assert edge_ids == sorted(edge_ids)
+
+
+@pytest.mark.asyncio
+async def test_calls_entries_and_funnel_are_emitted(tmp_path: Path) -> None:
+    root = tmp_path / "repo"
+    manifest = _make(
+        root,
+        {
+            "app/main.py": (
+                "def target():\n    return 1\n\n"
+                "def run(callback):\n    target()\n    callback()\n\n"
+                "if __name__ == '__main__':\n    run(target)\n"
+            )
+        },
+    )
+
+    outcome = await _analyze(root, manifest)
+
+    assert outcome.graph is not None
+    calls = [edge for edge in outcome.graph.edges if edge.kind is EdgeKind.CALLS]
+    assert {(edge.source_id, edge.target_id, edge.resolution) for edge in calls} == {
+        ("repo:function:app.main.run", "repo:function:app.main.target", CallResolution.RESOLVED),
+        ("repo:module:app.main", "repo:function:app.main.run", CallResolution.RESOLVED),
+    }
+    assert outcome.call_funnel is not None
+    assert outcome.call_funnel.calls_dynamic == 1
+    assert outcome.graph.entries[0].kind is EntryKind.MAIN_GUARD
+    assert outcome.graph.entries[0].target_node_id == "repo:function:app.main.run"
+
+
+@pytest.mark.asyncio
+async def test_ambiguous_calls_are_bounded_and_reported(tmp_path: Path) -> None:
+    root = tmp_path / "repo"
+    definitions = "\n".join(f"def choose():\n    return {index}\n" for index in range(6))
+    manifest = _make(root, {"app/m.py": definitions + "\ndef use():\n    return choose()\n"})
+
+    outcome = await _analyze(root, manifest)
+
+    assert outcome.graph is not None
+    calls = [edge for edge in outcome.graph.edges if edge.kind is EdgeKind.CALLS]
+    assert len(calls) == 5
+    assert all(edge.resolution is CallResolution.AMBIGUOUS for edge in calls)
+    assert all(edge.is_truncated for edge in calls)
+    assert outcome.call_funnel is not None
+    assert outcome.call_funnel.oversized_ambiguous_calls == 1
+
+
+@pytest.mark.asyncio
+async def test_duplicate_calls_keep_earliest_representative_span(tmp_path: Path) -> None:
+    root = tmp_path / "repo"
+    manifest = _make(
+        root,
+        {"app/m.py": "def target():\n    return 1\n\ndef use():\n    target()\n    target()\n"},
+    )
+
+    outcome = await _analyze(root, manifest)
+
+    assert outcome.graph is not None
+    calls = [edge for edge in outcome.graph.edges if edge.kind is EdgeKind.CALLS]
+    assert len(calls) == 1
+    assert calls[0].source_span is not None
+    assert calls[0].source_span.line_start == 5
 
 
 @pytest.mark.asyncio
